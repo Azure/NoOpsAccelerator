@@ -270,7 +270,7 @@ module storageAccount_roleAssignments './rbac/roleAssignments.bicep' = [for (rol
   }
 }]
 
-module storageAccount_privateEndpoints '../../Microsoft.Network/privateEndpoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module storageAccount_privateEndpoints '../../Microsoft.Network/privateEndPoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-StorageAccount-PrivateEndpoint-${index}'
   params: {
     groupIds: [

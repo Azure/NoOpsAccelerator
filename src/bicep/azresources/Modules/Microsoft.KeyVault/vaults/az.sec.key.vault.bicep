@@ -259,7 +259,7 @@ module keyVault_keys 'keys/az.sec.key.vault.key.bicep' = [for (key, index) in ke
   }
 }]
 
-module keyVault_privateEndpoints '../../Microsoft.Network/privateEndpoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module keyVault_privateEndpoints '../../Microsoft.Network/privateEndPoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-KeyVault-PrivateEndpoint-${index}'
   params: {
     groupIds: [

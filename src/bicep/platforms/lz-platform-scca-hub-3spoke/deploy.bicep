@@ -728,7 +728,7 @@ module modOperationsNetwork '../../azresources/hub-spoke/vdms/operations/anoa.lz
 
 // TIER 2 - SHARED SERVICES
 
-module modSharedServicesNetwork '../../azresources/hub-spoke/vdms/sharedservices/anoa.lz.svcs.network.bicep' = {
+module modSharedServicesNetwork '../../azresources/hub-spoke/vdms/sharedServices/anoa.lz.svcs.network.bicep' = {
   name: 'deploy-spoke-svcs-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parSharedServicesSubscriptionId)
   params: {
