@@ -1,0 +1,50 @@
+{
+    "properties": {
+        "displayName": "Audit Public IPs",
+        "policyType": "Custom",
+        "mode": "All",
+        "description": "Audit if public IPs are used in the environment",
+        "metadata": {
+            "category": "Network",
+            "source": "NoOps Accelerator Governance Policy",
+            "author": "Microsoft",
+            "version": "1.0.0"
+        },
+        "parameters": {
+            "effect": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect",
+                    "description": "Enable or disable the execution of the policy"
+                },
+                "allowedValues": [
+                    "Audit",
+                    "Deny",
+                    "Disabled"
+                ],
+                "defaultValue": "Audit"
+            }
+        },
+        "policyRule": {
+            "if": {
+                "allOf": [
+                    {
+                        "field": "type",
+                        "equals": "Microsoft.Network/publicIPAddresses"
+                    },
+                    {
+                        "field": "Microsoft.Network/publicIPAddresses/ipAddress",
+                        "exists": true
+                    },
+                    {
+                        "field": "Microsoft.Network/publicIPAddresses/ipConfiguration.id",
+                        "exists": true
+                    }
+                ]
+            },
+            "then": {
+                "effect": "[parameters('effect')]"
+            }
+        }
+    }
+}
