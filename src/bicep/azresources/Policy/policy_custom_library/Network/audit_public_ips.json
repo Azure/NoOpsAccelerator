@@ -35,10 +35,6 @@
                     {
                         "field": "Microsoft.Network/publicIPAddresses/ipAddress",
                         "exists": true
-                    },
-                    {
-                        "field": "Microsoft.Network/publicIPAddresses/ipConfiguration.id",
-                        "exists": true
                     }
                 ]
             },
