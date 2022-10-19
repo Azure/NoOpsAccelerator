@@ -54,7 +54,7 @@ var accountSasProperties = {
   signedProtocol: 'https'
 }
 
-resource automationAccount 'Microsoft.Automation/automationAccounts@2020-01-13-preview' existing = {
+resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' existing = {
   name: automationAccountName
 }
 

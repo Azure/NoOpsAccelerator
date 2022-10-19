@@ -57,10 +57,22 @@ param parAppServicePlan object
 
 // SUBSCRIPTIONS PARAMETERS
 
+// Target Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parTargetSubscriptionId": {
+//   "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxx"
+// }
 @description('The subscription ID for the Target Network and resources. It defaults to the deployment subscription.')
 param parTargetSubscriptionId string = subscription().subscriptionId
 
-@description('The name of the resource group in which the key vault will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.')
+// Target Resource Group Name
+// (JSON Parameter)
+// ---------------------------
+// "parTargetResourceGroup": {
+//   "value": "anoa-eastus-platforms-hub-rg"
+// }
+@description('The name of the resource group in which the App Service Plan will be deployed. If unchanged or not specified, the NoOps Accelerator will create an resource group to be used.')
 param parTargetResourceGroup string = ''
 
 // RESOURCE NAMING PARAMETERS
@@ -128,6 +140,6 @@ module appServicePlan '../../../azresources/Modules/Microsoft.Web/serverfarms/az
   }
 }
 
-output appServicePlanName string = varAppServicePlanName
-output resourceGroupName string = parTargetResourceGroup
-output tags object = modTags.outputs.tags
+output outAppServicePlanName string = varAppServicePlanName
+output outResourceGroupName string = parTargetResourceGroup
+output outTags object = modTags.outputs.tags

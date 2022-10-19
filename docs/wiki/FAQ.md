@@ -1,8 +1,4 @@
-# In this Section
-
-info
-
-## NoOps Accelerator FAQ
+# NoOps Accelerator FAQ
 
 This article answers frequently asked questions relating to NoOps Accelerator.
 

@@ -5,7 +5,7 @@ DESCRIPTION: The following components will be options in this deployment
               Subnets 
               Private DNS Zones - Details of all the Azure Private DNS zones can be found here --> https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration     
 AUTHOR/S: jspinella
-VERSION: 1.x.x
+
 */
 
 /*

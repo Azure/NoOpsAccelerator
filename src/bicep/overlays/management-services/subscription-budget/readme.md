@@ -2,7 +2,7 @@
 
 ## Overview
 
-This overlay module deploys
+This overlay module deploys a budget for an Azure Enterprise Agreement (EA) subscription.
 
 Read on to understand what this overlay does, and when you're ready, collect all of the pre-requisites, then deploy the overlay
 
@@ -44,12 +44,18 @@ The following Azure permissions, or scopes, are supported per subscription for b
 * Reader and Cost Management reader: Can view budgets that they have permission to.
 For more information about assigning permission to Cost Management data, see [Assign access to Cost Management data](https://docs.microsoft.com/en-us/azure/cost-management-billing/costs/assign-access-acm-data).
 
+## Parameters
+
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
-Required Parameters | Description
------------------------| -----------
-parLocation | The region to deploy resources into. It defaults to the deployment location.
-parSubscriptionBudget | The oject parameters of the Subscription Budget
+Required Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
+parSubscriptionBudget | object | {object} | The oject parameters of the Subscription Budget
+
+OptionalParameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+None
 
 ## Deploy the Overlay
 
@@ -64,7 +70,7 @@ For example, deploying using the `az deployment sub create` command in the Azure
 ### Azure CLI
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
 az deployment sub create \
    --template-file overlays/subscription-budget/deploy.bicep \
    --parameters @overlays/subscription-budget/deploy.parameters.json \
@@ -75,7 +81,7 @@ az deployment sub create \
 OR
 
 ```bash
-# For Azure IL regions
+# For Azure Government regions
 az deployment sub create \
   --template-file overlays/subscription-budget/deploy.bicep \
   --parameters @overlays/subscription-budget/deploy.parameters.json \
@@ -86,7 +92,7 @@ az deployment sub create \
 ### PowerShell
 
 ```powershell
-# For Azure global regions
+# For Azure Commerical regions
 New-AzSubscriptionDeployment `
   -TemplateFile overlays/subscription-budget/deploy.bicepp `
   -TemplateParameterFile overlays/subscription-budget/deploy.parameters.json `
@@ -97,7 +103,7 @@ New-AzSubscriptionDeployment `
 OR
 
 ```powershell
-# For Azure IL regions
+# For Azure Government regions
 New-AzSubscriptionDeployment `
   -TemplateFile overlays/subscription-budget/deploy.bicepp `
   -TemplateParameterFile overlays/subscription-budget/deploy.parameters.json `
@@ -121,6 +127,8 @@ Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resour
 az consumption budget list
 ```
 
+OR
+
 ```powershell
 Get-AzConsumptionBudget
 ```
@@ -134,6 +142,8 @@ The Bicep/ARM deployment of NoOps Accelerator - Subscription Budgets deployment 
 ```bash
 az consumption budget delete --budget-name MyBudget
 ```
+
+OR
 
 ```powershell
 Remove-AzConsumptionBudget -Name MyBudget

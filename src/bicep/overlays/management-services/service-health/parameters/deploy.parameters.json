@@ -6,19 +6,19 @@
         "value": {
           "orgPrefix": "anoa",
           "templateVersion": "v1.0",
-          "deployEnvironment": "serviceHealthAlerts"
+          "deployEnvironment": "dev"
         }
       },
       "parTags": {
         "value": {
           "organization": "anoa",
           "templateVersion": "v1.0",
-          "deployEnvironment": "serviceHealthAlerts",
+          "deployEnvironment": "dev",
           "deploymentType": "NoOpsBicep"
         }
       },
       "parTargetResourceGroup": {
-        "value": "example-rg"
+        "value": "<<example-rg>>"
       },
       "parServiceHealthAlerts": {
         "value": {

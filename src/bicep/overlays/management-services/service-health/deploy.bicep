@@ -50,8 +50,14 @@ param parServiceHealthAlerts object = {}
 
 // SUBSCRIPTIONS PARAMETERS
 
-@description('The name of the resource group in which the Service Health Alerts will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.')
-param parTargetResourceGroup string
+// Target Resource Group Name
+// (JSON Parameter)
+// ---------------------------
+// "parTargetResourceGroup": {
+//   "value": "anoa-eastus-platforms-hub-rg"
+// }
+@description('The name of the resource group in which the services will be deployed. If unchanged or not specified, the NoOps Accelerator will create an resource group to be used.')
+param parTargetResourceGroup string = ''
 
 // RESOURCE NAMING PARAMETERS
 

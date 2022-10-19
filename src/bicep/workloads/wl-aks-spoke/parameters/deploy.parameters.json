@@ -6,30 +6,57 @@
       "value": {
         "orgPrefix": "anoa",
         "templateVersion": "v1.0",
-        "deployEnvironment": "aks"
+        "deployEnvironment": "dev"
       }
     },
     "parTags": {
       "value": {
         "organization": "anoa",
         "templateVersion": "v1.0",
-        "deployEnvironment": "aks",
+        "deployEnvironment": "dev",
         "deploymentType": "NoOpsBicep"
       }
     },
-    "parWorkload": {
+    "parWorkloadSpoke": {
       "value": {
         "name": "app",
         "shortName": "app",
-        "subscriptionId": "896f5276-df9a-4317-a791-469396bef7fa",
+        "subscriptionId": "<<subscriptionId>>",
+        "enableDdosProtectionPlan": false,
         "network": {
           "virtualNetworkAddressPrefix": "10.0.125.0/26",
-          "subnetAddressPrefix": "10.0.125.0/26"
+          "subnetAddressPrefix": "10.0.125.0/26",
+          "virtualNetworkDiagnosticsLogs": [],
+          "virtualNetworkDiagnosticsMetrics": [],
+          "networkSecurityGroupRules": [],
+          "NetworkSecurityGroupDiagnosticsLogs": [
+            "NetworkSecurityGroupEvent",
+            "NetworkSecurityGroupRuleCounter"
+          ],
+          "subnetServiceEndpoints": [
+            {
+              "service": "Microsoft.Storage"
+            }
+          ],
+          "subnets": [],
+          "routeTable": {
+            "disableBgpRoutePropagation": false,
+            "routes": [
+              {
+                "name": "wl-routetable",
+                "properties": {
+                  "addressPrefix": "0.0.0.0/0",
+                  "nextHopIpAddress": "10.0.100.4",
+                  "nextHopType": "VirtualAppliance"
+                }
+              }
+            ]
+          }
         }
       }
     },
     "parHubSubscriptionId": {
-      "value": "896f5276-df9a-4317-a791-469396bef7fa"
+      "value": "<<subscriptionId>>"
     },
     "parHubResourceGroupName": {
       "value": "anoa-eastus-dev-hub-rg"
@@ -38,13 +65,10 @@
       "value": "anoa-eastus-dev-hub-vnet"
     },
     "parHubVirtualNetworkResourceId": {
-      "value": "/subscriptions/896f5276-df9a-4317-a791-469396bef7fa/resourceGroups/anoa-eastus-dev-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-dev-hub-vnet"
-    },
-    "parFirewallPrivateIPAddress": {
-      "value": "10.0.100.4"
+      "value": "/subscriptions/<<subscriptionId>>/resourceGroups/anoa-eastus-dev-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-dev-hub-vnet"
     },
     "parLogAnalyticsWorkspaceResourceId": {
-      "value": "/subscriptions/896f5276-df9a-4317-a791-469396bef7fa/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
+      "value": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
     },
     "parLogAnalyticsWorkspaceName": {
       "value": "anoa-eastus-dev-logging-log"
@@ -53,55 +77,74 @@
       "value": {
         "name": "anoaeastusdevacr",
         "acrSku": "Premium",
-        "enableResourceLock": true        
+        "enableResourceLock": true
       }
     },
     "parKubernetesCluster": {
       "value": {
         "name": "Contoso",
-        "enableSystemAssignedIdentity": true,
+        "enableSystemAssignedIdentity": false,
         "aksClusterKubernetesVersion": "1.24.3",
-        "enableResourceLock": true,
         "enableRBAC": true,
-        "enablePrivateCluster": true,
-        "enableAzurePolicy": true,
-        "enableAadProfileEnableAzureRBAC": true,
-        "enableAadProfileManaged": true,
-        "aadProfileAdminGroupObjectIDs": [
-          "b24988ac-6180-42a0-ab88-20f7382dd24c"
-        ],
+        "enableResourceLock": false,
+        "enablePodIdentity": false,
         "aksClusterSkuTier": "Free",
+        "enableIngressApplicationGateway": false,
         "primaryAgentPoolProfile": {
-          "name": "default",
-          "vmSize": "Standard_D4s_v3",
-          "osDiskSizeGB": 128,
+          "name": "systempool",
+          "vmSize": "Standard_DS2_v2",
+          "osDiskSizeGB": 30,
           "osDiskType": "Managed",
           "enableAutoScaling": true,
-          "count": 1,
-          "maxCount": 5,
-          "minCount": 1,
-          "maxPods": 50,
+          "count": 10,
           "osType": "Linux",
           "osSKU": "Ubuntu",
           "type": "VirtualMachineScaleSets",
-          "mode": "System"
+          "mode": "System",
+          "availabilityZones": []
         },
-        "networkProfile": {
+        "networkProfile": {          
           "aksClusterLoadBalancerSku": "standard",
-          "aksClusterNetworkPlugin": "azure",
-          "aksClusterNetworkPolicy": "azure",
-          "aksClusterServiceCidr": "10.1.0.0/16",
-          "aksClusterDnsServiceIP": "10.1.0.10",
-          "aksClusterDockerBridgeCidr": "170.10.0.1/16",
+          "aksClusterPodCidr": "10.244.0.0/16",
+          "aksClusterServiceCidr": "172.16.1.0/24",
+          "aksClusterDnsServiceIP": "172.16.1.10",
+          "aksClusterDockerBridgeCidr": "170.10.0.1/30",
           "aksClusterOutboundType": "userDefinedRouting"
+        },
+        "apiServerAccessProfile": {
+          "enablePrivateCluster": true,
+          "enablePrivateClusterPublicFQDN": false
+        },
+        "aadProfile": {
+          "aadProfileTenantId": "<<TenantId>>",
+          "aadProfileAdminGroupObjectIDs": [
+            "<<GroupObjectID>>"
+          ],
+          "enableAadProfileEnableAzureRBAC": true,
+          "enableAadProfileManaged": true
+        },
+        "addonProfiles": {
+          "omsagent": {
+            "enable": true,
+            "config": {
+              "logAnalyticsWorkspaceResourceID": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
+            }
+          },
+          "enableResourceLock": true,
+          "enableAzurePolicy": true,
+          "azureKeyvaultSecretsProvider": true
+        },
+        "servicePrincipalProfile": {
+          "clientId": "<<clientId>>",
+          "secret": "<<secret>>"
         }
       }
     },
-    "parStorageAccountAccess": {
+    "parWorkloadStorageAccountAccess": {
       "value": {
         "enableRoleAssignmentForStorageAccount": false,
         "principalIds": [
-          "7bc6bc45-b256-407c-9d79-bde13dfb5639"
+          "<<principalId>>"
         ],
         "roleDefinitionIdOrName": "Contributor"
       }

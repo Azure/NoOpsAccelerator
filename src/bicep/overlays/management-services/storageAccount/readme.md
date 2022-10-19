@@ -8,7 +8,7 @@ Read on to understand what this overlay does, and when you're ready, collect all
 
 ## About Azure Storage Account
 
-The docs on Azure Storage Account: https://docs.microsoft.com/en-us/azure/key-vault/. By default, this overlay will deploy resources into standard default hub/spoke subscriptions and resource groups.  
+The docs on Azure Storage Account: <https://docs.microsoft.com/en-us/azure/key-vault/>. By default, this overlay will deploy resources into standard default hub/spoke subscriptions and resource groups.  
 
 The subscription and resource group can be changed by providing the resource group name (Param: parTargetSubscriptionId/parTargetResourceGroup) and ensuring that the Azure context is set the proper subscription.  
 
@@ -16,16 +16,22 @@ The subscription and resource group can be changed by providing the resource gro
 
 * A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
 * Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
+ 
+## Parameters
 
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
-Deployment Output Name | Description
------------------------| -----------
-parStorageAccountName | The name of the storage account.  If not specified, the name will default to the Hub/Spoke default naming pattern.  
-parTargetResourceGroupName | The name of the resource group where the App Service Plan will be deployed.   If not specified, the resource group name will default to the shared services resource group name and subscription.
+Required Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+parRequired | object | {object} | Required values used with all resources.
+parTags | object | {object} | Required tags values used with all resources.
+parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
+parStorageAccount | object | {object} | The object parameters of the Azure Storage Account.
+parTargetSubscriptionId | string | `xxxxxx-xxxx-xxxx-xxxxx-xxxxxx` | The target subscription ID for the target Network and resources. It defaults to the deployment subscription.
+parTargetResourceGroup | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group in which the Azure Container Registry will be deployed. If unchanged or not specified, the NoOps Accelerator will create an resource group.
 
-Optional Parameters | Description
-------------------- | -----------
+OptionalParameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
 None
 
 ## Deploy the Overlay
@@ -39,7 +45,7 @@ For example, deploying using the `az deployment sub create` command in the Azure
 ### Azure CLI
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
 az login
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
@@ -53,8 +59,8 @@ cd overlays
 cd app-service-plan
 az deployment sub create \
    --name deployAppServicePlan
-   --template-file overlays/management-groups/deploy.bicep \
-   --parameters @overlays/management-groups/deploy.parameters.json \
+   --template-file overlays/StorageAccount/deploy.bicep \
+   --parameters @overlays/StorageAccount/parameters/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -62,10 +68,10 @@ az deployment sub create \
 OR
 
 ```bash
-# For Azure IL regions
-az deployment group create \
-  --template-file overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicep \
-  --parameters @overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json \
+# For Azure Government regions
+az deployment sub create \
+  --template-file overlays/StorageAccount/deploy.bicep \
+  --parameters @overlays/StorageAccount/parameters/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
   --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
@@ -74,11 +80,11 @@ az deployment group create \
 ### PowerShell
 
 ```powershell
-# For Azure global regions
+# For Azure Commerical regions
 New-AzGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json `
+  -TemplateFile overlays/StorageAccount/deploy.bicepp `
+  -TemplateParameterFile overlays/StorageAccount/parameters/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
@@ -87,11 +93,11 @@ New-AzGroupDeployment `
 OR
 
 ```powershell
-# For Azure IL regions
+# For Azure Government regions
 New-AzGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json `
+  -TemplateFile overlays/StorageAccount/deploy.bicepp `
+  -TemplateParameterFile overlays/StorageAccount/parameters/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'

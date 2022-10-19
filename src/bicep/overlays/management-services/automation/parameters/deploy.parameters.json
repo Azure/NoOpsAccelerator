@@ -2,19 +2,34 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "organizationName": {
-            "value": "anoa"
+        "parRequired": {
+            "value": {
+                "orgPrefix": "anoa",
+                "templateVersion": "v1.0",
+                "deployEnvironment": "dev"
+            }
         },
-        "deployEnvironment": {
-            "value": "dev"
+        "parTags": {
+            "value": {
+                "organization": "anoa",
+                "templateVersion": "v1.0",
+                "deployEnvironment": "dev",
+                "deploymentType": "NoOpsBicep"
+            }
         },
-        "templateVersion": {
-            "value": "v1.0"
+        "parTargetSubscriptionId": {
+            "value": "<<subscriptionId>>"
         },
-        "deployAutomationAccount": {
-            "value": true
+        "parTargetResourceGroup": {
+            "value": "anoa-eastus-platforms-hub-rg"
         },
-        "lockLevel": {
+        "parDiagnosticStorageAccountName": {
+            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Storage/storageAccounts/anoasthubushz5jwfncpw4"
+        },
+        "parLogAnalyticsWorkspaceName": {
+            "value": "<<logAnalyticsWorkspaceName>>"
+        },
+        "parLockLevel": {
             "value": "CanNotDelete"
         }
     }

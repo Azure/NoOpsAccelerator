@@ -1,0 +1,136 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": { 
+    "parAssignableScopeManagementGroupId": {
+      "value": "anoa"
+    },
+    "parRoleDefinitionInfo": {
+      "value": {
+        "definitions": [
+          {
+            "roleID": "6f0b9662-992a-523e-a58d-6a91804f2f29",
+            "roleName": "Custom - VM Operator",
+            "roleDescription": "Start and Stop Virtual Machines and reader",
+            "actions": [
+              "Microsoft.Compute/virtualMachines/read",
+              "Microsoft.Compute/virtualMachines/start/action",
+              "Microsoft.Compute/virtualMachines/restart/action",
+              "Microsoft.Resources/subscriptions/resourceGroups/read",
+              "Microsoft.Compute/virtualMachines/deallocate/action",
+              "Microsoft.Compute/virtualMachineScaleSets/deallocate/action",
+              "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/deallocate/action",
+              "Microsoft.Compute/virtualMachines/powerOff/action"
+            ],
+            "notActions": [],
+            "dataActions": [],
+            "notDataActions": [],
+            "scopeType": "ManagementGroup",
+            "scopeName": "anoa"
+          },
+          {
+            "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
+            "roleName": "Custom - Network Operations (NetOps)",
+            "roleDescription": "Platform-wide global connectivity management: virtual networks, UDRs, NSGs, NVAs, VPN, Azure ExpressRoute, and others.",
+            "actions": [
+              "Microsoft.Network/virtualNetworks/read",
+              "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/read",
+              "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/write",
+              "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/delete",
+              "Microsoft.Network/virtualNetworks/peer/action",
+              "Microsoft.Resources/deployments/operationStatuses/read",
+              "Microsoft.Resources/deployments/write",
+              "Microsoft.Resources/deployments/read"
+            ],
+            "notActions": [],
+            "dataActions": [],
+            "notDataActions": [],
+            "scopeType": "ManagementGroup",
+            "scopeName": "anoa"
+          },
+          {
+            "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
+            "roleName": "Custom - Cyber Security Operations (CyberSecOps)",
+            "roleDescription": "Security Administrator role with a horizontal view across the entire Azure estate and the Azure Key Vault purge policy.",
+            "actions": [
+              "*/read",
+              "*/register/action",
+              "Microsoft.KeyVault/locations/deletedVaults/purge/action",
+              "Microsoft.PolicyInsights/*",
+              "Microsoft.Authorization/policyAssignments/*",
+              "Microsoft.Authorization/policyDefinitions/*",
+              "Microsoft.Authorization/policyExemptions/*",
+              "Microsoft.Authorization/policySetDefinitions/*",
+              "Microsoft.Insights/alertRules/*",
+              "Microsoft.Resources/deployments/*",
+              "Microsoft.Security/*",
+              "Microsoft.Support/*"
+            ],
+            "notActions": [],
+            "dataActions": [],
+            "notDataActions": [],
+            "scopeType": "ManagementGroup",
+            "scopeName": "anoa"
+          },
+          {
+            "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
+            "roleName": "Custom - Landing Zone Application Owner",
+            "roleDescription": "Contributor role granted for application/operations team at resource group level.",
+            "actions": [
+              "*"
+            ],
+            "notActions": [
+              "Microsoft.Authorization/*/write",
+              "Microsoft.Network/publicIPAddresses/write",
+              "Microsoft.Network/virtualNetworks/write",
+              "Microsoft.KeyVault/locations/deletedVaults/purge/action"
+            ],
+            "dataActions": [],
+            "notDataActions": [],
+            "scopeType": "ManagementGroup",
+            "scopeName": "anoa"
+          },
+          {
+            "roleID": "72dd118f-5398-5835-8432-ced9ab12a3de",
+            "roleName": "Custom - Landing Zone Subscription Owner",
+            "roleDescription": "Delegated role for subscription owner generated from subscription Owner role.",
+            "actions": [
+              "*"
+            ],
+            "notActions": [
+              "Microsoft.Authorization/*/write",
+              "Microsoft.Network/vpnGateways/*",
+              "Microsoft.Network/expressRouteCircuits/*",
+              "Microsoft.Network/routeTables/write",
+              "Microsoft.Network/vpnSites/*"
+            ],
+            "dataActions": [],
+            "notDataActions": [],
+            "scopeType": "ManagementGroup",
+            "scopeName": "anoa"
+          },
+          {
+            "roleID": "bb465e79-5df0-597b-a848-85006554c065",
+            "roleName": "Custom - Storage Operator",
+            "roleDescription": "Custom Storage Operator role for deploying virtual machines.",
+            "actions": [
+              "Microsoft.Authorization/*/read",
+              "Microsoft.Insights/alertRules/*",
+              "Microsoft.Insights/diagnosticSettings/*",
+              "Microsoft.Network/virtualNetworks/subnets/joinViaServiceEndpoint/action",
+              "Microsoft.ResourceHealth/availabilityStatuses/read",
+              "Microsoft.Resources/deployments/*",
+              "Microsoft.Resources/subscriptions/resourceGroups/read",
+              "Microsoft.Storage/storageAccounts/*",
+              "Microsoft.Support/*",
+              "Microsoft.Storage/storageAccounts/listkeys/action"
+            ],
+            "notActions": [],
+            "scopeType": "ManagementGroup",
+            "scopeName": "anoa"
+          }
+        ]
+      }
+    }
+  }
+}

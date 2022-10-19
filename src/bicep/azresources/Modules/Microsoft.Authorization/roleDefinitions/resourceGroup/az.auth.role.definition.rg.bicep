@@ -28,7 +28,7 @@ param resourceGroupName string = resourceGroup().name
 @sys.description('Optional. Role definition assignable scopes. If not provided, will use the current scope provided.')
 param assignableScopes array = []
 
-resource roleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' = {
+resource roleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
   name: guid(roleName, subscriptionId, resourceGroupName)
   properties: {
     roleName: roleName

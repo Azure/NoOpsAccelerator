@@ -7,15 +7,14 @@
 // ----------------------------------------------------------------------------------
 
 /*
-SUMMARY: Overlay Module Example to deploy a Application Gateway to the Hub Network
+SUMMARY: Module to deploy a Application Gateway to the Hub Network
 DESCRIPTION: The following components will be options in this deployment
-              Application Gateway
+              Automation Account
 AUTHOR/S: jspinella
 VERSION: 1.x.x
 */
 
-// === PARAMETERS ===
-targetScope = 'resourceGroup'
+targetScope = 'subscription'
 
 // REQUIRED PARAMETERS
 // Example (JSON)
@@ -48,23 +47,36 @@ param parRequired object
 param parTags object
 
 @description('The region to deploy resources into. It defaults to the deployment location.')
-param parLocation string = resourceGroup().location
+param parLocation string = deployment().location
 
-// HUB NETWORK PARAMETERS
+// SUBSCRIPTIONS PARAMETERS
 
-@description('The resource group name for the Hub Network and resources.')
-param parHubResourceGroupName string
+// Hub Subscription Id
+// (JSON Parameter)
+// ---------------------------
+// "parHubSubscriptionId": {
+//   "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxx"
+// }
+@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
+param parHubSubscriptionId string = subscription().subscriptionId
 
-@description('The resource group name for the Hub Network name.')
+// Hub Resource Group Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubResourceGroup": {
+//   "value": "anoa-eastus-platforms-hub-rg"
+// }
+@description('The name of the Hub resource group in which the app gateway will be deployed.')
+param parHubResourceGroup string = ''
+
+// Hub Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubVirtualNetworkName": {
+//   "value": "anoa-eastus-platforms-hub-vnet"
+// }
+@description('The Hub Virtual Network Name for the Hub Network.')
 param parHubVirtualNetworkName string
-
-// LOGGING PARAMETERS
-
-@description('Log Analytics Workspace Resource Id Needed for NSG, VNet and Activity Logging')
-param parLogAnalyticsWorkspaceResourceId string
-
-@description('The resource group name for the Hub Network and resources. It defaults to the deployment resource group.')
-param parHubLogStorageResourceId string
 
 // RESOURCE NAMING PARAMETERS
 
@@ -74,72 +86,17 @@ param parDeploymentNameSuffix string = utcNow()
 @description('The current date - do not override the default value')
 param dateUtcNow string = utcNow('yyyy-MM-dd HH:mm:ss')
 
-param subnetAddressPrefix string
+// APPLICATION GATEWAY PARAMETERS
 
-// APP GATEWAY PARAMETERS
-
-@description('Application gateway tier')
+@description('Optional. Specify the type of lock.')
 param parAppGateway object
 
-@description('Application gateway tier')
-@allowed([
-  'Standard'
-  'WAF'
-  'Standard_v2'
-  'WAF_v2'
-])
-param parTier string
+// LOGGING PARAMETERS
+@description('Specify the Diagnostic Storage Account Name.')
+param parDiagnosticStorageAccountName string
 
-@description('Application gateway sku')
-@allowed([
-  'Standard_Small'
-  'Standard_Medium'
-  'Standard_Large'
-  'WAF_Medium'
-  'WAF_Large'
-  'Standard_v2'
-  'WAF_v2'
-])
-param parSku string
-
-@description('Array containing front end ports')
-@metadata({
-  name: 'Front port name'
-  port: 'Integer containing port number'
-})
-param parFrontEndPorts array
-
-@description('Array containing http listeners')
-@metadata({
-  name: 'Listener name'
-  protocol: 'Listener protocol'
-  frontEndPort: 'Front end port name'
-  sslCertificate: 'SSL certificate name' // only required for https listeners
-  hostNames: 'Array containing host names'
-  firewallPolicy: 'Enabled/Disabled. Configures firewall policy on listener'
-})
-param parHttpListeners array
-
-@description('Array containing request routing rules')
-@metadata({
-  name: 'Rule name'
-  ruleType: 'Rule type'
-  listener: 'Http listener name'
-  backendPool: 'Backend pool name'
-  backendHttpSettings: 'Backend http setting name'
-  redirectConfiguration: 'Redirection configuration name'
-})
-param parRules array
-
-@description('Public ip address name')
-param parPublicIpAddressName string
-
-@description('Application gateway subnet name')
-param parSubnetName string
-
-// VARIABLES
-
-var subnetName = 'AppGWSubnet' // The subnet name for VNG Hosts must be 'AppGWSubnet'
+@description('[Free/Standard/Premium/PerNode/PerGB2018/Standalone] The SKU for the Log Analytics Workspace. It defaults to "PerGB2018". See https://docs.microsoft.com/en-us/azure/azure-monitor/logs/resource-manager-workspace for valid settings.')
+param parLogAnalyticsWorkspaceName string
 
 /*
   NAMING CONVENTION
@@ -152,69 +109,103 @@ var varResourceToken = 'resource_token'
 var varNameToken = 'name_token'
 var varNamingConvention = '${toLower(parRequired.orgPrefix)}-${toLower(parLocation)}-${toLower(parRequired.deployEnvironment)}-${varNameToken}-${toLower(varResourceToken)}'
 
-var varApplicationGatewayNamingConvention = replace(varNamingConvention, varResourceToken, 'agway')
+// RESOURCE NAME CONVENTIONS WITH ABBREVIATIONS
+
+var varAppGatewayNamingConvention = replace(varNamingConvention, varResourceToken, 'agw')
+
+// APP SERVICE PLAN NAMES
 
 var varHubName = 'hub'
-var varHubApplicationGatewayName = replace(varApplicationGatewayNamingConvention, varNameToken, varHubName)
+var varAppGatewayResourceGroupName = replace(varAppGatewayNamingConvention, varNameToken, varHubName)
 
 //=== TAGS === 
 
 var referential = {
   region: parLocation
   deploymentDate: dateUtcNow
-  workload: 'appGateway'
 }
 
 @description('Resource group tags')
 module modTags '../../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
-  name: 'appg-tags-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription()
-  params: {    
-    resourceGroupName: parHubResourceGroupName
+  name: 'deploy-agw-tags--${parLocation}-${parDeploymentNameSuffix}'
+  scope: subscription(parHubSubscriptionId)
+  params: {
     tags: union(parTags, referential)
   }
 }
 
-// HUB VNET
-
-resource resHubVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-02-01' existing = {
-  name: parHubVirtualNetworkName
-}
-
-// ADD GATEWAY SUBNET TO HUB
-
-resource resSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
-  name: '${parHubVirtualNetworkName}/${subnetName}'
-  properties: {
-    addressPrefix: subnetAddressPrefix
-    privateEndpointNetworkPolicies: 'Enabled'
-    privateLinkServiceNetworkPolicies: 'Enabled'
-  }
-}
-
-// HUB APP GATEWAY 
-
-module modHubAppGateway '../../../azresources/Modules/Microsoft.Network/applicationGateway/az.net.application.gateway.bicep' = {
-  name: 'deploy-${varHubName}-vnet-gateway-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parHubResourceGroupName)
+module modAppGateway '../../../azresources/Modules/Microsoft.Network/applicationGateway/az.net.application.gateway.bicep' = {
+  scope: resourceGroup(parHubSubscriptionId, parHubResourceGroup)
+  name: 'deploy-agw-${parDeploymentNameSuffix}'
   params: {
-    // Required parameters
-    applicationGatewayName: varHubApplicationGatewayName
-    location: parLocation    
-    frontEndPorts: parFrontEndPorts
-    httpListeners: parHttpListeners
-    publicIpAddressName: parPublicIpAddressName
-    rules: parRules
-    sku: parSku
-    subnetName: parSubnetName
-    tier: parTier
-    vNetName: resHubVirtualNetwork.name
-    vNetResourceGroup: parHubResourceGroupName
-    diagnosticStorageAccountId: parHubLogStorageResourceId
-    logAnalyticsWorkspaceId: parLogAnalyticsWorkspaceResourceId
-    enableDiagnostics: true
+    applicationGatewayName: varAppGatewayResourceGroupName
+    location: parLocation
+    webApplicationFirewallConfiguration: parAppGateway.webApplicationFirewallConfiguration
+    sku: parAppGateway.sku
+    gatewayIPConfigurations: [
+      {
+        name: '${varAppGatewayResourceGroupName}-IpConfig'
+        properties: {
+          subnet: {
+            id: resourceId('Microsoft.Network/virtualNetworks/subnets', parHubVirtualNetworkName, 'myAGSubnet')
+          }
+        }
+      }
+    ]
+    frontendIPConfigurations: [
+      {
+        name: '${varAppGatewayResourceGroupName}-FrontendIP'
+        properties: {
+          privateIPAllocationMethod: parAppGateway.frontendIPConfigurations.privateIPAllocationMethod
+          publicIPAddress: {
+            id: resourceId('Microsoft.Network/publicIPAddresses', '${publicIPAddressName}0')
+          }
+        }
+      }
+    ]
+    frontendPorts: [
+      {
+        name: 'port_80'
+        properties: {
+          port: 80
+        }
+      }
+    ]
+    backendAddressPools: [
+      {
+        name: '${varAppGatewayResourceGroupName}-BackendPool'
+        properties: {}
+      }
+    ]
+    backendHttpSettingsCollection: [
+      {
+        name: '${varAppGatewayResourceGroupName}-HTTPSetting'
+        properties: {
+          port: 80
+          protocol: 'Http'
+          cookieBasedAffinity: 'Disabled'
+          pickHostNameFromBackendAddress: false
+          requestTimeout: 20
+        }
+      }
+    ]
+    httpListeners: [
+      {
+        name: '${varAppGatewayResourceGroupName}-Listener'
+        properties: {
+          frontendIPConfiguration: {
+            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', varAppGatewayResourceGroupName, 'appGwPublicFrontendIp')
+          }
+          frontendPort: {
+            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', varAppGatewayResourceGroupName, 'port_80')
+          }
+          protocol: 'Http'
+          requireServerNameIndication: false
+        }
+      }
+    ]
   }
-  dependsOn: [
-    resSubnet
-  ]
 }
+
+output outAppGatewayName string = modAppGateway.name
+output outAppGatewayId string = modAppGateway.outputs.resourceId

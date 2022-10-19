@@ -1,155 +1,477 @@
-# NoOps Accelerator - Enclave - SCCA Compliant Hub - 1 Spoke landing zone with a Azure Kubernetes Service
-
-## Navigation
-
-- [NoOps Accelerator - Enclave - SCCA Compliant Hub - 1 Spoke landing zone with a Azure Kubernetes Service](#noops-accelerator---enclave---scca-compliant-hub---1-spoke-landing-zone-with-a-azure-kubernetes-service)
-  - [Navigation](#navigation)
-  - [Overview](#overview)
-  - [Architecture](#architecture)
-  - [Pre-requisites](#pre-requisites)
-  - [Deployment examples](#deployment-examples)
-  - [Parameters](#parameters)
-    - [Parameter Usage: `appSettingsKeyValuePairs`](#parameter-usage-appsettingskeyvaluepairs)
-  - [Outputs](#outputs)
-  - [Resource Types](#resource-types)
-  - [Air-Gapped Clouds](#air-gapped-clouds)
-  - [Cleanup](#cleanup)
-  - [Example Output in Azure](#example-output-in-azure)
+# NoOps Accelerator - Enclave - SCCA Compliant Hub - 1 Spoke landing zone with a Azure Kubernetes Service workload
 
 ## Overview
 
-This platform module deploys Enclave Hub/Spoke landing zone with a Azure Kubernetes Service.
+This enclave module deploys Platform Hub - 1 Spoke landing zone with a Azure Kubernetes Service workload.
+
+> NOTE: When deploying enclaves; Management Groups, Policy and Roles need to be deployed first. Please review the Pre-requisites for more information.
 
 Read on to understand what this enclave does, and when you're ready, collect all of the pre-requisites, then deploy the enclave.
 
 ## Architecture
 
- ![Enclave Hub/Spoke landing zone with a Azure Kubernetes Service Architecture](../../../bicep/)
+ ![Enclave Hub/Spoke landing zone with a Azure Kubernetes Service Architecture](../enclave-scca-hubspoke-aks/media/hub-1spoke-aks-network-topology-architecture.jpg)
+
+## About Hub 1 Spoke Landing Zone with Azure Kubernetes Service - Private Cluster Workload
+
+The docs on Hub/Spoke Landing Zone: <https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke?tabs=cli>.
+
+The docs on Azure Kubernetes Service: <https://docs.microsoft.com/en-us/azure/aks/>.
+
+This Enclave uses the [Azure Kubernetes Service - Cluster workload](../../../bicep/workloads/wl-aks-spoke/readme.md) to deploy resources into [Platform Hub 1 Spoke Network](../../../bicep/platforms/lz-platform-scca-hub-1spoke/readme.md).
 
 ## Pre-requisites
 
-* One or more Azure subscriptions where you or an identity you manage has Owner RBAC permissions
-* For deployments in the Azure Portal you need access to the portal in the cloud you want to deploy to, such as <https://portal.azure.com> or <https://portal.azure.us>.
-* For deployments in BASH or a Windows shell, then a terminal instance with the AZ CLI installed is required. For example, Azure Cloud Shell, or a command shell on your local machine with the AZ CLI installed.
-* For PowerShell deployments you need a PowerShell terminal with the Azure Az PowerShell module installed.
+### Subscriptions
 
->NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the instructions here.
+Most customers will deploy each tier to a separate Azure subscription, but multiple subscriptions are not required. A single subscription deployment is good for a testing and evaluation, or possibly a small IT Admin team.
 
-## Deployment examples
+### Operational Network Artifacts
 
-The following module usage examples are retrieved from the content of the files hosted in the module's `enclave-scca-hubspoke-aks` folder.
+If needed, The Operational Network Artifacts are used when operations wants to seperate all key, secrets and operations storage from the hub/spoke model.
 
-   >**Note**: The name of each example is based on the name of the file from which it is taken.
-   >**Note**: Each example lists all the required parameters first, followed by the rest - each in alphabetical order.
+### Management Groups
 
-<h3>Example 1: Enclave Deploy</h3>
+The Enclave Management Groups ovlerlay module deploys a management group hierarchy in a tenant under the `Tenant Root Group`.  This is accomplished through a tenant-scoped Azure Resource Manager (ARM) deployment.  The heirarchy can be modifed by editing [Azure Parameters template located in "management-groups/parameters" folder](../../overlays/management-groups/parameters/deploy.parameters.json).
 
-<details>
+Azure NoOps Accelerator recommends the following Management Group structure. This structure can be customized based on your organization's requirements.
 
-<summary>via Bicep module</summary>
+* Workloads will be split by 2 groups of archtypes (INTERNAL, PARTNERS).
+* Sandbox management group is used for any new subscriptions that will be created. This will remove the subscription sprawl from the Root Tenant Group and will pull all subscriptions into the security compliance.
 
-```bicep
+The hierarchy created by the deployment ([Azure Parameters template located in "management-groups/parameters" folder](../../overlays/management-groups/parameters/deploy.parameters.json)) is:
 
-```
+![Enclave Hub/Spoke landing zone with a Azure Kubernetes Service Architecture](./media/01%20-%20Management%20Group%20Design.jpg)
 
-</details>
+>NOTE: Management Group structure can be deployed or modified through [Azure Bicep template located in "management-groups" folder](../../overlays/management-groups).  See [overlays/management-groups/readme.md](../../../overlays/management-groups/readme.md) to update parameters
 
-<h3>Example 2: Artifacts</h3>
+<h3>Overlay Example: Management Groups</h3>
 
 <details>
 
-<summary>via Bicep module</summary>
+<summary>via Bash</summary>
 
-```bicep
+```bash
+# For Azure Commerical regions
 
+#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
+az login
+cd src/bicep/overlays
+cd management-groups
+az deployment mg create \
+   --template-file overlays/management-groups/deploy.bicep \
+   --parameters @overlays/management-groups/deploy.parameters.json \
+   --location 'eastus'
+```
+
+```bash
+# For Azure Government regions
+
+# change Azure Clouds
+az cloud set --name AzureUSGovernment
+
+#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
+az login
+cd src/bicep/overlays
+cd management-groups
+az deployment mg create \
+  --template-file overlays/management-groups/deploy.bicep \
+  --parameters @overlays/management-groups/deploy.parameters.json \
+  --location 'usgovvirginia'
 ```
 
 </details>
+<p>
+
+<details>
+
+<summary>via Powershell</summary>
+
+```powershell
+# For Azure Commerical regions
+
+#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
+Connect-AzAccount
+
+#Fetch the list of available Tenant Ids.
+Get-AzTenant
+
+#Grab the tenant Id Switch to another active directory tenant.
+Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+
+New-AzManagementGroupDeployment `
+  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
+  -TemplateFile overlays/management-groups/deploy.bicepp `
+  -TemplateParameterFile overlays/management-groups/deploy.parameters.json `
+  -Location 'eastus'
+```
+
+OR
+
+```powershell
+# For Azure Government regions
+
+#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
+Connect-AzAccount
+
+#Fetch the list of available Tenant Ids.
+Get-AzTenant
+
+#Grab the tenant Id Switch to another active directory tenant.
+Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+
+New-AzManagementGroupDeployment `
+  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
+  -TemplateFile overlays/management-groups/deploy.bicepp `
+  -TemplateParameterFile overlays/management-groups/deploy.parameters.json `
+  -Location  'usgovvirginia'
+```
+</details>
+<p>
+
+### Policy - Security Controls
+
+[Azure Policy](https://docs.microsoft.com/azure/governance/policy/overview) is used to deploy guardrails for your environment. Azure Policy supports organizational standards enforcement and at-scale compliance evaluation.
+
+Implementing governance for resource consistency, legal compliance, security, cost, and management are common use cases for Azure Policy. To assist you in getting started, your Azure environment already has built-in policy definitions for these typical use cases.
+
+A collection of built-in Azure Policy Sets based on Regulatory Compliance are configured with Azure NoOps Accelerator. To boost compliance for logging, networking, and tagging requirements, custom policy sets have been developed. Through automation, these can be further expanded or eliminated as needed by the department.
+
+> Policy structure can be deployed or modified through [Azure Bicep template located in "policy" folder](../../overlays/policy)
+
+![Enclave Hub/Spoke landing zone with a Azure Kubernetes Service Architecture](./media/MgmtGroups_Policies_v0.1.jpg)
+
+<h3>Overlay Example: Policies</h3>
+
+<details>
+
+<summary>via Bash</summary>
+
+```bash
+# For Azure Commerical regions
+az login
+cd src/bicep/overlays
+cd policy
+az deployment mg create \
+   --template-file overlays/policy/deploy.bicep \
+   --parameters @overlays/policy/deploy.parameters.json \
+   --location 'eastus'
+```
+
+```bash
+# For Azure Government regions
+az deployment mg create \
+  --template-file overlays/policy/deploy.bicep \
+  --parameters @overlays/policy/deploy.parameters.json \
+  --location 'usgovvirginia'
+```
+
+</details>
+<p>
+
+<details>
+
+<summary>via Powershell</summary>
+
+```powershell
+# For Azure Commerical regions
+
+#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
+Connect-AzAccount
+
+#Fetch the list of available Tenant Ids.
+Get-AzTenant
+
+#Grab the tenant Id Switch to another active directory tenant.
+Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+
+New-AzManagementGroupDeployment `
+  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
+  -TemplateFile overlays/policy/deploy.bicep `
+  -TemplateParameterFile overlays/policy/deploy.parameters.json `
+  -Location 'eastus'
+```
+
+OR
+
+```powershell
+# For Azure Government regions
+
+#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
+Connect-AzAccount
+
+#Fetch the list of available Tenant Ids.
+Get-AzTenant
+
+#Grab the tenant Id Switch to another active directory tenant.
+Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+
+New-AzManagementGroupDeployment `
+  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
+  -TemplateFile overlays/policy/deploy.bicep `
+  -TemplateParameterFile overlays/policy/deploy.parameters.json `
+  -Location  'usgovvirginia'
+```
+</details>
+<p>
+
+### RBAC - Roles
+
+The Enclave Roles overlay module deploys a role definitions in a specific `Management Group`.  This is accomplished through a managmenent-group-scoped Azure Resource Manager (ARM) deployment.  The role definitions heirarchy can be modifed by editing ([Azure Parameters template located in "roles/parameters" folder](../../overlays/roles/parameters/deploy.parameters.json)).  
+
+Module deploys the following resources:
+
+* Enclave Roles Definitions
+
+The definitions created by the deployment is:
+
+* Custom - VM Operator
+* Custom - Network Operations (NetOps)
+* Custom - Security Operations (SecOps)
+* Custom - Landing Zone Application Owner
+* Custom - Landing Zone Subscription Owner
+* Custom - Storage Operator
+
+Azure NoOps Accelerator assumes that Azure Active Directory has been provisioned and configured based on organization's requirements. It is important to check the following configuration for Azure Active Directory:
+
+* License - Consider Azure PD Premium P2
+* Multi-Factor Authentication - Enabled for all users
+* Conditional Access Policies - Configured based on location & devices
+* Privileged Identity Management (PIM) - Enabled for elevated access control.
+* App Registration - Consider disabling for all users and created on-demand by CloudOps teams.
+* Sign-In Logs - Logs are exported to Log Analytics workspace & Microsoft Sentinel used for threat hunting (Security Monitoring Team).
+* Break-glass procedure - Process documented and implemented including 2 break glass accounts with different MFA devices & split up passwords.
+* Azure Directory to Azure Active Directory synchronization - Are the identities synchronized or using cloud only account?
+  
+> Roles structure can be deployed or modified through [Azure Bicep template located in "roles" folder](../../overlays/roles/)
+
+<h3>Overlay Example: Roles</h3>
+
+<details>
+
+<summary>via Bash</summary>
+
+```bash
+# For Azure Commerical regions
+
+#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
+az login
+cd src/bicep/overlays
+cd roles
+az deployment mg create \
+   --template-file overlays/roles/deploy.bicep \
+   --parameters @overlays/roles/deploy.parameters.json \
+   --location 'eastus'
+```
+
+```bash
+# For Azure Government regions
+
+# change Azure Clouds
+az cloud set --name AzureUSGovernment
+
+#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
+az login
+cd src/bicep/overlays
+cd roles
+az deployment mg create \
+  --template-file overlays/roles/deploy.bicep \
+  --parameters @overlays/roles/deploy.parameters.json \
+  --location 'usgovvirginia'
+```
+
+</details>
+<p>
+
+<details>
+
+<summary>via Powershell</summary>
+
+```powershell
+# For Azure Commerical regions
+
+#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
+Connect-AzAccount
+
+#Fetch the list of available Tenant Ids.
+Get-AzTenant
+
+#Grab the tenant Id Switch to another active directory tenant.
+Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+
+New-AzManagementGroupDeployment `
+  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
+  -TemplateFile overlays/roles/deploy.bicepp `
+  -TemplateParameterFile overlays/roles/deploy.parameters.json `
+  -Location 'eastus'
+```
+
+OR
+
+```powershell
+# For Azure Government regions
+
+#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
+Connect-AzAccount
+
+#Fetch the list of available Tenant Ids.
+Get-AzTenant
+
+#Grab the tenant Id Switch to another active directory tenant.
+Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+
+New-AzManagementGroupDeployment `
+  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
+  -TemplateFile overlays/roles/deploy.bicepp `
+  -TemplateParameterFile overlays/roles/deploy.parameters.json `
+  -Location  'usgovvirginia'
+```
+</details>
+<p>
 
 ## Parameters
 
-**Required parameters**
-| Parameter Name | Type | Allowed Values | Description |
+See below for information on how to use the appropriate deployment parameters for use with this enclave:
+
+Required Parameters | Type | Allowed Values | Description
 | :-- | :-- | :-- | :-- |
-| `name` | string |  | Name of the site. |
-| `location` | string | `[resourceGroup().location]` |  | Location for all Resources. |
+parRequired | object | {object} | Required values used with all resources.
+parTags | object | {object} | Required tags values used with all resources.
+parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
+parHub | object | {object} | Hub Virtual network configuration. See [azresources/hub-spoke-core/vdss/hub/readme.md](../../azresources/hub-spoke-core/vdss/hub/readme.md)
+parOperationsSpoke | object | {object} | Operations Spoke Virtual network configuration. See [See azresources/hub-spoke-core/vdms/operations/readme.md](../../azresources/hub-spoke-core/vdms/operations/readme.md)
+parAzureFirewall | object | {object} | Azure Firewall configuration. Azure Firewall is deployed in Forced Tunneling mode where a route table must be added as the next hop.
+parLogging | object | {object} | Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment.
+parRemoteAccess | object | {object} | When set to "true", provisions Azure Bastion Host. It defaults to "false".
+parWorkload | object | {object} | Required values used for workloads.
+parHubSubscriptionId | string | `xxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx` | The subscription ID for the Hub Network.
+parHubResourceGroupName | string | `anoa-eastus-platforms-hub-rg` | The resource group name for the Hub Network.
+parHubVirtualNetworkName | string | `anoa-eastus-platforms-hub-vnet` | The virtual network name for the Hub Network.
+parHubVirtualNetworkResourceId | string | `/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-vnet` | The resource ID of the virtual network for the Hub Network.
+parHubFirewallPolicyName | string | `anoa-eastus-dev-hub-afwp` | The name of the Firewall Policy in the Hub Virtual Network that hosts rules for Hub Subnet traffic
+parFirewallPrivateIPAddress | string | `10.0.100.4` | The private ip address of the Firewall in the Hub Virtual Network.
+parLogAnalyticsWorkspaceResourceId | string | `/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log` | Log Analytics Workspace Resource Id.
+parLogAnalyticsWorkspaceId | string | `anoa-eastus-dev-logging-log` | Log Analytics Workspace Resource Id
+parSourceAddresses | array | `10.0.100.4` | Log Analytics Workspace Resource Id
+parKubernetesCluster | object | {object} | The object parameters of the Azure Kubernetes Cluster. Found at [Azure Kubernetes Cluster](../../../bicep/overlays/management-services/kubernetesCluster/readme.md)
+parContainerRegistry | object | {object} | The object parameters of the Container Registry. Found at [Azure Container Registry](../../../bicep/overlays/management-services/containerRegistry/readme.md)
+parStorageAccountAccess | object | {object} | Defines the Storage Account Access.
 
-**Optional parameters**
-| Parameter Name | Type | Default Value | Allowed Values | Description |
-| :-- | :-- | :-- | :-- | :-- |
-| `appInsightId` | string | `''` |  | Resource ID of the app insight to leverage for this resource. |
-| `appServiceEnvironmentId` | string | `''` |  | The resource ID of the app service environment to use for this resource. |
-| `appSettingsKeyValuePairs` | object | `{object}` |  | The app settings-value pairs except for AzureWebJobsStorage, AzureWebJobsDashboard, APPINSIGHTS_INSTRUMENTATIONKEY and APPLICATIONINSIGHTS_CONNECTION_STRING. |
-| `authSettingV2Configuration` | object | `{object}` |  | The auth settings V2 configuration. |
-| `clientAffinityEnabled` | bool | `True` |  | If client affinity is enabled. |
-| `diagnosticEventHubAuthorizationRuleId` | string | `''` |  | Resource ID of the diagnostic event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to. |
-| `diagnosticEventHubName` | string | `''` |  | Name of the diagnostic event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category. |
-| `diagnosticLogCategoriesToEnable` | array | `[if(equals(parameters('kind'), 'functionapp'), createArray('FunctionAppLogs'), createArray('AppServiceHTTPLogs', 'AppServiceConsoleLogs', 'AppServiceAppLogs', 'AppServiceAuditLogs', 'AppServiceIPSecAuditLogs', 'AppServicePlatformLogs'))]` | `[AppServiceAppLogs, AppServiceAuditLogs, AppServiceConsoleLogs, AppServiceHTTPLogs, AppServiceIPSecAuditLogs, AppServicePlatformLogs, FunctionAppLogs]` | The name of logs that will be streamed. |
-| `diagnosticLogsRetentionInDays` | int | `365` |  | Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely. |
-| `diagnosticMetricsToEnable` | array | `[AllMetrics]` | `[AllMetrics]` | The name of metrics that will be streamed. |
-| `diagnosticSettingsName` | string | `[format('{0}-diagnosticSettings', parameters('name'))]` |  | The name of the diagnostic setting, if deployed. |
-| `diagnosticStorageAccountId` | string | `''` |  | Resource ID of the diagnostic storage account. |
-| `diagnosticWorkspaceId` | string | `''` |  | Resource ID of log analytics workspace. |
-| `httpsOnly` | bool | `True` |  | Configures a site to accept only HTTPS requests. Issues redirect for HTTP requests. |
-| `lock` | string | `''` | `['', CanNotDelete, ReadOnly]` | Specify the type of lock. |
-| `privateEndpoints` | array | `[]` |  | Configuration details for private endpoints. For security reasons, it is recommended to use private endpoints whenever possible. |
-| `roleAssignments` | array | `[]` |  | Array of role assignment objects that contain the 'roleDefinitionIdOrName' and 'principalId' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'. |
-| `setAzureWebJobsDashboard` | bool | `[if(contains(parameters('kind'), 'functionapp'), true(), false())]` |  | For function apps. If true the app settings "AzureWebJobsDashboard" will be set. If false not. In case you use Application Insights it can make sense to not set it for performance reasons. |
-| `siteConfig` | object | `{object}` |  | The site config object. |
-| `storageAccountId` | string | `''` |  | Required if app of kind functionapp. Resource ID of the storage account to manage triggers and logging function executions. |
-| `storageAccountRequired` | bool | `False` |  | Checks if Customer provided storage account is required. |
-| `systemAssignedIdentity` | bool | `False` |  | Enables system assigned managed identity on the resource. |
-| `tags` | object | `{object}` |  | Tags of the resource. |
-| `userAssignedIdentities` | object | `{object}` |  | The ID(s) to assign to the resource. |
-| `virtualNetworkSubnetId` | string | `''` |  | Azure Resource Manager ID of the Virtual network and subnet to be joined by Regional VNET Integration. This must be of the form /subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}. |
+Optional Parameters | Type | Allowed Values | Description
+| :-- | :-- | :-- | :-- |
+parNetworkArtifacts | object | {object} | Optional. Enables Operations Network Artifacts Resource Group with KV and Storage account for the ops subscriptions used in the deployment.
+parSecurityCenter | object | {object} | Microsoft Defender for Cloud.  It includes email and phone.
+parDdosStandard | bool | `false` | DDOS Standard configuration.
 
+## Deploy the Enclave
 
-### Parameter Usage: `appSettingsKeyValuePairs`
+Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process of deploying Encalve.
 
-AzureWebJobsStorage, AzureWebJobsDashboard, APPINSIGHTS_INSTRUMENTATIONKEY and APPLICATIONINSIGHTS_CONNECTION_STRING are set separately (check parameters storageAccountId, setAzureWebJobsDashboard, appInsightId).
-For all other app settings key-value pairs use this object.
+For example, deploying using the `az deployment sub create` command in the Azure CLI:
 
-<details>
+### Azure CLI
 
-<summary>via Bicep module</summary>
-
-```json
-
+```bash
+# For Azure Commerical regions
+az login
+cd src/bicep
+cd enclaves/enclave-scca-hubspoke-aks
+az deployment sub create \ 
+--name deploy-scca-enclave-with-aks \
+--subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
+--template-file deploy.bicep \
+--location eastus \
+--parameters @parameters/deploy.parameters.json
 ```
 
-</details>
+OR
 
-## Outputs
+```bash
+# For Azure Government regions
+az deployment sub create \
+  --name deploy-scca-enclave-with-aks \
+  --template-file enclaves/enclave-scca-hubspoke-aks/deploy.bicep \
+  --parameters @enclaves/enclave-scca-hubspoke-aks/parameters/deploy.parameters.json \
+  --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
+  --location 'usgovvirginia'
+```
 
-| Output Name | Type | Description |
-| :-- | :-- | :-- |
-| `location` | string | The location the resource was deployed into. |
-| `name` | string | The name of the site. |
-| `resourceGroupName` | string | The resource group the site was deployed into. |
-| `resourceId` | string | The resource ID of the site. |
-| `systemAssignedPrincipalId` | string | The principal ID of the system assigned identity. |
+### PowerShell
 
-## Resource Types
+```powershell
+# For Azure Commerical regions
+New-AzSubscriptionDeployment `
+  -Name deploy-scca-enclave-with-aks `
+  -TemplateFile enclaves/enclave-scca-hubspoke-aks/deploy.bicep `
+  -TemplateParameterFile enclaves/enclave-scca-hubspoke-aks/parameters/deploy.parameters.json `
+  -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
+  -Location 'eastus'
+```
 
-| Resource Type | API Version |
-| :-- | :-- |
-| `Microsoft.Authorization/locks` | [2017-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2017-04-01/locks) |
-| `Microsoft.Authorization/roleAssignments` | [2020-10-01-preview](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2020-10-01-preview/roleAssignments) |
-| `Microsoft.Insights/diagnosticSettings` | [2021-05-01-preview](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Insights/2021-05-01-preview/diagnosticSettings) |
-| `Microsoft.Network/privateEndpoints` | [2021-08-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-08-01/privateEndpoints) |
-| `Microsoft.Network/privateEndpoints/privateDnsZoneGroups` | [2021-08-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-08-01/privateEndpoints/privateDnsZoneGroups) |
-| `Microsoft.App/containerApps` | [2021-03-01](https://docs.microsoft.com/en-us/azure/templates/microsoft.app/2022-03-01/containerapps) |
-| `Microsoft.App/managedEnvironments` | [2021-03-01](https://docs.microsoft.com/en-us/azure/templates/microsoft.app/2022-03-01/managedenvironments) |
+OR
+
+```powershell
+# For Azure Government regions
+New-AzSubscriptionDeployment `
+  -Name deploy-scca-enclave-with-aks `
+  -TemplateFile enclaves/enclave-scca-hubspoke-aks/deploy.bicep `
+  -TemplateParameterFile enclaves/enclave-scca-hubspoke-aks/parameters/deploy.parameters.json `
+  -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
+  -Location  'usgovvirginia'
+```
+
+## Extending the Overlay
+
+By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [`App Service Plans `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
 
 ## Air-Gapped Clouds
 
 For air-gapped clouds it may be convenient to transfer and deploy the compiled ARM template instead of the Bicep template if the Bicep CLI tools are not available or if it is desirable to transfer only one file into the air gap.
 
+## Validate the deployment
+
+Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
+
+Configure the default group using:
+
+```bash
+az configure --defaults group=anoa-eastus-dev-aks-rg.
+```
+
+```bash
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-dev-aks-rg
+```
+
+OR
+
+```powershell
+Get-AzResource -ResourceGroupName anoa-eastus-dev-aks-rg
+```
+
 ## Cleanup
 
-The Bicep/ARM deployment of NoOps Accelerator Logging deployment can be deleted with these steps:
+The Bicep/ARM deployment of NoOps Accelerator - Azure App Service Plan deployment can be deleted with these steps:
 
-## Example Output in Azure
+### Delete Resource Groups
 
-![Example Deployment Output](images/operationsNetworkExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
+```bash
+az group delete --name anoa-eastus-dev-aks-rg
+```
 
+OR
+
+```powershell
+Remove-AzResourceGroup -Name anoa-eastus-dev-aks-rg
+```
+
+### Delete Deployments
+
+```bash
+az deployment delete --name deploy-scca-enclave-with-aks
+```
+
+OR
+
+```powershell
+Remove-AzSubscriptionDeployment -Name deploy-scca-enclave-with-aks
+```

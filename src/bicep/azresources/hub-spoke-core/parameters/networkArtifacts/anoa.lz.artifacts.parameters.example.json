@@ -1,0 +1,71 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parOrgPrefix": {
+            "value": "anoa"
+        },
+        "parTemplateVersion": {
+            "value": "v1.0"
+        },
+        "parHubSubscriptionId": {
+            "value": "<<HUB SUBSCRIPTION ID>>"
+        },
+        "parDeployEnvironment": {
+            "value": "platforms"
+        },
+        "parDeployArtifacts": {
+            "value": false
+        },     
+        "parArtifactsKeyVaultObjectId": {
+            "value": "<<ARTIFACTS KEY VAULT OBJECT ID>>"
+        },
+        "parArtifactsKeyVaultPoliciesKeys": {
+            "value": [
+                "encrypt",
+                "decrypt",
+                "wrapKey",
+                "unwrapKey",
+                "sign",
+                "verify",
+                "get",
+                "list",
+                "create",
+                "update",
+                "import",
+                "delete",
+                "backup",
+                "restore",
+                "recover",
+                "purge"
+            ]
+        },
+        "parArtifactsKeyVaultPoliciesSecrets": {
+            "value": [
+                "get",
+                "list",
+                "set",
+                "delete",
+                "backup",
+                "restore",
+                "recover",
+                "purge"
+            ]
+        },
+        "parAddRoleAssignmentForStorageAccount": {
+            "value": true
+        },
+        "parStorageAccountAccessObjectId": {
+            "value": "<<STORAGE ACCOUNT ACCESS OBJECT ID>>"
+        },
+        "parStorageAccountAccessType": {
+            "value": "Group"
+        },
+        "parLinuxVmAdminPasswordOrKey": {
+            "value": "Rem0te@2020246"
+        },
+        "parWindowsVmAdminPassword": {
+            "value": "Rem0te@2020246"
+        }
+    }
+}

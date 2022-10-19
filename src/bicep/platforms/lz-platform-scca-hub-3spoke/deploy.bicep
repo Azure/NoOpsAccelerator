@@ -41,7 +41,7 @@ targetScope = 'subscription' //Deploying at Subscription scope to allow resource
 //     "deployEnvironment": "mlz"
 //   }
 // }
-@description('Required values used with all resources.')
+@description('Required. The values used with all resources.')
 param parRequired object
 
 // REQUIRED TAGS
@@ -56,25 +56,19 @@ param parRequired object
 //     "deploymentType": "NoOpsBicep"
 //   }
 // }
-@description('Required tags values used with all resources.')
+@description('Required. The tags values used with all resources.')
 param parTags object
 
-@description('The region to deploy resources into. It defaults to the deployment location.')
+@description('Required. The region to deploy resources into. It defaults to the deployment location.')
 param parLocation string = deployment().location
 
-// SUBSCRIPTIONS PARAMETERS
+// DEPLOYEMENT PARAMETERS
 
-@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
-param parHubSubscriptionId string = subscription().subscriptionId
+@description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
+param parDeploymentNameSuffix string = utcNow()
 
-@description('The subscription ID for the Identity Network and resources. It defaults to the deployment subscription.')
-param parIdentitySubscriptionId string = subscription().subscriptionId
-
-@description('The subscription ID for the Operations Network and resources. It defaults to the deployment subscription.')
-param parOperationsSubscriptionId string = subscription().subscriptionId
-
-@description('The subscription ID for the Shared Services Network and resources. It defaults to the deployment subscription.')
-param parSharedServicesSubscriptionId string = subscription().subscriptionId
+@description('The current date - do not override the default value')
+param dateUtcNow string = utcNow('yyyy-MM-dd HH:mm:ss')
 
 // OPERATIONS NETWORK ARTIFACTS
 // Example (JSON)
@@ -100,299 +94,303 @@ param parSharedServicesSubscriptionId string = subscription().subscriptionId
 //     }
 //   }
 // }
-@description('Enables Operations Network Artifacts Resource Group with KV and Storage account for the ops subscriptions used in the deployment.')
+@description('Optional. Enables Operations Network Artifacts Resource Group with KV and Storage account for the ops subscriptions used in the deployment.')
 param parNetworkArtifacts object
 
 //DDOS PARAMETERS
-
-@description('Enables DDOS deployment on the Hub Network.')
+// (JSON Parameter)
+// ---------------------------
+//"parDdosStandard": {
+//      "value": {
+//        "enable": false
+//      }
+//    }
+@description('Optional. Enables DDOS deployment on the Hub Network.')
 param parDdosStandard object
 
-// RESOURCE NAMING PARAMETERS
+// HUB PARAMETERS
+// (JSON Parameter)
+// ---------------------------
+//"parHub": {
+//      "value": {
+//        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+//        "virtualNetworkAddressPrefix": "10.0.100.0/24",
+//        "subnetAddressPrefix": "10.0.100.128/27",
+//        "virtualNetworkDiagnosticsLogs": [],
+//        "virtualNetworkDiagnosticsMetrics": [],
+//        "networkSecurityGroupRules": [],
+//        "networkSecurityGroupDiagnosticsLogs":[
+//          {
+//            "category": "NetworkSecurityGroupEvent",
+//            "enabled": true
+//          },
+//          {
+//            "category": "NetworkSecurityGroupRuleCounter",
+//            "enabled": true
+//          }
+//        ],
+//        "subnetServiceEndpoints": [
+//          {
+//           "service": "Microsoft.Storage"
+//         }
+//        ]
+//      }
+//    }
+@description('Hub Virtual network configuration.  See azresources/hub-spoke-core/vdss/hub/readme.md')
+param parHub object
 
-@description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
-param parDeploymentNameSuffix string = utcNow()
+// OPERATIONS SPOKE PARAMETERS
+// (JSON Parameter)
+// ---------------------------
+//"parOperationsSpoke": {
+//      "value": {
+//        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+//        "virtualNetworkAddressPrefix": "10.0.115.0/26",
+//        "subnetAddressPrefix": "10.0.115.0/27",
+//        "sourceAddressPrefixes": [],
+//        "virtualNetworkDiagnosticsLogs": [],
+//        "virtualNetworkDiagnosticsMetrics": [],
+//        "networkSecurityGroupRules": [
+//          {
+//            "name": "Allow-Traffic-From-Spokes",
+//            "properties": {
+//              "access": "Allow",
+//              "description": "Allow traffic from spokes",
+//              "destinationAddressPrefix": "10.0.115.0/26",
+//             "destinationPortRanges": [
+//               "22",
+//                "80",
+//                "443",
+//                "3389"
+//             ],
+//              "direction": "Inbound",
+//              "priority": 200,
+//              "protocol": "*",
+//              "sourceAddressPrefixes": [],
+//              "sourcePortRange": "*"
+//            },
+//            "type": "string"
+//          }
+//        ],
+//        "publicIPAddressDiagnosticsLogs": [
+//          {
+//            "category": "DDoSProtectionNotifications",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationFlowLogs",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationReports",
+//            "enabled": true
+//          }
+//        ],
+//        "networkSecurityGroupDiagnosticsLogs":[
+//          {
+//            "category": "NetworkSecurityGroupEvent",
+//            "enabled": true
+//          },
+//          {
+//            "category": "NetworkSecurityGroupRuleCounter",
+//            "enabled": true
+//          }
+//        ],
+//        "subnetServiceEndpoints": [
+//          {
+//            "service": "Microsoft.Storage"
+//          }
+//        ]
+//      }
+//    }
+@description('Operations Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdms/operations/readme.md')
+param parOperationsSpoke object
 
-@description('The current date - do not override the default value')
-param dateUtcNow string = utcNow('yyyy-MM-dd HH:mm:ss')
+// IDENTITY SPOKE PARAMETERS
+// (JSON Parameter)
+// ---------------------------
+//"parIdentitySpoke": {
+//      "value": {
+//        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+//        "virtualNetworkAddressPrefix": "10.0.115.0/26",
+//        "subnetAddressPrefix": "10.0.115.0/27",
+//        "sourceAddressPrefixes": [],
+//        "virtualNetworkDiagnosticsLogs": [],
+//        "virtualNetworkDiagnosticsMetrics": [],
+//        "networkSecurityGroupRules": [
+//          {
+//            "name": "Allow-Traffic-From-Spokes",
+//            "properties": {
+//              "access": "Allow",
+//              "description": "Allow traffic from spokes",
+//              "destinationAddressPrefix": "10.0.115.0/26",
+//             "destinationPortRanges": [
+//               "22",
+//                "80",
+//                "443",
+//                "3389"
+//             ],
+//              "direction": "Inbound",
+//              "priority": 200,
+//              "protocol": "*",
+//              "sourceAddressPrefixes": [],
+//              "sourcePortRange": "*"
+//            },
+//            "type": "string"
+//          }
+//        ],
+//        "publicIPAddressDiagnosticsLogs": [
+//          {
+//            "category": "DDoSProtectionNotifications",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationFlowLogs",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationReports",
+//            "enabled": true
+//          }
+//        ],
+//        "networkSecurityGroupDiagnosticsLogs":[
+//          {
+//            "category": "NetworkSecurityGroupEvent",
+//            "enabled": true
+//          },
+//          {
+//            "category": "NetworkSecurityGroupRuleCounter",
+//            "enabled": true
+//          }
+//        ],
+//        "subnetServiceEndpoints": [
+//          {
+//            "service": "Microsoft.Storage"
+//          }
+//        ]
+//      }
+//    }
+@description('Identity Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdss/identity/readme.md')
+param parIdentitySpoke object
 
-// NETWORK ADDRESS SPACE PARAMETERS
-
-@description('The CIDR Virtual Network Address Prefix for the Hub Virtual Network.')
-param parHubVirtualNetworkAddressPrefix string = '10.0.100.0/24'
-
-@description('The CIDR Subnet Address Prefix for the default Hub subnet. It must be in the Hub Virtual Network space.')
-param parHubSubnetAddressPrefix string = '10.0.100.128/27'
-
-@description('The CIDR Subnet Address Prefix for the Azure Firewall Subnet. It must be in the Hub Virtual Network space. It must be /26.')
-param parFirewallClientSubnetAddressPrefix string = '10.0.100.0/26'
-
-@description('The CIDR Subnet Address Prefix for the Azure Firewall Management Subnet. It must be in the Hub Virtual Network space. It must be /26.')
-param parFirewallManagementSubnetAddressPrefix string = '10.0.100.64/26'
-
-@description('The CIDR Virtual Network Address Prefix for the Identity Virtual Network.')
-param parIdentityVirtualNetworkAddressPrefix string = '10.0.110.0/26'
-
-@description('The CIDR Subnet Address Prefix for the default Identity subnet. It must be in the Identity Virtual Network space.')
-param parIdentitySubnetAddressPrefix string = '10.0.110.0/27'
-
-@description('The CIDR Virtual Network Address Prefix for the Operations Virtual Network.')
-param parOperationsVirtualNetworkAddressPrefix string = '10.0.115.0/26'
-
-@description('The CIDR Subnet Address Prefix for the default Operations subnet. It must be in the Operations Virtual Network space.')
-param parOperationsSubnetAddressPrefix string = '10.0.115.0/27'
-
-@description('The CIDR Virtual Network Address Prefix for the Shared Services Virtual Network.')
-param parSharedServicesVirtualNetworkAddressPrefix string = '10.0.120.0/26'
-
-@description('The CIDR Subnet Address Prefix for the default Shared Services subnet. It must be in the Shared Services Virtual Network space.')
-param parSharedServicesSubnetAddressPrefix string = '10.0.120.0/27'
+// SHARED SERVICES SPOKE PARAMETERS
+// (JSON Parameter)
+// ---------------------------
+//"parSharedServicesSpoke": {
+//      "value": {
+//        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+//        "virtualNetworkAddressPrefix": "10.0.115.0/26",
+//        "subnetAddressPrefix": "10.0.115.0/27",
+//        "sourceAddressPrefixes": [],
+//        "virtualNetworkDiagnosticsLogs": [],
+//        "virtualNetworkDiagnosticsMetrics": [],
+//        "networkSecurityGroupRules": [
+//          {
+//            "name": "Allow-Traffic-From-Spokes",
+//            "properties": {
+//              "access": "Allow",
+//              "description": "Allow traffic from spokes",
+//              "destinationAddressPrefix": "10.0.115.0/26",
+//             "destinationPortRanges": [
+//               "22",
+//                "80",
+//                "443",
+//                "3389"
+//             ],
+//              "direction": "Inbound",
+//              "priority": 200,
+//              "protocol": "*",
+//              "sourceAddressPrefixes": [],
+//              "sourcePortRange": "*"
+//            },
+//            "type": "string"
+//          }
+//        ],
+//        "publicIPAddressDiagnosticsLogs": [
+//          {
+//            "category": "DDoSProtectionNotifications",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationFlowLogs",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationReports",
+//            "enabled": true
+//          }
+//        ],
+//        "networkSecurityGroupDiagnosticsLogs":[
+//          {
+//            "category": "NetworkSecurityGroupEvent",
+//            "enabled": true
+//          },
+//          {
+//            "category": "NetworkSecurityGroupRuleCounter",
+//            "enabled": true
+//          }
+//        ],
+//        "subnetServiceEndpoints": [
+//          {
+//            "service": "Microsoft.Storage"
+//          }
+//        ]
+//      }
+//    }
+@description('Shared Services Spoke Virtual network configuration.  See azresources/hub-spoke-core/vdms/sharedservices/readme.md')
+param parSharedServicesSpoke object
 
 // FIREWALL PARAMETERS
-
-@description('Switch which allows Azure Firewall deployment to be disabled. Default: true')
-param parAzureFirewallEnabled bool = true
-
-@description('Azure Firewall Tier associated with the Firewall to deploy. Default: Standard ')
-@allowed([
-  'Standard'
-  'Premium'
-])
-param parFirewallSkuTier string
-
-@description('Supernet CIDR address for the entire network of vnets, this address allows for communication between spokes. Recommended to use a Supernet calculator if modifying vnet addresses')
-param parFirewallSupernetIPAddress string = '10.0.96.0/19'
-
-@allowed([
-  'Alert'
-  'Deny'
-  'Off'
-])
-param parFirewallThreatIntelMode string
-
-@allowed([
-  'Alert'
-  'Deny'
-  'Off'
-])
-@description('[Alert/Deny/Off] The Azure Firewall Intrusion Detection mode. Valid values are "Alert", "Deny", or "Off". The default value is "Alert".')
-param parFirewallIntrusionDetectionMode string = 'Alert'
-
-@description('An array of Firewall Diagnostic Logs categories to collect. See "https://docs.microsoft.com/en-us/azure/firewall/firewall-diagnostics#enable-diagnostic-logging-through-the-azure-portal" for valid values.')
-param parFirewallDiagnosticsLogs array = [
-  'AzureFirewallApplicationRule'
-  'AzureFirewallNetworkRule'
-  'AzureFirewallDnsProxy'
-]
-
-@description('An array of Firewall Diagnostic Metrics categories to collect. See "https://docs.microsoft.com/en-us/azure/firewall/firewall-diagnostics#enable-diagnostic-logging-through-the-azure-portal" for valid values.')
-param parFirewallDiagnosticsMetrics array = [
-  'AllMetrics'   
-]
-
-@description('Subnet name for the Firewall Default is "AzureFirewallSubnet"')
-param parFirewallClientSubnetName string = 'AzureFirewallSubnet'
-
-@description('An array of Service Endpoints to enable for the Azure Firewall Client Subnet. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview for valid settings.')
-param parFirewallClientSubnetServiceEndpoints array = []
-
-@description('An array of Azure Firewall Public IP Address Availability Zones. It defaults to empty, or "No-Zone", because Availability Zones are not available in every cloud. See https://docs.microsoft.com/en-us/azure/virtual-network/ip-services/public-ip-addresses#sku for valid settings.')
-param parFirewallClientPublicIPAddressAvailabilityZones array = []
-
-@description('Subnet name for the Firewall Default is "AzureFirewallManagementSubnet"')
-param parFirewallManagementSubnetName string = 'AzureFirewallManagementSubnet'
-
-@description('An array of Service Endpoints to enable for the Azure Firewall Management Subnet. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview for valid settings.')
-param parFirewallManagementSubnetServiceEndpoints array = []
-
-@description('An array of Azure Firewall Public IP Address Availability Zones. It defaults to empty, or "No-Zone", because Availability Zones are not available in every cloud. See https://docs.microsoft.com/en-us/azure/virtual-network/ip-services/public-ip-addresses#sku for valid settings.')
-param parFirewallManagementPublicIPAddressAvailabilityZones array = []
-
-@description('An array of Public IP Address Diagnostic Logs for the Azure Firewall. See https://docs.microsoft.com/en-us/azure/ddos-protection/diagnostic-logging?tabs=DDoSProtectionNotifications#configure-ddos-diagnostic-logs for valid settings.')
-param parPublicIPAddressDiagnosticsLogs array = [
-  'DDoSProtectionNotifications'
-  'DDoSMitigationFlowLogs'
-  'DDoSMitigationReports'
-]
-
-@description('An array of Public IP Address Diagnostic Metrics for the Azure Firewall. See https://docs.microsoft.com/en-us/azure/ddos-protection/diagnostic-logging?tabs=DDoSProtectionNotifications for valid settings.')
-param parPublicIPAddressDiagnosticsMetrics array = [
-  'AllMetrics'
-]
-
-@description('Application Rule Collection')
-param parApplicationRuleCollections array = []
-
-@description('Network Rule Collection')
-param parNetworkRuleCollections array = []
-
-// HUB NETWORK PARAMETERS
-
-@description('An array of Network Diagnostic Logs to enable for the Hub Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings.')
-param parHubVirtualNetworkDiagnosticsLogs array = []
-
-@description('An array of Network Diagnostic Metrics to enable for the Hub Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#metrics for valid settings.')
-param parHubVirtualNetworkDiagnosticsMetrics array = []
-
-@description('An array of Network Security Group Rules to apply to the Hub Virtual Network. See https://docs.microsoft.com/en-us/azure/templates/microsoft.network/networksecuritygroups/securityrules?tabs=bicep#securityrulepropertiesformat for valid settings.')
-param parHubNetworkSecurityGroupRules array = []
-
-@description('An array of Network Security Group diagnostic logs to apply to the Hub Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
-param parHubNetworkSecurityGroupDiagnosticsLogs array = [
-  'NetworkSecurityGroupEvent'
-  'NetworkSecurityGroupRuleCounter'
-]
-
-@description('An array of Service Endpoints to enable for the Hub subnet. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview for valid settings.')
-param parHubSubnetServiceEndpoints array = [
-  {
-    service: 'Microsoft.Storage'
-  }
-]
-
-// IDENTITY PARAMETERS
-
-@description('An array of Network Diagnostic Logs to enable for the Identity Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings.')
-param parIdentityVirtualNetworkDiagnosticsLogs array = []
-
-@description('An array of Network Diagnostic Metrics to enable for the Identity Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#metrics for valid settings.')
-param parIdentityVirtualNetworkDiagnosticsMetrics array = []
-
-@description('An array of Network Security Group Rules to apply to the Identity Virtual Network. See https://docs.microsoft.com/en-us/azure/templates/microsoft.network/networksecuritygroups/securityrules?tabs=bicep#securityrulepropertiesformat for valid settings.')
-param parIdentityNetworkSecurityGroupRules array = [
-  {
-    name: 'Allow-Traffic-From-Spokes'
-    properties: {
-      access: 'Allow'
-      description: 'Allow traffic from spokes'
-      destinationAddressPrefix: parIdentityVirtualNetworkAddressPrefix
-      destinationPortRanges: [
-        '22'
-        '80'
-        '443'
-        '3389'
-      ]
-      direction: 'Inbound'
-      priority: 200
-      protocol: '*'
-      sourceAddressPrefixes: parIdentitySourceAddressPrefixes
-      sourcePortRange: '*'
-    }
-    type: 'string'
-  }
-]
-
-@description('An array of')
-param parIdentitySourceAddressPrefixes array = []
-
-@description('An array of Network Security Group diagnostic logs to apply to the Identity Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
-param parIdentityNetworkSecurityGroupDiagnosticsLogs array = [
-  'NetworkSecurityGroupEvent'
-  'NetworkSecurityGroupRuleCounter'
-]
-
-@description('An array of Service Endpoints to enable for the Identity subnet. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview for valid settings.')
-param parIdentitySubnetServiceEndpoints array = [
-  {
-    service: 'Microsoft.Storage'
-  }
-]
-
-// OPERATIONS NETWORK PARAMETERS
-
-@description('An array of Network Diagnostic Logs to enable for the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings.')
-param parOperationsVirtualNetworkDiagnosticsLogs array = []
-
-@description('An array of Network Diagnostic Metrics to enable for the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#metrics for valid settings.')
-param parOperationsVirtualNetworkDiagnosticsMetrics array = []
-
-@description('An array of Network Security Group rules to apply to the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/templates/microsoft.network/networksecuritygroups/securityrules?tabs=bicep#securityrulepropertiesformat for valid settings.')
-param parOperationsNetworkSecurityGroupRules array = [
-  {
-    name: 'Allow-Traffic-From-Spokes'
-    properties: {
-      access: 'Allow'
-      description: 'Allow traffic from spokes'
-      destinationAddressPrefix: parOperationsVirtualNetworkAddressPrefix
-      destinationPortRanges: [
-        '22'
-        '80'
-        '443'
-        '3389'
-      ]
-      direction: 'Inbound'
-      priority: 200
-      protocol: '*'
-      sourceAddressPrefixes: parOperationsSourceAddressPrefixes
-      sourcePortRange: '*'
-    }
-    type: 'string'
-  }
-]
-
-@description('An array of')
-param parOperationsSourceAddressPrefixes array = []
-
-@description('An array of Network Security Group diagnostic logs to apply to the Operations Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
-param parOperationsNetworkSecurityGroupDiagnosticsLogs array = [
-  'NetworkSecurityGroupEvent'
-  'NetworkSecurityGroupRuleCounter'
-]
-
-@description('An array of Service Endpoints to enable for the Operations subnet. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview for valid settings.')
-param parOperationsSubnetServiceEndpoints array = [
-  {
-    service: 'Microsoft.Storage'
-  }
-]
-
-// SHARED SERVICES NETWORK PARAMETERS
-
-@description('An array of Network Diagnostic Logs to enable for the SharedServices Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#logs for valid settings.')
-param parSharedServicesVirtualNetworkDiagnosticsLogs array = []
-
-@description('An array of Network Diagnostic Metrics to enable for the SharedServices Virtual Network. See https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/diagnostic-settings?tabs=CMD#metrics for valid settings.')
-param parSharedServicesVirtualNetworkDiagnosticsMetrics array = []
-
-@description('An array of Network Security Group rules to apply to the SharedServices Virtual Network. See https://docs.microsoft.com/en-us/azure/templates/microsoft.network/networksecuritygroups/securityrules?tabs=bicep#securityrulepropertiesformat for valid settings.')
-param parSharedServicesNetworkSecurityGroupRules array = [
-  {
-    name: 'Allow-Traffic-From-Spokes'
-    properties: {
-      access: 'Allow'
-      description: 'Allow traffic from spokes'
-      destinationAddressPrefix: parSharedServicesVirtualNetworkAddressPrefix
-      destinationPortRanges: [
-        '22'
-        '80'
-        '443'
-        '3389'
-      ]
-      direction: 'Inbound'
-      priority: 200
-      protocol: '*'
-      sourceAddressPrefixes: parSharedServicesSourceAddressPrefixes
-      sourcePortRange: '*'
-    }
-    type: 'string'
-  }
-]
-
-@description('An array of')
-param parSharedServicesSourceAddressPrefixes array = []
-
-@description('An array of Network Security Group diagnostic logs to apply to the SharedServices Virtual Network. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-nsg-manage-log#log-categories for valid settings.')
-param parSharedServicesNetworkSecurityGroupDiagnosticsLogs array = [
-  'NetworkSecurityGroupEvent'
-  'NetworkSecurityGroupRuleCounter'
-]
-
-@description('An array of Service Endpoints to enable for the SharedServices subnet. See https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-service-endpoints-overview for valid settings.')
-param parSharedServicesSubnetServiceEndpoints array = [
-  {
-    service: 'Microsoft.Storage'
-  }
-]
+// (JSON Parameter)
+// ---------------------------
+//"parAzureFirewall": {
+//      "value": {
+//       "enable": true,
+//        "clientSubnetName": "AzureFirewallSubnet",
+//        "clientSubnetAddressPrefix": "10.0.100.0/26",
+//        "clientSubnetServiceEndpoints": [],
+//        "clientPublicIPAddressAvailabilityZones": [],
+//        "managementSubnetName": "AzureFirewallManagementSubnet",
+//        "managementSubnetAddressPrefix": "10.0.100.64/26",
+//        "managementSubnetServiceEndpoints": [],
+//        "managementPublicIPAddressAvailabilityZones": [],
+//        "supernetIPAddress": "10.0.96.0/19",
+//        "skuTier": "Premium",
+//        "threatIntelMode": "Alert",
+//        "intrusionDetectionMode": "Alert",
+//        "publicIPAddressDiagnosticsLogs": [
+//          {
+//            "category": "DDoSProtectionNotifications",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationFlowLogs",
+//            "enabled": true
+//          },
+//          {
+//            "category": "DDoSMitigationReports",
+//            "enabled": true
+//          }
+//        ],
+//        "publicIPAddressDiagnosticsMetrics": [
+//          {
+//            "category": "AllMetrics",
+//            "enabled": true
+//          }
+//        ],
+//        "diagnosticsLogs": [
+//          "AzureFirewallApplicationRule",
+//          "AzureFirewallNetworkRule",
+//          "AzureFirewallDnsProxy"
+//        ],
+//        "diagnosticsMetrics": [
+//          "AllMetrics"
+//        ],
+//        "ruleCollectionGroups": []
+//      }
+//    }
+@description('Required. The CIDR Subnet Address Prefix for the Azure Firewall Subnet. It must be in the Hub Virtual Network space. It must be /26.')
+param parAzureFirewall object
 
 // LOGGING PARAMETERS
 // Logging
@@ -409,23 +407,6 @@ param parSharedServicesSubnetServiceEndpoints array = [
 // }
 @description('Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment.')
 param parLogging object
-
-// STORAGE ACCOUNTS RBAC
-
-// Storage Account RBAC
-// Example (JSON)
-// -----------------------------
-// "parStorageAccountAccess": {
-//   "value": {
-//     "enableRoleAssignmentForStorageAccount": true,
-//     "principalIds": [
-//       "xxxxxx-xxxxx-xxxxx-xxxx-xxxxxxx"
-//     ],
-//     "roleDefinitionIdOrName": "Group"
-//   }
-// },  
-@description('Account for access to Storage')
-param parStorageAccountAccess object
 
 // MICROSOFT DEFENDER PARAMETERS
 
@@ -449,18 +430,19 @@ param parSecurityCenter object
 // -----------------------------
 // "parRemoteAccess": {
 //   "value": {
-//     "enable": true,
+//     "enable": true,        
 //     "bastion": {
 //       "sku": "Standard",
 //       "subnetAddressPrefix": "10.0.100.160/27",
 //       "publicIPAddressAvailabilityZones": [],
+//       "encryptionAtHost": false,
 //       "linux": {
 //         "enable": true,
+//         "vmName": "bastion-linux",
 //         "vmAdminUsername": "azureuser",
-//         "enableVmPasswordAuthentication": true,
-//         "vmAuthenticationType": "password",
-//         "vmAdminPasswordOrKey": "Rem0te@2020246",
-//         "vmSize": "Standard_B2s",
+//         "disablePasswordAuthentication": false,
+//         "vmAdminPasswordOrKey": "Rem0te@2020246",          
+//         "vmSize": "Standard_DS1_v2",
 //         "vmOsDiskCreateOption": "FromImage",
 //         "vmOsDiskType": "Standard_LRS",
 //         "vmImagePublisher": "Canonical",
@@ -471,16 +453,21 @@ param parSecurityCenter object
 //       },
 //       "windows": {
 //         "enable": true,
+//         "vmName": "bastion-windows",
 //         "vmAdminUsername": "azureuser",
-//         "VmAdminPassword": "Rem0te@2020246",
+//         "vmAdminPassword": "Rem0te@2020246",
 //         "vmSize": "Standard_DS1_v2",
 //         "vmOsDiskCreateOption": "FromImage",
-//         "VmStorageAccountType": "StandardSSD_LRS",
+//         "vmStorageAccountType": "StandardSSD_LRS",
 //         "vmImagePublisher": "MicrosoftWindowsServer",
 //         "vmImageOffer": "WindowsServer",
 //         "vmImageSku": "2019-datacenter",
 //         "vmImageVersion": "latest",
 //         "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
+//       },
+//       "customScriptExtension": {
+//         "install": false,
+//         "script64": ""
 //       }
 //     }
 //   }
@@ -547,9 +534,9 @@ module modTags '../../azresources/Modules/Microsoft.Resources/tags/az.resources.
 
 // LOGGING & LOG ANALYTICS WORKSPACE
 
-module modLogAnalyticsWorkspace '../../azresources/hub-spoke/vdms/logging/anoa.lz.logging.bicep' = {
+module modLogAnalyticsWorkspace '../../azresources/hub-spoke-core/vdms/logging/anoa.lz.logging.bicep' = {
   name: 'deploy-hubspoke-laws-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parOperationsSubscriptionId)
+  scope: subscription(parOperationsSpoke.subscriptionId)
   params: {
     // Required Parameters
     parOrgPrefix: parRequired.orgPrefix
@@ -564,17 +551,19 @@ module modLogAnalyticsWorkspace '../../azresources/hub-spoke/vdms/logging/anoa.l
     parLogAnalyticsWorkspaceSkuName: parLogging.logAnalyticsWorkspaceSkuName
     parLogAnalyticsWorkspaceRetentionInDays: parLogging.logAnalyticsWorkspaceRetentionInDays
     parLogAnalyticsWorkspaceCappingDailyQuotaGb: parLogging.logAnalyticsWorkspaceCappingDailyQuotaGb
+    parLogStorageSkuName: parLogging.logStorageSkuName
 
     // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parLoggingStorageAccountAccess: parLogging.storageAccountAccess
+    
   }
 }
 
 // ARTIFACTS
 
-module modArtifacts '../../azresources/hub-spoke/vdss/networkArtifacts/anoa.lz.artifacts.bicep' = if (parNetworkArtifacts.enable) {
+module modArtifacts '../../azresources/hub-spoke-core/vdss/networkArtifacts/anoa.lz.artifacts.bicep' = if (parNetworkArtifacts.enable) {
   name: 'deploy-hubspoke-artifacts-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parHubSubscriptionId)
+  scope: subscription(parHub.subscriptionId)
   params: {
     // Required Parameters
     parOrgPrefix: parRequired.orgPrefix
@@ -586,12 +575,15 @@ module modArtifacts '../../azresources/hub-spoke/vdss/networkArtifacts/anoa.lz.a
     parArtifactsKeyVaultPolicies: parNetworkArtifacts.artifactsKeyVault.keyVaultPolicies
 
     // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parArtifactsStorageAccountAccess: parNetworkArtifacts.storageAccountAccess
 
     // Bastion Secrets Parameters
     parEnableBastionSecrets: parRemoteAccess.enable
     parLinuxVmAdminPasswordOrKey: parRemoteAccess.bastion.linux.vmAdminPasswordOrKey
     parWindowsVmAdminPassword: parRemoteAccess.bastion.windows.vmAdminPassword
+
+    // Logging Parameters
+    parLogStorageSkuName: parLogging.logStorageSkuName
   }
 }
 
@@ -599,67 +591,62 @@ module modArtifacts '../../azresources/hub-spoke/vdss/networkArtifacts/anoa.lz.a
 
 // HUB
 
-module modHubNetwork '../../azresources/hub-spoke/vdss/hub/anoa.lz.hub.network.bicep' = {
+module modHubNetwork '../../azresources/hub-spoke-core/vdss/hub/anoa.lz.hub.network.bicep' = {
   name: 'deploy-hub-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parHubSubscriptionId)
+  scope: subscription(parHub.subscriptionId)
   params: {
     // Required Parameters
     parOrgPrefix: parRequired.orgPrefix
     parLocation: parLocation
     parDeployEnvironment: parRequired.deployEnvironment
     parTags: modTags.outputs.tags
-    
+ 
     // Enable DDOS Protection Plan
-    parDeployddosProtectionPlan: parDdosStandard.enable
+    parDeployddosProtectionPlan: parDdosStandard.enabled
 
     // Hub Network Parameters
-    parHubVirtualNetworkAddressPrefix: parHubVirtualNetworkAddressPrefix
-    parHubSubnetAddressPrefix: parHubSubnetAddressPrefix
-    parHubNetworkSecurityGroupDiagnosticsLogs: parHubNetworkSecurityGroupDiagnosticsLogs
-    parHubNetworkSecurityGroupRules: parHubNetworkSecurityGroupRules
-    parHubSubnetServiceEndpoints: parHubSubnetServiceEndpoints
-    parHubVirtualNetworkDiagnosticsLogs: parHubVirtualNetworkDiagnosticsLogs
-    parHubVirtualNetworkDiagnosticsMetrics: parHubVirtualNetworkDiagnosticsMetrics
-    parPublicIPAddressDiagnosticsLogs: parPublicIPAddressDiagnosticsLogs
-    parPublicIPAddressDiagnosticsMetrics: parPublicIPAddressDiagnosticsMetrics
+    parHubVirtualNetworkAddressPrefix: parHub.virtualNetworkAddressPrefix
+    parHubSubnetAddressPrefix: parHub.subnetAddressPrefix
+    parHubNetworkSecurityGroupDiagnosticsLogs: parHub.networkSecurityGroupDiagnosticsLogs
+    parHubNetworkSecurityGroupRules: parHub.networkSecurityGroupRules
+    parHubSubnetServiceEndpoints: parHub.subnetServiceEndpoints
+    parHubVirtualNetworkDiagnosticsLogs: parHub.virtualNetworkDiagnosticsLogs
+    parHubVirtualNetworkDiagnosticsMetrics: parHub.virtualNetworkDiagnosticsMetrics
+    parHubSubnets: parHub.subnets
 
     // Enable Azure FireWall
-    parAzureFirewallEnabled: parAzureFirewallEnabled
-    parFirewallClientSubnetAddressPrefix: parFirewallClientSubnetAddressPrefix
-    parFirewallManagementSubnetAddressPrefix: parFirewallManagementSubnetAddressPrefix
+    parAzureFirewallEnabled: parAzureFirewall.enable
     parDisableBgpRoutePropagation: false
 
     // Hub Firewall Parameters
-    parFirewallSupernetIPAddress: parFirewallSupernetIPAddress
-    parFirewallSkuTier: parFirewallSkuTier
-    parFirewallThreatIntelMode: parFirewallThreatIntelMode
-    parFirewallIntrusionDetectionMode: parFirewallIntrusionDetectionMode
-    parFirewallClientPublicIPAddressAvailabilityZones: parFirewallClientPublicIPAddressAvailabilityZones
-    parFirewallClientSubnetName: parFirewallClientSubnetName
-    parFirewallClientSubnetServiceEndpoints: parFirewallClientSubnetServiceEndpoints
-    parFirewallDiagnosticsLogs: parFirewallDiagnosticsLogs
-    parFirewallDiagnosticsMetrics: parFirewallDiagnosticsMetrics
-    parFirewallManagementPublicIPAddressAvailabilityZones: parFirewallManagementPublicIPAddressAvailabilityZones
-    parFirewallManagementSubnetName: parFirewallManagementSubnetName
-    parFirewallManagementSubnetServiceEndpoints: parFirewallManagementSubnetServiceEndpoints
-    parApplicationRuleCollections: parApplicationRuleCollections
-    parNetworkRuleCollections: parNetworkRuleCollections
+    parFirewallSupernetIPAddress: parAzureFirewall.supernetIPAddress
+    parFirewallSkuTier: parAzureFirewall.skuTier
+    parFirewallThreatIntelMode: parAzureFirewall.threatIntelMode
+    parFirewallIntrusionDetectionMode: parAzureFirewall.intrusionDetectionMode
+    parFirewallClientPublicIPAddressAvailabilityZones: parAzureFirewall.clientPublicIPAddressAvailabilityZones
+    parFirewallDiagnosticsLogs: parAzureFirewall.diagnosticsLogs
+    parFirewallDiagnosticsMetrics: parAzureFirewall.diagnosticsMetrics
+    parFirewallManagementPublicIPAddressAvailabilityZones: parAzureFirewall.managementPublicIPAddressAvailabilityZones
+    parPublicIPAddressDiagnosticsLogs: parAzureFirewall.publicIPAddressDiagnosticsLogs
+    parPublicIPAddressDiagnosticsMetrics: parAzureFirewall.parPublicIPAddressDiagnosticsMetrics    
+    parFirewallPolicyRuleCollectionGroups: parAzureFirewall.ruleCollectionGroups
 
     // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parHubStorageAccountAccess: parHub.storageAccountAccess
 
     // Log Analytics Parameters
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
     parLogAnalyticsWorkspaceName: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
+    parLogStorageSkuName: parLogging.logStorageSkuName
 
   }
 }
 
 // TIER 0 - IDENTITY
 
-module modIdentityNetwork '../../azresources/hub-spoke/vdss/identity/anoa.lz.id.network.bicep' = {
+module modIdentityNetwork '../../azresources/hub-spoke-core/vdss/identity/anoa.lz.id.network.bicep' = {
   name: 'deploy-spoke-id-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parIdentitySubscriptionId)
+  scope: subscription(parIdentitySpoke.subscriptionId)
   params: {
     // Required Parameters
     parOrgPrefix: parRequired.orgPrefix
@@ -668,21 +655,22 @@ module modIdentityNetwork '../../azresources/hub-spoke/vdss/identity/anoa.lz.id.
     parTags: modTags.outputs.tags
 
     // Identity Network Parameters
-    parIdentityNetworkSecurityGroupDiagnosticsLogs: parIdentityNetworkSecurityGroupDiagnosticsLogs
-    parIdentitySubnetAddressPrefix: parIdentitySubnetAddressPrefix
-    parIdentityNetworkSecurityGroupRules: parIdentityNetworkSecurityGroupRules
-    parIdentitySubnetServiceEndpoints: parIdentitySubnetServiceEndpoints
-    parIdentityVirtualNetworkAddressPrefix: parIdentityVirtualNetworkAddressPrefix
-    parIdentityVirtualNetworkDiagnosticsLogs: parIdentityVirtualNetworkDiagnosticsLogs
-    parIdentityVirtualNetworkDiagnosticsMetrics: parIdentityVirtualNetworkDiagnosticsMetrics
+    parIdentityNetworkSecurityGroupDiagnosticsLogs: parIdentitySpoke.networkSecurityGroupDiagnosticsLogs
+    parIdentitySubnetAddressPrefix: parIdentitySpoke.subnetAddressPrefix
+    parIdentitySourceAddressPrefixes: parIdentitySpoke.sourceAddressPrefixes
+    parIdentityNetworkSecurityGroupRules: parIdentitySpoke.networkSecurityGroupRules
+    parIdentitySubnetServiceEndpoints: parIdentitySpoke.subnetServiceEndpoints
+    parIdentityVirtualNetworkAddressPrefix: parIdentitySpoke.virtualNetworkAddressPrefix
+    parIdentityVirtualNetworkDiagnosticsLogs: parIdentitySpoke.virtualNetworkDiagnosticsLogs
+    parIdentityVirtualNetworkDiagnosticsMetrics: parIdentitySpoke.virtualNetworkDiagnosticsMetrics
     parFirewallPrivateIPAddress: modHubNetwork.outputs.firewallPrivateIPAddress
-    parDisableBgpRoutePropagation: true
+    parDisableBgpRoutePropagation: true // Enable BGP Route Propagation for Identity Spoke
 
     // Log Storage Sku Parameters
     parLogStorageSkuName: parLogging.logStorageSkuName
 
     // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parStorageAccountAccess: parIdentitySpoke.storageAccountAccess
 
     // Log Analytics Parameters
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
@@ -692,33 +680,32 @@ module modIdentityNetwork '../../azresources/hub-spoke/vdss/identity/anoa.lz.id.
 
 // TIER 1 - OPERATIONS
 
-module modOperationsNetwork '../../azresources/hub-spoke/vdms/operations/anoa.lz.ops.network.bicep' = {
+module modOperationsNetwork '../../azresources/hub-spoke-core/vdms/operations/anoa.lz.ops.network.bicep' = {
   name: 'deploy-spoke-ops-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parOperationsSubscriptionId)
+  scope: subscription(parOperationsSpoke.subscriptionId)
   params: {
-    // Required Parameters
+     // Required Parameters
     parOrgPrefix: parRequired.orgPrefix
     parLocation: parLocation
     parDeployEnvironment: parRequired.deployEnvironment
     parTags: modTags.outputs.tags
 
     // Operations Network Parameters
-    parOperationsNetworkSecurityGroupDiagnosticsLogs: parOperationsNetworkSecurityGroupDiagnosticsLogs
-    parOperationsSubnetAddressPrefix: parOperationsSubnetAddressPrefix
-    parOperationsSourceAddressPrefixes: parOperationsSourceAddressPrefixes
-    parOperationsNetworkSecurityGroupRules: parOperationsNetworkSecurityGroupRules
-    parOperationsSubnetServiceEndpoints: parOperationsSubnetServiceEndpoints
-    parOperationsVirtualNetworkAddressPrefix: parOperationsVirtualNetworkAddressPrefix
-    parOperationsVirtualNetworkDiagnosticsLogs: parOperationsVirtualNetworkDiagnosticsLogs
-    parOperationsVirtualNetworkDiagnosticsMetrics: parOperationsVirtualNetworkDiagnosticsMetrics
+    parOperationsNetworkSecurityGroupDiagnosticsLogs: parOperationsSpoke.networkSecurityGroupDiagnosticsLogs
+    parOperationsSubnetAddressPrefix: parOperationsSpoke.subnetAddressPrefix
+    parOperationsNetworkSecurityGroupRules: parOperationsSpoke.networkSecurityGroupRules
+    parOperationsSubnetServiceEndpoints: parOperationsSpoke.subnetServiceEndpoints
+    parOperationsVirtualNetworkAddressPrefix: parOperationsSpoke.virtualNetworkAddressPrefix
+    parOperationsVirtualNetworkDiagnosticsLogs: parOperationsSpoke.virtualNetworkDiagnosticsLogs
+    parOperationsVirtualNetworkDiagnosticsMetrics: parOperationsSpoke.virtualNetworkDiagnosticsMetrics
     parFirewallPrivateIPAddress: modHubNetwork.outputs.firewallPrivateIPAddress
-    parDisableBgpRoutePropagation: true
+    parDisableBgpRoutePropagation: true // Enable BGP Route Propagation for Operations Spoke
 
     // Log Storage Sku Parameters
     parLogStorageSkuName: parLogging.logStorageSkuName
 
     // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parOperationsStorageAccountAccess: parOperationsSpoke.storageAccountAccess
 
     // Log Analytics Parameters
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
@@ -728,32 +715,33 @@ module modOperationsNetwork '../../azresources/hub-spoke/vdms/operations/anoa.lz
 
 // TIER 2 - SHARED SERVICES
 
-module modSharedServicesNetwork '../../azresources/hub-spoke/vdms/sharedservices/anoa.lz.svcs.network.bicep' = {
+module modSharedServicesNetwork '../../azresources/hub-spoke-core/vdms/sharedservices/anoa.lz.svcs.network.bicep' = {
   name: 'deploy-spoke-svcs-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parSharedServicesSubscriptionId)
+  scope: subscription(parSharedServicesSpoke.subscriptionId)
   params: {
-    // Required Parameters
+     // Required Parameters
     parOrgPrefix: parRequired.orgPrefix
     parLocation: parLocation
     parDeployEnvironment: parRequired.deployEnvironment
     parTags: modTags.outputs.tags
 
-    // Shared Services Network Parameters
-    parSharedServicesNetworkSecurityGroupDiagnosticsLogs: parSharedServicesNetworkSecurityGroupDiagnosticsLogs
-    parSharedServicesSubnetAddressPrefix: parSharedServicesSubnetAddressPrefix
-    parSharedServicesNetworkSecurityGroupRules: parSharedServicesNetworkSecurityGroupRules
-    parSharedServicesSubnetServiceEndpoints: parSharedServicesSubnetServiceEndpoints
-    parSharedServicesVirtualNetworkAddressPrefix: parSharedServicesVirtualNetworkAddressPrefix
-    parSharedServicesVirtualNetworkDiagnosticsLogs: parSharedServicesVirtualNetworkDiagnosticsLogs
-    parSharedServicesVirtualNetworkDiagnosticsMetrics: parSharedServicesVirtualNetworkDiagnosticsMetrics
+    // SharedServices Network Parameters
+    parSharedServicesNetworkSecurityGroupDiagnosticsLogs: parSharedServicesSpoke.networkSecurityGroupDiagnosticsLogs
+    parSharedServicesSubnetAddressPrefix: parSharedServicesSpoke.subnetAddressPrefix
+    parSharedServicesSourceAddressPrefixes: parSharedServicesSpoke.sourceAddressPrefixes
+    parSharedServicesNetworkSecurityGroupRules: parSharedServicesSpoke.networkSecurityGroupRules
+    parSharedServicesSubnetServiceEndpoints: parSharedServicesSpoke.subnetServiceEndpoints
+    parSharedServicesVirtualNetworkAddressPrefix: parSharedServicesSpoke.virtualNetworkAddressPrefix
+    parSharedServicesVirtualNetworkDiagnosticsLogs: parSharedServicesSpoke.virtualNetworkDiagnosticsLogs
+    parSharedServicesVirtualNetworkDiagnosticsMetrics: parSharedServicesSpoke.virtualNetworkDiagnosticsMetrics
     parFirewallPrivateIPAddress: modHubNetwork.outputs.firewallPrivateIPAddress
-    parDisableBgpRoutePropagation: true
+    parDisableBgpRoutePropagation: true // Enable BGP Route Propagation for SharedServices Spoke
 
     // Log Storage Sku Parameters
     parLogStorageSkuName: parLogging.logStorageSkuName
 
     // RBAC for Storage Parameters
-    parStorageAccountAccess: parStorageAccountAccess
+    parStorageAccountAccess: parSharedServicesSpoke.storageAccountAccess
 
     // Log Analytics Parameters
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
@@ -763,9 +751,9 @@ module modSharedServicesNetwork '../../azresources/hub-spoke/vdms/sharedservices
 
 // VIRTUAL NETWORK PEERINGS
 
-module modHubVirtualNetworkPeerings '../../azresources/hub-spoke/peering/hub/anoa.lz.hub.network.peerings.bicep' = {
+module modHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/hub/anoa.lz.hub.network.peerings.bicep' = {
   name: 'deploy-vnet-peerings-hub-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
+  scope: resourceGroup(parHub.subscriptionId, varHubResourceGroupName)
   params: {
     parHubVirtualNetworkName: modHubNetwork.outputs.virtualNetworkName
     parSpokes: [
@@ -788,9 +776,9 @@ module modHubVirtualNetworkPeerings '../../azresources/hub-spoke/peering/hub/ano
   }
 }
 
-module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
+module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
   name: 'deploy-vnet-spoke-peerings-ops-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parOperationsSubscriptionId, varOperationsResourceGroupName)
+  scope: resourceGroup(parOperationsSpoke.subscriptionId, varOperationsResourceGroupName)
   params: {
     parSpokeName: 'operations'
     parSpokeResourceGroupName: varOperationsResourceGroupName
@@ -802,9 +790,9 @@ module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke/peeri
   }
 }
 
-module modSpokeIdToHubVirtualNetworkPeerings '../../azresources/hub-spoke/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
+module modSpokeIdToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
   name: 'deploy-vnet-spoke-peerings-id-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parIdentitySubscriptionId, varIdentityResourceGroupName)
+  scope: resourceGroup(parIdentitySpoke.subscriptionId, varIdentityResourceGroupName)
   params: {
     parSpokeName: 'identity'
     parSpokeResourceGroupName: varIdentityResourceGroupName
@@ -816,9 +804,9 @@ module modSpokeIdToHubVirtualNetworkPeerings '../../azresources/hub-spoke/peerin
   }
 }
 
-module modSpokeSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-spoke/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
+module modSpokeSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/peering/spoke/anoa.lz.spoke.network.peering.bicep' = {
   name: 'deploy-vnet-spoke-peerings-svcs-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parSharedServicesSubscriptionId, varSharedServicesResourceGroupName)
+  scope: resourceGroup(parSharedServicesSpoke.subscriptionId, varSharedServicesResourceGroupName)
   params: {
     parSpokeName: 'sharedservices'
     parSpokeResourceGroupName: varSharedServicesResourceGroupName
@@ -834,7 +822,7 @@ module modSpokeSharedServicesToHubVirtualNetworkPeerings '../../azresources/hub-
 
 module modRemoteAccess '../../overlays/management-services/bastion/deploy.bicep' = if (parRemoteAccess.enable) {
   name: 'deploy-remote-access-hub-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
+  scope: resourceGroup(parHub.subscriptionId, varHubResourceGroupName)
   params: {
     // Required Parameters
     parRequired:parRequired
@@ -856,7 +844,7 @@ module modRemoteAccess '../../overlays/management-services/bastion/deploy.bicep'
 
 module modVMExt '../../azresources/Modules/Microsoft.Compute/virtualmachines/extensions/az.com.virtual.machine.extensions.bicep' = if (parRemoteAccess.enable && parRemoteAccess.bastion.customScriptExtension.install) {
   name: 'deploy-vmext-${parLocation}-${parDeploymentNameSuffix}'
-  scope: resourceGroup(parHubSubscriptionId, varHubResourceGroupName)
+  scope: resourceGroup(parHub.subscriptionId, varHubResourceGroupName)
   params: {
     location: parLocation
     type: 'CustomScript'
@@ -885,9 +873,9 @@ module modDefender '../../overlays/management-services/defender/deploy.bicep' = 
 
 // MICROSOFT DEFENDER FOR CLOUD FOR SPOKES
 
-module spokeOpsDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parOperationsSubscriptionId != parHubSubscriptionId) {
+module spokeOpsDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parOperationsSpoke.subscriptionId != parHub.subscriptionId) {
   name: 'deploy-defender-ops-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parOperationsSubscriptionId)
+  scope: subscription(parOperationsSpoke.subscriptionId)
   params: {
     parLocation: parLocation
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
@@ -895,9 +883,9 @@ module spokeOpsDefender '../../overlays/management-services/defender/deploy.bice
   }
 }
 
-module spokeIdDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parIdentitySubscriptionId != parHubSubscriptionId) {
+module spokeIdDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parIdentitySpoke.subscriptionId != parHub.subscriptionId) {
   name: 'deploy-defender-id-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parIdentitySubscriptionId)
+  scope: subscription(parIdentitySpoke.subscriptionId)
   params: {
     parLocation: parLocation
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
@@ -905,9 +893,9 @@ module spokeIdDefender '../../overlays/management-services/defender/deploy.bicep
   }
 }
 
-module spokeSvcsDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parSharedServicesSubscriptionId != parHubSubscriptionId) {
+module spokeSvcsDefender '../../overlays/management-services/defender/deploy.bicep' = if (parSecurityCenter.enableDefender && parSharedServicesSpoke.subscriptionId != parHub.subscriptionId) {
   name: 'deploy-defender-svcs-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parSharedServicesSubscriptionId)
+  scope: subscription(parSharedServicesSpoke.subscriptionId)
   params: {
     parLocation: parLocation
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
@@ -922,7 +910,7 @@ output deployEnvironment string = parRequired.deployEnvironment
 output firewallPrivateIPAddress string = modHubNetwork.outputs.firewallPrivateIPAddress
 
 output hub object = {
-  subscriptionId: parHubSubscriptionId
+  subscriptionId: parHub.subscriptionId
   resourceGroupName: modHubNetwork.outputs.resourceGroupName
   resourceGroupResourceId: modHubNetwork.outputs.resourceGroupResourceId
   virtualNetworkName: modHubNetwork.outputs.virtualNetworkName

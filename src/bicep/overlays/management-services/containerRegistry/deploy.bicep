@@ -52,18 +52,71 @@ param parLocation string = deployment().location
 @description('Defines the Container Registry.')
 param parContainerRegistry object 
 
+// HUB NETWORK PARAMETERS
+
+// Hub Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubSubscriptionId": {
+//   "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxx"
+// }
+@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
+param parHubSubscriptionId string = subscription().subscriptionId
+
+// Hub Subnet Resource Id
+// (JSON Parameter)
+// ---------------------------
+// "parHubVirtualNetworkResourceId": {
+//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-vnet"
+// }
+@description('The virtual network resource Id for the Hub Network.')
+param parHubVirtualNetworkResourceId string = ''
+
+// Hub Resource Group Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubResourceGroupName": {
+//   "value": "anoa-eastus-platforms-hub-rg"
+// }
+@description('The name of the Hub resource group which contains the network for vnet peering.')
+param parHubResourceGroupName string = ''
+
 // SUBSCRIPTIONS PARAMETERS
 
-@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
+// Target Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parTargetSubscriptionId": {
+//   "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxx"
+// }
+@description('The subscription ID for the Target Network and resources. It defaults to the deployment subscription.')
 param parTargetSubscriptionId string = subscription().subscriptionId
 
-@description('The name of the resource group in which the key vault will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.')
-param parTargetResourceGroup string
+// Target Resource Group Name
+// (JSON Parameter)
+// ---------------------------
+// "parTargetResourceGroup": {
+//   "value": "anoa-eastus-platforms-hub-rg"
+// }
+@description('The name of the resource group in which the service will be deployed. If unchanged or not specified, the NoOps Accelerator will create an resource group to be used.')
+param parTargetResourceGroup string = ''
 
-@description('The name of the VNet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.')
+// Target Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubVirtualNetworkName": {
+//   "value": "anoa-eastus-platforms-hub-vnet"
+// }
+@description('The name of the VNet in which the aks will be deployed.')
 param parTargetVNetName string
 
-@description('The name of the Subnet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.')
+// Target Subnet Name
+// (JSON Parameter)
+// ---------------------------
+// "parHubVirtualNetworkName": {
+//   "value": "anoa-eastus-platforms-hub-snet"
+// }
+@description('The name of the Subnet in which the aks will be deployed.')
 param parTargetSubnetName string
 
 // RESOURCE NAMING PARAMETERS
@@ -148,9 +201,12 @@ module privatednsACRZone '../../../azresources/Modules/Microsoft.Network/private
   name: 'deploy-acrpvtdnszone-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parTargetResourceGroup)
   params: {
-    name: (environment().name =~ 'AzureCloud' ? 'privatelink.azurecr.${environment().suffixes.storage}' : 'privatelink.azurecr.usgovcloudapi.net')
+    name: 'privatelink${environment().suffixes.acrLoginServer}'
     location: 'global'     
   }  
+  dependsOn: [
+    acrpvtEndpoint
+  ]
 }
 
 module privateDNSACR '../../../azresources/Modules/Microsoft.Network/privateDnsZones/virtualNetworkLinks/az.net.private.dns.vnet.link.bicep' = {
@@ -161,6 +217,9 @@ module privateDNSACR '../../../azresources/Modules/Microsoft.Network/privateDnsZ
     virtualNetworkResourceId: vnetacrpvt.id
     privateDnsZoneName: privatednsACRZone.outputs.name
   }
+  dependsOn: [
+    privatednsACRZone
+  ]
 }
 
 module privateACRDNSZoneGroup  '../../../azresources/Modules/Microsoft.Network/privateEndPoints/privateDnsZoneGroups/az.net.private.dns.groups.bicep' = {
@@ -172,6 +231,24 @@ module privateACRDNSZoneGroup  '../../../azresources/Modules/Microsoft.Network/p
     ]
     privateEndpointName: acrpvtEndpoint.outputs.name
   }
+  dependsOn: [
+    acrpvtEndpoint
+    privatednsACRZone
+    privateDNSACR
+  ]
+}
+
+module modACRHubLink '../../../azresources/Modules/Microsoft.Network/privateDnsZones/virtualNetworkLinks/az.net.private.dns.vnet.link.bicep' = {
+  name: 'deploy-aksHubLink-${parLocation}-${parDeploymentNameSuffix}'
+  scope: resourceGroup(parHubSubscriptionId, parHubResourceGroupName)
+  params: {
+    virtualNetworkResourceId: parHubVirtualNetworkResourceId
+    privateDnsZoneName: privateACRDNSZoneGroup.name
+  }
+  dependsOn: [
+    privateACRDNSZoneGroup
+    modContainerRegistry
+  ]
 }
 
 // Create Container Registry

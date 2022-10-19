@@ -14,7 +14,10 @@ The subscription and resource group can be changed by providing the resource gro
 
 ## Pre-requisites
 
-* A hub/spoke LZ deployment (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
+* A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
+* Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
+
+## Parameters
 
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
@@ -25,7 +28,7 @@ parTags | object | {object} | Required tags values used with all resources.
 parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
 parKeyVaultName | object | {object} | The object of the key vault.  
 parTargetSubscriptionId | string | `xxxxxx-xxxx-xxxx-xxxxx-xxxxxx` | The target subscription ID for the target Network and resources. It defaults to the deployment subscription.
-parTargetResourceGroup | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group in which the key vault will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
+parTargetResourceGroup | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group in which the key vault will be deployed. If unchanged or not specified, the NoOps Accelerator will create an resource group to be used.
 
 ## Deploy the Overlay
 
@@ -40,7 +43,7 @@ For example, deploying using the `az deployment sub create` command in the Azure
 ### Azure CLI
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
 az login
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
@@ -51,11 +54,11 @@ az deployment sub create \
 --location eastus \
 --parameters @parameters/deploy.parameters.json
 cd overlays
-cd app-service-plan
+cd keyVault
 az deployment sub create \
-   --name deployAppServicePlan
-   --template-file overlays/management-groups/deploy.bicep \
-   --parameters @overlays/management-groups/deploy.parameters.json \
+   --name deploykeyVault
+   --template-file overlays/keyVault/deploy.bicep \
+   --parameters @overlays/keyVault/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -63,38 +66,33 @@ az deployment sub create \
 OR
 
 ```bash
-# For Azure IL regions
-az deployment group create \
-  --template-file overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicep \
-  --parameters @overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json \
+# For Azure Government regions
+az deployment sub create \
+  --template-file overlays/keyVault/deploy.bicep \
+  --parameters @overlays/keyVault/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-  --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
 ```
 
 ### PowerShell
 
 ```powershell
-# For Azure global regions
-New-AzGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json `
+# For Azure Commerical regions
+New-AzSubscriptionDeployment `
+  -TemplateFile overlays/keyVault/deploy.bicep `
+  -TemplateParameterFile overlays/keyVault/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
 ```
 
 OR
 
 ```powershell
-# For Azure IL regions
-New-AzGroupDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.bicepp `
-  -TemplateParameterFile overlays/management-groups/anoa.lz.mgmt.svcs.service.health.parameters.example.json `
+# For Azure Government regions
+New-AzSubscriptionDeployment `
+  -TemplateFile overlays/keyVault/deploy.bicep `
+  -TemplateParameterFile overlays/keyVault/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
 

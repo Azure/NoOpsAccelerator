@@ -7,6 +7,13 @@ param administratorLogin string = ''
 @secure()
 param administratorLoginPassword string = ''
 
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+@description('Conditional. The administrator username for the server. Required if no `administrators` object for AAD authentication is provided.')
+param publicNetworkAccess string = 'Enabled'
+
 @description('Optional. Location for all resources.')
 param location string = resourceGroup().location
 
@@ -89,6 +96,7 @@ resource server 'Microsoft.Sql/servers@2021-05-01-preview' = {
     } : null
     version: '12.0'
     minimalTlsVersion: minimalTlsVersion
+    publicNetworkAccess:  publicNetworkAccess
   }
 }
 
@@ -146,7 +154,7 @@ module server_databases './databases/az.data.sqlserver.database.bicep' = [for (d
   }
 }]
 
-module server_privateEndpoints '../../Microsoft.Network/privateEndpoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module server_privateEndpoints '../../Microsoft.Network/privateEndpoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-SQLServer-PrivateEndpoint-${index}'
   params: {
     groupIds: [

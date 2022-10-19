@@ -1,7 +1,6 @@
 // ----------------------------------------------------------------------------------
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
-//
+// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
+
 // THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, 
 // EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES 
 // OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -55,11 +54,23 @@ param parDataBricksWorkspace object
 
 // SUBSCRIPTIONS PARAMETERS
 
-@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
+// Target Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parTargetSubscriptionId": {
+//   "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxx"
+// }
+@description('The subscription ID for the Target Network and resources. It defaults to the deployment subscription.')
 param parTargetSubscriptionId string = subscription().subscriptionId
 
-@description('The name of the resource group in which the key vault will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.')
-param parTargetResourceGroup string
+// Target Resource Group Name
+// (JSON Parameter)
+// ---------------------------
+// "parTargetResourceGroup": {
+//   "value": "anoa-eastus-platforms-hub-rg"
+// }
+@description('The name of the resource group in which the App Service Plan will be deployed. If unchanged or not specified, the NoOps Accelerator will create an resource group to be used.')
+param parTargetResourceGroup string = ''
 
 // RESOURCE NAMING PARAMETERS
 

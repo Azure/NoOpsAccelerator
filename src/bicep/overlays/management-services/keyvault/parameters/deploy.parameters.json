@@ -31,8 +31,8 @@
       },
       "parKeyVault": {
         "value": {
-            "name": "",
-            "vaultSku": "",
+            "name": "keyvault001",
+            "vaultSku": "Standard",
             "enableSoftDelete": true,
             "enablePurgeProtection": true,
             "enabledForDiskEncryption": false,

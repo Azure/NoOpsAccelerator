@@ -242,7 +242,7 @@ module app_roleAssignments './rbac/roleAssignments.bicep' = [for (roleAssignment
   }
 }]
 
-module app_privateEndpoints '../../Microsoft.Network/privateEndPoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module app_privateEndpoints '../../Microsoft.Network/privateEndPoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-Site-PrivateEndpoint-${index}'
   params: {
     groupIds: [
@@ -279,3 +279,7 @@ output systemAssignedPrincipalId string = systemAssignedIdentity && contains(app
 
 @description('The location the resource was deployed into.')
 output location string = app.location
+
+@description('The location the resource was deployed into.')
+output privateEndpointsName string = app_privateEndpoints[0].outputs.name
+

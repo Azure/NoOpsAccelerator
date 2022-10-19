@@ -1,6 +1,7 @@
 # Modules Library
 
 This folder contains select bicep modules influenced from the [CARML](https://aka.ms/CARML) library that will be used to deploy NoOps Accelerator and the resources that it depends on, such as:
+
 *  Application Gateway
 *  Azure Firewalls
 *  Azure Firewall Policies
@@ -22,5 +23,3 @@ This folder contains select bicep modules influenced from the [CARML](https://ak
 *  Route Tables
 *  User Assigned Identities
 *  Virtual Networks
-
-These modules are called by the GitHub Actions located under the 'workflows' folder.

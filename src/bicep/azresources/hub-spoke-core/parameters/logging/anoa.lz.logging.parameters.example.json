@@ -1,0 +1,42 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parOrgPrefix": {
+            "value": "anoa"
+        },
+        "parTemplateVersion": {
+            "value": "v1.0"
+        },
+        "parOperationsSubscriptionId": {
+            "value": "<<subscriptionId>>"
+        },
+        "parDeployEnvironment": {
+            "value": "workload"
+        },        
+        "parLogAnalyticsWorkspaceCappingDailyQuotaGb": {
+            "value": -1
+        },
+        "parLogAnalyticsWorkspaceRetentionInDays": {
+            "value": 30
+        },
+        "parLogAnalyticsWorkspaceSkuName": {
+            "value": "PerGB2018"
+        },
+        "parDeploySentinel": {
+            "value": false
+        },
+        "parLogStorageSkuName": {
+            "value": "Standard_GRS"
+        },
+        "parAddRoleAssignmentForStorageAccount": {
+            "value": true
+        },
+        "parStorageAccountAccessObjectId": {
+            "value": "<<objectId>>"
+        },
+        "parStorageAccountAccessType": {
+            "value": "Group"
+        }
+    }
+}

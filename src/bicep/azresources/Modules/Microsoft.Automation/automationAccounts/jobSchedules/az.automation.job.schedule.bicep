@@ -24,7 +24,7 @@ param parameters object = {}
 @description('Optional. The hybrid worker group that the scheduled job should run on.')
 param runOn string = ''
 
-resource automationAccount 'Microsoft.Automation/automationAccounts@2020-01-13-preview' existing = {
+resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' existing = {
   name: automationAccountName
 }
 

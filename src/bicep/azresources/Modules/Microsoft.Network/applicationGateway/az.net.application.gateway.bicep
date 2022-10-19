@@ -1,20 +1,78 @@
 /* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
-@description('Application gateway name')
+@description('Required. Name of the Application Gateway.')
+@maxLength(24)
 param applicationGatewayName string
 
-@description('Application gateway location')
+@description('Optional. Location for all resources.')
 param location string = resourceGroup().location
 
-@description('Application gateway tier')
-@allowed([
-  'Standard'
-  'WAF'
-  'Standard_v2'
-  'WAF_v2'
-])
-param tier string
+@description('Optional. The ID(s) to assign to the resource.')
+param userAssignedIdentities object = {}
 
-@description('Application gateway sku')
+@description('Optional. Authentication certificates of the application gateway resource.')
+param authenticationCertificates array = []
+
+@description('Optional. Upper bound on number of Application Gateway capacity.')
+param autoscaleMaxCapacity int = -1
+
+@description('Optional. Lower bound on number of Application Gateway capacity.')
+param autoscaleMinCapacity int = -1
+
+@description('Optional. Backend address pool of the application gateway resource.')
+param backendAddressPools array = []
+
+@description('Optional. Backend http settings of the application gateway resource.')
+param backendHttpSettingsCollection array = []
+
+@description('Optional. Custom error configurations of the application gateway resource.')
+param customErrorConfigurations array = []
+
+@description('Optional. Whether FIPS is enabled on the application gateway resource.')
+param enableFips bool = false
+
+@description('Optional. Whether HTTP2 is enabled on the application gateway resource.')
+param enableHttp2 bool = false
+
+@description('Optional. The resource ID of an associated firewall policy. Should be configured for security reasons.')
+param firewallPolicyId string = ''
+
+@description('Optional. Frontend IP addresses of the application gateway resource.')
+param frontendIPConfigurations array = []
+
+@description('Optional. Frontend ports of the application gateway resource.')
+param frontendPorts array = []
+
+@description('Optional. Subnets of the application gateway resource.')
+param gatewayIPConfigurations array = []
+
+@description('Optional. Enable request buffering.')
+param enableRequestBuffering bool = false
+
+@description('Optional. Enable response buffering.')
+param enableResponseBuffering bool = false
+
+@description('Optional. Http listeners of the application gateway resource.')
+param httpListeners array = []
+
+@description('Optional. Load distribution policies of the application gateway resource.')
+param loadDistributionPolicies array = []
+
+@description('Optional. PrivateLink configurations on application gateway.')
+param privateLinkConfigurations array = []
+
+@description('Optional. Probes of the application gateway resource.')
+param probes array = []
+
+@description('Optional. Redirect configurations of the application gateway resource.')
+param redirectConfigurations array = []
+
+@description('Optional. Request routing rules of the application gateway resource.')
+param requestRoutingRules array = []
+
+@description('Optional. Rewrite rules for the application gateway resource.')
+param rewriteRuleSets array = []
+
+@description('Optional. The name of the SKU for the Application Gateway.')
 @allowed([
   'Standard_Small'
   'Standard_Medium'
@@ -24,436 +82,276 @@ param tier string
   'Standard_v2'
   'WAF_v2'
 ])
-param sku string
+param sku string = 'WAF_Medium'
 
-@description('Enable HTTP/2 support')
-param http2Enabled bool = true
-
-@description('Capacity (instance count) of application gateway')
+@description('Optional. The number of Application instances to be configured.')
 @minValue(1)
-@maxValue(32)
+@maxValue(10)
 param capacity int = 2
 
-@description('Autoscale capacity (instance count) of application gateway')
-@minValue(1)
-@maxValue(32)
-param autoScaleMaxCapacity int = 10
-
-@description('Public ip address name')
-param publicIpAddressName string
-
-@description('Virutal network subscription id')
-param vNetSubscriptionId string = subscription().subscriptionId
-
-@description('Virutal network resource group')
-param vNetResourceGroup string
-
-@description('Virutal network name')
-param vNetName string
-
-@description('Application gateway subnet name')
-param subnetName string
-
-@description('Array containing ssl certificates')
-@metadata({
-  name: 'Certificate name'
-  keyVaultResourceId: 'Key vault resource id'
-  secretName: 'Secret name'
-})
+@description('Optional. SSL certificates of the application gateway resource.')
 param sslCertificates array = []
 
-@description('Array containing trusted root certificates')
-@metadata({
-  name: 'Certificate name'
-  keyVaultResourceId: 'Key vault resource id'
-  secretName: 'Secret name'
-})
-param trustedRootCertificates array = []
-
-@description('Array containing http listeners')
-@metadata({
-  name: 'Listener name'
-  protocol: 'Listener protocol'
-  frontEndPort: 'Front end port name'
-  sslCertificate: 'SSL certificate name' // only required for https listeners
-  hostNames: 'Array containing host names'
-  firewallPolicy: 'Enabled/Disabled. Configures firewall policy on listener'
-})
-param httpListeners array
-
-@description('Array containing backend address pools')
-@metadata({
-  name: 'Backend address pool name'
-  backendAddresses: 'Array containing backend addresses'
-})
-param backendAddressPools array = []
-
-@description('Array containing backend http settings')
-@metadata({
-  name: 'Backend http setting name'
-  port: 'integer containing port number'
-  protocol: 'Backend http setting protocol'
-  cookieBasedAffinity: 'Enabled/Disabled. Configures cookie based affinity.'
-  requestTimeout: 'Integer containing backend http setting request timeout'
-  connectionDraining: {
-    drainTimeoutInSec: 'Integer containing connection drain timeout in seconds'
-    enabled: 'Bool to enable connection draining'
-  }
-  trustedRootCertificate: 'Trusted root certificate name'
-  hostName: 'Backend http setting host name'
-  probeName: 'Custom probe name'
-})
-param backendHttpSettings array = []
-
-@description('Array containing request routing rules')
-@metadata({
-  name: 'Rule name'
-  ruleType: 'Rule type'
-  listener: 'Http listener name'
-  backendPool: 'Backend pool name'
-  backendHttpSettings: 'Backend http setting name'
-  redirectConfiguration: 'Redirection configuration name'
-})
-param rules array
-
-@description('Array containing redirect configurations')
-@metadata({
-  name: 'Redirecton name'
-  redirectType: 'Redirect type'
-  targetUrl: 'Target URL'
-  includePath: 'Bool to include path'
-  includeQueryString: 'Bool to include query string'
-  requestRoutingRule: 'Name of request routing rule to associate redirection configuration'
-})
-param redirectConfigurations array = []
-
-@description('Array containing front end ports')
-@metadata({
-  name: 'Front port name'
-  port: 'Integer containing port number'
-})
-param frontEndPorts array
-
-@description('Array containing custom probes')
-@metadata({
-  name: 'Custom probe name'
-  protocol: 'Custom probe protocol'
-  host: 'Host name'
-  path: 'Probe path'
-  interval: 'Integer containing probe interval'
-  timeout: 'Integer containing probe timeout'
-  unhealthyThreshold: 'Integer containing probe unhealthy threshold'
-  pickHostNameFromBackendHttpSettings: 'Bool to enable pick host name from backend settings'
-  minServers: 'Integer containing min servers'
-  match: {
-    statusCodes: [
-      'Custom probe status codes'
-    ]
-  }
-})
-param customProbes array = []
-
-@description('Resource id of an existing user assigned managed identity to associate with the application gateway')
-param managedIdentityResourceId string = ''
-
-@description('Enable web application firewall')
-param enableWebApplicationFirewall bool = false
-
-@description('Name of the firewall policy. Only required if enableWebApplicationFirewall is set to true')
-param firewallPolicyName string = ''
-
-@description('Array containing the firewall policy settings. Only required if enableWebApplicationFirewall is set to true')
-@metadata({
-  requestBodyCheck: 'Bool to enable request body check'
-  maxRequestBodySizeInKb: 'Integer containing max request body size in kb'
-  fileUploadLimitInMb: 'Integer containing file upload limit in mb'
-  state: 'Enabled/Disabled. Configures firewall policy settings'
-  mode: 'Sets the detection mode'
-})
-param firewallPolicySettings object = {
-  requestBodyCheck: true
-  maxRequestBodySizeInKb: 128
-  fileUploadLimitInMb: 100
-  state: 'Enabled'
-  mode: 'Detection'
-}
-
-@description('Array containing the firewall policy custom rules. Only required if enableWebApplicationFirewall is set to true')
-@metadata({
-  action: 'Type of actions'
-  matchConditions: 'Array containing match conditions'
-  name: 'Custom rule name'
-  priority: 'Integer containing priority'
-  ruleType: 'Rule type'
-})
-param firewallPolicyCustomRules array = []
-
-@description('Array containing the firewall policy managed rule set. Only required if enableWebApplicationFirewall is set to true')
-@metadata({
-  ruleSetType: 'Rule set type'
-  ruleSetVersion: 'Rule set version'
-})
-param firewallPolicyManagedRuleSets array = [
-  {
-    ruleSetType: 'OWASP'
-    ruleSetVersion: '3.2'
-  }
+@description('Optional. Ssl cipher suites to be enabled in the specified order to application gateway.')
+@allowed([
+  'TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA'
+  'TLS_DHE_DSS_WITH_AES_128_CBC_SHA'
+  'TLS_DHE_DSS_WITH_AES_128_CBC_SHA256'
+  'TLS_DHE_DSS_WITH_AES_256_CBC_SHA'
+  'TLS_DHE_DSS_WITH_AES_256_CBC_SHA256'
+  'TLS_DHE_RSA_WITH_AES_128_CBC_SHA'
+  'TLS_DHE_RSA_WITH_AES_128_GCM_SHA256'
+  'TLS_DHE_RSA_WITH_AES_256_CBC_SHA'
+  'TLS_DHE_RSA_WITH_AES_256_GCM_SHA384'
+  'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA'
+  'TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256'
+  'TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256'
+  'TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA'
+  'TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384'
+  'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384'
+  'TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA'
+  'TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256'
+  'TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256'
+  'TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA'
+  'TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384'
+  'TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384'
+  'TLS_RSA_WITH_3DES_EDE_CBC_SHA'
+  'TLS_RSA_WITH_AES_128_CBC_SHA'
+  'TLS_RSA_WITH_AES_128_CBC_SHA256'
+  'TLS_RSA_WITH_AES_128_GCM_SHA256'
+  'TLS_RSA_WITH_AES_256_CBC_SHA'
+  'TLS_RSA_WITH_AES_256_CBC_SHA256'
+  'TLS_RSA_WITH_AES_256_GCM_SHA384'
+])
+param sslPolicyCipherSuites array = [
+  'TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384'
+  'TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256'
 ]
 
-@description('Array containing the firewall policy managed rule exclusions. Only required if enableWebApplicationFirewall is set to true')
-@metadata({
-  matchVariable: 'Variable to be excluded'
-  selector: 'String specifying exclusions'
-  selectorMatchOperator: 'Exclusion operator'
-})
-param firewallPolicyManagedRuleExclusions array = []
+@description('Optional. Ssl protocol enums.')
+@allowed([
+  'TLSv1_0'
+  'TLSv1_1'
+  'TLSv1_2'
+])
+param sslPolicyMinProtocolVersion string = 'TLSv1_2'
 
-@description('Enable delete lock')
-param enableDeleteLock bool = false
+@description('Optional. Ssl predefined policy name enums.')
+@allowed([
+  'AppGwSslPolicy20150501'
+  'AppGwSslPolicy20170401'
+  'AppGwSslPolicy20170401S'
+  ''
+])
+param sslPolicyName string = ''
 
-@description('Enable diagnostic logs')
-param enableDiagnostics bool = false
+@description('Optional. Type of Ssl Policy.')
+@allowed([
+  'Custom'
+  'Predefined'
+])
+param sslPolicyType string = 'Custom'
 
-@description('Storage account resource id. Only required if enableDiagnostics is set to true')
+@description('Optional. SSL profiles of the application gateway resource.')
+param sslProfiles array = []
+
+@description('Optional. Trusted client certificates of the application gateway resource.')
+param trustedClientCertificates array = []
+
+@description('Optional. Trusted Root certificates of the application gateway resource.')
+param trustedRootCertificates array = []
+
+@description('Optional. URL path map of the application gateway resource.')
+param urlPathMaps array = []
+
+@description('Optional. Application gateway web application firewall configuration. Should be configured for security reasons.')
+param webApplicationFirewallConfiguration object = {}
+
+@description('Optional. A list of availability zones denoting where the resource needs to come from.')
+param zones array = []
+
+@description('Optional. Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely.')
+@minValue(0)
+@maxValue(365)
+param diagnosticLogsRetentionInDays int = 365
+
+@description('Optional. Resource ID of the diagnostic storage account. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub.')
 param diagnosticStorageAccountId string = ''
 
-@description('Log analytics workspace resource id. Only required if enableDiagnostics is set to true')
-param logAnalyticsWorkspaceId string = ''
+@description('Optional. Resource ID of the diagnostic log analytics workspace. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub.')
+param diagnosticWorkspaceId string = ''
 
-var publicIpLockName = '${publicIpAddress.name}-lck'
-var publicIpDiagnosticsName = '${publicIpAddress.name}-dgs'
-var appGatewayLockName = '${applicationGateway.name}-lck'
-var appGatewayDiagnosticsName = '${applicationGateway.name}-dgs'
-var gatewayIpConfigurationName = 'appGatewayIpConfig'
-var frontendIpConfigurationName = 'appGwPublicFrontendIp'
+@description('Optional. Resource ID of the diagnostic event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to.')
+param diagnosticEventHubAuthorizationRuleId string = ''
 
-resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-03-01' = {
-  name: publicIpAddressName
-  location: location
-  sku: {
-    name: 'Standard'
+@description('Optional. Name of the diagnostic event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub.')
+param diagnosticEventHubName string = ''
+
+@description('Optional. The name of logs that will be streamed.')
+@allowed([
+  'ApplicationGatewayAccessLog'
+  'ApplicationGatewayPerformanceLog'
+  'ApplicationGatewayFirewallLog'
+])
+param diagnosticLogCategoriesToEnable array = [
+  'ApplicationGatewayAccessLog'
+  'ApplicationGatewayPerformanceLog'
+  'ApplicationGatewayFirewallLog'
+]
+
+@description('Optional. The name of metrics that will be streamed.')
+@allowed([
+  'AllMetrics'
+])
+param diagnosticMetricsToEnable array = [
+  'AllMetrics'
+]
+
+var identityType = !empty(userAssignedIdentities) ? 'UserAssigned' : 'None'
+
+var identity = identityType != 'None' ? {
+  type: identityType
+  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : null
+} : null
+
+@description('Optional. The name of the diagnostic setting, if deployed.')
+param diagnosticSettingsName string = '${applicationGatewayName}-diagnosticSettings'
+
+var diagnosticsLogs = [for category in diagnosticLogCategoriesToEnable: {
+  category: category
+  enabled: true
+  retentionPolicy: {
+    enabled: true
+    days: diagnosticLogsRetentionInDays
   }
-  properties: {
-    publicIPAllocationMethod: 'Static'
-  }
-}
+}]
 
-resource publicIpAddressDiagnostics 'microsoft.insights/diagnosticSettings@2021-05-01-preview' = if (enableDiagnostics) {
-  scope: publicIpAddress
-  name: publicIpDiagnosticsName
-  properties: {
-    workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
-    storageAccountId: empty(diagnosticStorageAccountId) ? null : diagnosticStorageAccountId
-    logs: [
-      {
-        categoryGroup: 'allLogs'
-        enabled: true
-      }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-      }
-    ]
+var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
+  category: metric
+  timeGrain: null
+  enabled: true
+  retentionPolicy: {
+    enabled: true
+    days: diagnosticLogsRetentionInDays
   }
-}
+}]
 
-resource publicIpAddressLock 'Microsoft.Authorization/locks@2017-04-01' = if (enableDeleteLock) {
-  scope: publicIpAddress
-  name: publicIpLockName
-  properties: {
-    level: 'CanNotDelete'
-  }
-}
+@allowed([
+  ''
+  'CanNotDelete'
+  'ReadOnly'
+])
+@description('Optional. Specify the type of lock.')
+param lock string = ''
 
-resource applicationGateway 'Microsoft.Network/applicationGateways@2021-03-01' = {
+@description('Optional. Array of role assignment objects that contain the \'roleDefinitionIdOrName\' and \'principalId\' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: \'/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11\'.')
+param roleAssignments array = []
+
+@description('Optional. Resource tags.')
+param tags object = {}
+
+
+
+
+resource applicationGateway 'Microsoft.Network/applicationGateways@2021-08-01' = {
   name: applicationGatewayName
   location: location
-  identity: !empty(managedIdentityResourceId) ? {
-    type: 'UserAssigned'
-    userAssignedIdentities: {
-      '${managedIdentityResourceId}': {}
-    }
-  } : null
-  properties: {
-    sku: {
-      name: sku
-      tier: tier
-    }
-    autoscaleConfiguration: {
-      minCapacity: capacity
-      maxCapacity: autoScaleMaxCapacity
-    }
-    enableHttp2: http2Enabled
-    webApplicationFirewallConfiguration: enableWebApplicationFirewall ? {
-      enabled: firewallPolicySettings.state == 'Enabled' ? true : false
-      firewallMode: firewallPolicySettings.mode
-      ruleSetType: 'OWASP'
-      ruleSetVersion: '3.2'
-    } : null
-    gatewayIPConfigurations: [
-      {
-        name: gatewayIpConfigurationName
-        properties: {
-          subnet: {
-            id: resourceId(vNetSubscriptionId, vNetResourceGroup, 'Microsoft.Network/virtualNetworks/subnets', vNetName, subnetName)
-          }
-        }
+  tags: tags
+  identity: identity
+  properties: union({
+      authenticationCertificates: authenticationCertificates
+      autoscaleConfiguration: autoscaleMaxCapacity > 0 && autoscaleMinCapacity >= 0 ? {
+        maxCapacity: autoscaleMaxCapacity
+        minCapacity: autoscaleMinCapacity
+      } : null
+      backendAddressPools: backendAddressPools
+      backendHttpSettingsCollection: backendHttpSettingsCollection
+      customErrorConfigurations: customErrorConfigurations
+      enableHttp2: enableHttp2
+      firewallPolicy: !empty(firewallPolicyId) ? {
+        id: firewallPolicyId
+      } : null
+      forceFirewallPolicyAssociation: !empty(firewallPolicyId)
+      frontendIPConfigurations: frontendIPConfigurations
+      frontendPorts: frontendPorts
+      gatewayIPConfigurations: gatewayIPConfigurations
+      globalConfiguration: {
+        enableRequestBuffering: enableRequestBuffering
+        enableResponseBuffering: enableResponseBuffering
       }
-    ]
-    frontendIPConfigurations: [
-      {
-        name: frontendIpConfigurationName
-        properties: {
-          publicIPAddress: {
-            id: publicIpAddress.id
-          }
-        }
+      httpListeners: httpListeners
+      loadDistributionPolicies: loadDistributionPolicies
+      privateLinkConfigurations: privateLinkConfigurations
+      probes: probes
+      redirectConfigurations: redirectConfigurations
+      requestRoutingRules: requestRoutingRules
+      rewriteRuleSets: rewriteRuleSets
+      sku: {
+        name: sku
+        tier: endsWith(sku, 'v2') ? sku : substring(sku, 0, indexOf(sku, '_'))
+        capacity: autoscaleMaxCapacity > 0 && autoscaleMinCapacity >= 0 ? null : capacity
       }
-    ]
-    frontendPorts: [for frontEndPort in frontEndPorts: {
-      name: frontEndPort.name
-      properties: {
-        port: frontEndPort.port
+      sslCertificates: sslCertificates
+      sslPolicy: {
+        cipherSuites: sslPolicyCipherSuites
+        minProtocolVersion: sslPolicyMinProtocolVersion
+        policyName: empty(sslPolicyName) ? null : sslPolicyName
+        policyType: sslPolicyType
       }
-    }]
-    probes: [for probe in customProbes: {
-      name: probe.name
-      properties: {
-        protocol: probe.protocol
-        host: probe.host
-        path: probe.path
-        interval: probe.interval
-        timeout: probe.timeout
-        unhealthyThreshold: probe.unhealthyThreshold
-        pickHostNameFromBackendHttpSettings: probe.pickHostNameFromBackendHttpSettings
-        minServers: probe.minServers
-        match: probe.match
-      }
-    }]
-    backendAddressPools: [for backendAddressPool in backendAddressPools: {
-      name: backendAddressPool.name
-      properties: {
-        backendAddresses: backendAddressPool.backendAddresses
-      }
-    }]
-    firewallPolicy: enableWebApplicationFirewall ? {
-      id: firewallPolicy.id
-    } : null
-    trustedRootCertificates: [for trustedRootCertificate in trustedRootCertificates: {
-      name: trustedRootCertificate.name
-      properties: {
-        keyVaultSecretId: '${reference(trustedRootCertificate.keyVaultResourceId, '2021-10-01').vaultUri}secrets/${trustedRootCertificate.secretName}'
-      }
-    }]
-    sslCertificates: [for sslCertificate in sslCertificates: {
-      name: sslCertificate.name
-      properties: {
-        keyVaultSecretId: '${reference(sslCertificate.keyVaultResourceId, '2021-10-01').vaultUri}secrets/${sslCertificate.secretName}'
-      }
-    }]
-    backendHttpSettingsCollection: [for backendHttpSetting in backendHttpSettings: {
-      name: backendHttpSetting.name
-      properties: {
-        port: backendHttpSetting.port
-        protocol: backendHttpSetting.protocol
-        cookieBasedAffinity: backendHttpSetting.cookieBasedAffinity
-        affinityCookieName: contains(backendHttpSetting, 'affinityCookieName') ? backendHttpSetting.affinityCookieName : null
-        requestTimeout: backendHttpSetting.requestTimeout
-        connectionDraining: backendHttpSetting.connectionDraining
-        probe: contains(backendHttpSetting, 'probeName') ? json('{"id": "${resourceId('Microsoft.Network/applicationGateways/probes', applicationGatewayName, backendHttpSetting.probeName)}"}') : null
-        trustedRootCertificates: contains(backendHttpSetting, 'trustedRootCertificate') ? json('[{"id": "${resourceId('Microsoft.Network/applicationGateways/trustedRootCertificates', applicationGatewayName, backendHttpSetting.trustedRootCertificate)}"}]') : null
-        // hostName: contains(backendHttpSetting, 'hostName') ? backendHttpSetting.hostName : json('null')
-        pickHostNameFromBackendAddress: contains(backendHttpSetting, 'pickHostNameFromBackendAddress') ? backendHttpSetting.pickHostNameFromBackendAddress : false
-      }
-    }]
-    httpListeners: [for httpListener in httpListeners: {
-      name: httpListener.name
-      properties: {
-        frontendIPConfiguration: {
-          id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', applicationGatewayName, frontendIpConfigurationName)
-        }
-        frontendPort: {
-          id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', applicationGatewayName, httpListener.frontEndPort)
-        }
-        protocol: httpListener.protocol
-        sslCertificate: contains(httpListener, 'sslCertificate') ? json('{"id": "${resourceId('Microsoft.Network/applicationGateways/sslCertificates', applicationGatewayName, httpListener.sslCertificate)}"}') : null
-        hostNames: contains(httpListener, 'hostNames') ? httpListener.hostNames : null
-        hostName: contains(httpListener, 'hostName') ? httpListener.hostName : null
-        requireServerNameIndication: contains(httpListener, 'requireServerNameIndication') ? httpListener.requireServerNameIndication : false
-        firewallPolicy: contains(httpListener, 'firewallPolicy') ? json('{"id": "${firewallPolicy.id}"}') : null
-      }
-    }]
-    requestRoutingRules: [for rule in rules: {
-      name: rule.name
-      properties: {
-        ruleType: rule.ruleType
-        httpListener: contains(rule, 'listener') ? json('{"id": "${resourceId('Microsoft.Network/applicationGateways/httpListeners', applicationGatewayName, rule.listener)}"}') : null
-        backendAddressPool: contains(rule, 'backendPool') ? json('{"id": "${resourceId('Microsoft.Network/applicationGateways/backendAddressPools', applicationGatewayName, rule.backendPool)}"}') : null
-        backendHttpSettings: contains(rule, 'backendHttpSettings') ? json('{"id": "${resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', applicationGatewayName, rule.backendHttpSettings)}"}') : null
-        redirectConfiguration: contains(rule, 'redirectConfiguration') ? json('{"id": "${resourceId('Microsoft.Network/applicationGateways/redirectConfigurations', applicationGatewayName, rule.redirectConfiguration)}"}') : null
-      }
-    }]
-    redirectConfigurations: [for redirectConfiguration in redirectConfigurations: {
-      name: redirectConfiguration.name
-      properties: {
-        redirectType: redirectConfiguration.redirectType
-        targetUrl: redirectConfiguration.targetUrl
-        targetListener: contains(redirectConfiguration, 'targetListener') ? json('{"id": "${resourceId('Microsoft.Network/applicationGateways/httpListeners', applicationGatewayName, redirectConfiguration.targetListener)}"}') : null
-        includePath: redirectConfiguration.includePath
-        includeQueryString: redirectConfiguration.includeQueryString
-        requestRoutingRules: [
-          {
-            id: resourceId('Microsoft.Network/applicationGateways/requestRoutingRules', applicationGatewayName, redirectConfiguration.requestRoutingRule)
-          }
-        ]
-      }
-    }]
-  }
+      sslProfiles: sslProfiles
+      trustedClientCertificates: trustedClientCertificates
+      trustedRootCertificates: trustedRootCertificates
+      urlPathMaps: urlPathMaps
+      webApplicationFirewallConfiguration: webApplicationFirewallConfiguration
+    }, (enableFips ? {
+      enableFips: enableFips
+    } : {}), {})
+  zones: zones
 }
 
-resource applicationGatewayDiagnostics 'microsoft.insights/diagnosticSettings@2021-05-01-preview' = if (enableDiagnostics) {
-  scope: applicationGateway
-  name: appGatewayDiagnosticsName
+resource applicationGateway_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+  name: '${applicationGateway.name}-${lock}-lock'
   properties: {
-    workspaceId: empty(logAnalyticsWorkspaceId) ? null : logAnalyticsWorkspaceId
+    level: any(lock)
+    notes: lock == 'CanNotDelete' ? 'Cannot delete resource or child resources.' : 'Cannot modify the resource or child resources.'
+  }
+  scope: applicationGateway
+}
+
+resource applicationGateway_diagnosticSettingName 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(diagnosticStorageAccountId) || !empty(diagnosticWorkspaceId) || !empty(diagnosticEventHubAuthorizationRuleId) || !empty(diagnosticEventHubName)) {
+  name: diagnosticSettingsName
+  properties: {
     storageAccountId: empty(diagnosticStorageAccountId) ? null : diagnosticStorageAccountId
-    logs: [
-      {
-        categoryGroup: 'allLogs'
-        enabled: true
-      }
-    ]
-    metrics: [
-      {
-        category: 'AllMetrics'
-        enabled: true
-      }
-    ]
+    workspaceId: empty(diagnosticWorkspaceId) ? null : diagnosticWorkspaceId
+    eventHubAuthorizationRuleId: empty(diagnosticEventHubAuthorizationRuleId) ? null : diagnosticEventHubAuthorizationRuleId
+    eventHubName: empty(diagnosticEventHubName) ? null : diagnosticEventHubName
+    metrics: empty(diagnosticStorageAccountId) && empty(diagnosticWorkspaceId) && empty(diagnosticEventHubAuthorizationRuleId) && empty(diagnosticEventHubName) ? null : diagnosticsMetrics
+    logs: empty(diagnosticStorageAccountId) && empty(diagnosticWorkspaceId) && empty(diagnosticEventHubAuthorizationRuleId) && empty(diagnosticEventHubName) ? null : diagnosticsLogs
   }
-}
-
-resource applicationGatewayLock 'Microsoft.Authorization/locks@2017-04-01' = if (enableDeleteLock) {
   scope: applicationGateway
-  name: appGatewayLockName
-  properties: {
-    level: 'CanNotDelete'
-  }
 }
 
-resource firewallPolicy 'Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies@2021-03-01' = if (enableWebApplicationFirewall) {
-  name: firewallPolicyName == '' ? 'placeholdervalue' : firewallPolicyName // placeholder value required as name cannot be empty/null when enableWebApplicationFirewall equals false 
-  location: location
-  properties: {
-    customRules: firewallPolicyCustomRules
-    policySettings: firewallPolicySettings
-    managedRules: {
-      managedRuleSets: firewallPolicyManagedRuleSets
-      exclusions: firewallPolicyManagedRuleExclusions
-    }
+module applicationGateway_roleAssignments './rbac/roleAssignments.bicep' = [for (roleAssignment, index) in roleAssignments: {
+  name: '${uniqueString(deployment().name, location)}-AppGateway-Rbac-${index}'
+  params: {
+    description: contains(roleAssignment, 'description') ? roleAssignment.description : ''
+    principalIds: roleAssignment.principalIds
+    principalType: contains(roleAssignment, 'principalType') ? roleAssignment.principalType : ''
+    roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
+    condition: contains(roleAssignment, 'condition') ? roleAssignment.condition : ''
+    delegatedManagedIdentityResourceId: contains(roleAssignment, 'delegatedManagedIdentityResourceId') ? roleAssignment.delegatedManagedIdentityResourceId : ''
+    resourceId: applicationGateway.id
   }
-}
+}]
 
+@description('The name of the application gateway.')
 output name string = applicationGateway.name
-output id string = applicationGateway.id
+
+@description('The resource ID of the application gateway.')
+output resourceId string = applicationGateway.id
+
+@description('The resource group the application gateway was deployed into.')
+output resourceGroupName string = resourceGroup().name
+
+@description('The location the resource was deployed into.')
+output location string = applicationGateway.location

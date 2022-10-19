@@ -40,6 +40,12 @@ param parSecurityCenter object
 
 // LOGGING PARAMETERS
 
+// Logging Log Analytics Workspace Resource Id
+// (JSON Parameter)
+// ---------------------------
+// "parLogAnalyticsWorkspaceResourceId": {
+//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-platforms-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-platforms-logging-log"
+// }
 @description('Log Analytics Workspace Resource Id Needed for Defender')
 param parLogAnalyticsWorkspaceResourceId string
 

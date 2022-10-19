@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {        
         "parTargetSubscriptionId": {
-            "value": "896f5276-df9a-4317-a791-469396bef7fa"
+            "value": "<<subscriptionId>>"
         },
         "parSecurityCenter": {
             "value": {

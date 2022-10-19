@@ -2,7 +2,7 @@
 
 ## Overview
 
-This overlay module adds an web traffic load balancer that enables you to manage traffic to your web applications. This application gateway is meant to be in the Hub Network.
+This overlay module adds an web traffic load balancer that enables you to manage traffic to your web applications. This application gateway is meant to be in the Hub Network of the deployed hub/spoke design.
 
 Read on to understand what this overlay does, and when you're ready, collect all of the pre-requisites, then deploy the overlay
 
@@ -22,6 +22,8 @@ Some particulars about Application Gateway:
 
 * A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
 * Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
+
+## Parameters
 
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
@@ -45,11 +47,18 @@ Once you have the hub/spoke output values, you can pass those in as parameters t
 
 For example, deploying using the `az deployment sub create` command in the Azure CLI:
 
-### Azure CLI
+<h3>Overlay Example: Application Gateway</h3>
+
+<details>
+
+<summary>via Bash</summary>
 
 ```bash
-# For Azure global regions
+# For Azure Commerical regions
+
+#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
 az login
+
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
 az deployment sub create \ 
@@ -59,11 +68,11 @@ az deployment sub create \
 --location eastus \
 --parameters @platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json
 cd overlays
-cd app-service-plan
+cd applicationGateway
 az deployment sub create \
    --name deploy-AppGateway
-   --template-file overlays/app-service-plan/deploy.bicep \
-   --parameters @overlays/app-service-plan/deploy.parameters.json \
+   --template-file overlays/applicationGateway/deploy.bicep \
+   --parameters @overlays/applicationGateway/parameters/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -71,22 +80,45 @@ az deployment sub create \
 OR
 
 ```bash
-# For Azure IL regions
+# For Azure Government regions
+
+# change Azure Clouds
+az cloud set --name AzureUSGovernment
+
+#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
+az login
+cd src/bicep/overlays
+cd applicationGateway
 az deployment sub create \
-  --template-file overlays/app-service-plan/deploy.bicep \
-  --parameters @overlays/app-service-plan/deploy.parameters.json \
+  --template-file overlays/applicationGateway/deploy.bicep \
+  --parameters @overlays/applicationGateway/parameters/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
   --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
 ```
 
-### PowerShell
+</details>
+<p>
+
+<details>
+
+<summary>via Powershell</summary>
 
 ```powershell
-# For Azure global regions
+# For Azure Commerical regions
+
+#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
+Connect-AzAccount
+
+#Fetch the list of available Tenant Ids.
+Get-AzTenant
+
+#Grab the tenant Id Switch to another active directory tenant.
+Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+
 New-AzSubscriptionDeployment `
-  -TemplateFile overlays/app-service-plan/deploy.bicepp `
-  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
+  -TemplateFile overlays/applicationGateway/deploy.bicepp `
+  -TemplateParameterFile overlays/applicationGateway/parameters/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -Location 'eastus'
 ```
@@ -94,17 +126,30 @@ New-AzSubscriptionDeployment `
 OR
 
 ```powershell
-# For Azure IL regions
+# For Azure Government regions
+
+#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
+Connect-AzAccount
+
+#Fetch the list of available Tenant Ids.
+Get-AzTenant
+
+#Grab the tenant Id Switch to another active directory tenant.
+Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+
 New-AzSubscriptionDeployment `
-  -TemplateFile overlays/app-service-plan/deploy.bicepp `
-  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
+  -TemplateFile overlays/applicationGateway/deploy.bicepp `
+  -TemplateParameterFile overlays/applicationGateway/parameters/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -Location  'usgovvirginia'
 ```
 
+</details>
+<p>
+
 ## Extending the Overlay
 
-By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [`App Service Plans `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
+By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [`Network Application Gateways [Microsoft.Network/applicationGateways]`](../../../azresources/Modules/Microsoft.Network/applicationGateway/readme.md)
 
 ## Air-Gapped Clouds
 
@@ -114,12 +159,20 @@ For air-gapped clouds it may be convenient to transfer and deploy the compiled A
 
 Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
 
+Configure the default group using:
+
 ```bash
-az resource list --resource-group anoa-eastus-dev-appplan-rg
+az configure --defaults group=anoa-eastus-dev-appGateway-rg.
 ```
 
+```bash
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-dev-appGateway-rg
+```
+
+OR
+
 ```powershell
-Get-AzResource -ResourceGroupName anoa-eastus-dev-appplan-rg
+Get-AzResource -ResourceGroupName anoa-eastus-dev-appGateway-rg
 ```
 
 ## Cleanup
@@ -132,6 +185,8 @@ The Bicep/ARM deployment of NoOps Accelerator - Application Gateway deployment c
 az group delete --name anoa-eastus-dev-appgateway-rg
 ```
 
+OR
+
 ```powershell
 Remove-AzResourceGroup -Name anoa-eastus-dev-appgateway-rg
 ```
@@ -142,6 +197,8 @@ Remove-AzResourceGroup -Name anoa-eastus-dev-appgateway-rg
 az deployment delete --name deploy-AppGateway
 ```
 
+OR
+
 ```powershell
 Remove-AzSubscriptionDeployment -Name deploy-AppGateway
 ```
@@ -149,3 +206,9 @@ Remove-AzSubscriptionDeployment -Name deploy-AppGateway
 ## Example Output in Azure
 
 ![App Gateway Example Deployment Output](media/agwExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
+
+### References
+
+* [Azure Application Gateway Documentation](https://docs.microsoft.com/en-us/azure/application-gateway//)
+* [Azure Application Gateway Overview](https://docs.microsoft.com/en-us/azure/application-gateway/overview)
+* [Overview of TLS termination and end to end TLS with Application Gateway](https://docs.microsoft.com/en-us/azure/application-gateway/ssl-overview)

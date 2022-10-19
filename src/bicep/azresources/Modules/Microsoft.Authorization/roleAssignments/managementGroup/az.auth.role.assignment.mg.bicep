@@ -322,7 +322,7 @@ var builtInRoleNames_var = {
 
 var roleDefinitionId_var = (contains(builtInRoleNames_var, roleDefinitionIdOrName) ? builtInRoleNames_var[roleDefinitionIdOrName] : roleDefinitionIdOrName)
 
-resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-10-01-preview' = {
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(managementGroupId, roleDefinitionId_var, principalId)
   properties: {
     roleDefinitionId: roleDefinitionId_var

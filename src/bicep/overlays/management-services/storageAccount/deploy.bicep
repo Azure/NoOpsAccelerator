@@ -48,24 +48,42 @@ param parTags object
 @description('The region to deploy resources into. It defaults to the deployment location.')
 param parLocation string = deployment().location
 
-// APP SERVICE PARAMETERS
-
+// STORAGE ACCOUNT PARAMETERS
+// Example (JSON)
+// -----------------------------
+//"parStorageAccount": {
+//        "value": {
+//           "storageAccountKind": "Storage",
+//           "storageAccountSku": "Standard_LRS"
+//        }
+//   }
 @description('Defines the App Service Plan.')
-param parAppServicePlan object 
+param parStorageAccount object
 
 // SUBSCRIPTIONS PARAMETERS
 
-@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
+// Target Virtual Network Name
+// (JSON Parameter)
+// ---------------------------
+// "parTargetSubscriptionId": {
+//   "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxx"
+// }
+@description('The subscription ID for the Target Network and resources. It defaults to the deployment subscription.')
 param parTargetSubscriptionId string = subscription().subscriptionId
 
-@description('The name of the resource group in which the key vault will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.')
-param parTargetResourceGroup string
+// Target Resource Group Name
+// (JSON Parameter)
+// ---------------------------
+// "parTargetResourceGroup": {
+//   "value": "anoa-eastus-platforms-hub-rg"
+// }
+@description('The name of the resource group in which the service will be deployed. If unchanged or not specified, the NoOps Accelerator will create an resource group to be used.')
+param parTargetResourceGroup string = ''
 
 // RESOURCE NAMING PARAMETERS
 
 @description('A suffix to use for naming deployments uniquely. It defaults to the Bicep resolution of the "utcNow()" function.')
 param parDeploymentNameSuffix string = utcNow()
-
 
 @description('The current date - do not override the default value')
 param dateUtcNow string = utcNow('yyyy-MM-dd HH:mm:ss')
@@ -84,11 +102,15 @@ var varNamingConvention = '${toLower(parRequired.orgPrefix)}-${toLower(parLocati
 // RESOURCE NAME CONVENTIONS WITH ABBREVIATIONS
 
 var varResourceGroupNamingConvention = replace(varNamingConvention, varResourceToken, 'rg')
+var varStorageAccountNamingConvention = toLower('${parRequired.deployEnvironment}st${varNameToken}unique_storage_token')
 
 // APP SERVICE PLAN NAMES
 
-var varAppServicePlanName = 'AppSvcsPlan'
-var varServiceHealtResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, varAppServicePlanName)
+var varStorageAccountName = 'AppSvcsPlan'
+var varStorageAccountGroupName = replace(varResourceGroupNamingConvention, varNameToken, varStorageAccountName)
+var varStorageAccountLogStorageAccountShortName = replace(varStorageAccountNamingConvention, varNameToken, varStorageAccountName)
+var varStorageAccountLogStorageAccountUniqueName = replace(varStorageAccountLogStorageAccountShortName, 'unique_storage_token', uniqueString(parTargetSubscriptionId, parLocation, parRequired.deployEnvironment))
+var varStorageAccountLogStorageAccountName = take(varStorageAccountLogStorageAccountUniqueName, 23)
 
 //=== TAGS === 
 
@@ -96,7 +118,6 @@ var referential = {
   region: parLocation
   deploymentDate: dateUtcNow
 }
-
 
 @description('Resource group tags')
 module modTags '../../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
@@ -110,22 +131,26 @@ module modTags '../../../azresources/Modules/Microsoft.Resources/tags/az.resourc
 // APP SERVICE PLAN
 
 // Create App Service Plan resource group
-resource rgAppServicePlanRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: (!empty(parTargetResourceGroup)) ? parTargetResourceGroup : varServiceHealtResourceGroupName
+resource rgStorageAccountRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
+  name: (!empty(parTargetResourceGroup)) ? parTargetResourceGroup : varStorageAccountGroupName
   location: parLocation
 }
 
 // Create App Service Plan
-module appServicePlan '../../../azresources/Modules/Microsoft.Web/serverfarms/az.app.service.plan.bicep' = {
-  name: 'appServicePlanName'
-  scope: resourceGroup(parTargetSubscriptionId, rgAppServicePlanRg.name)
-  params: {    
-    location: parLocation    
-    appServicePlanName: varAppServicePlanName
-    appServicePlanSku:  parAppServicePlan.appServicePlanSku         
+module modStorageAccount '../../../azresources/Modules/Microsoft.Storage/storageAccounts/az.data.storage.bicep' = {
+  name: 'StorageAccountName'
+  scope: resourceGroup(rgStorageAccountRg.name)
+  params: {
+    // Required parameters
+    name: varStorageAccountLogStorageAccountName
+    location: parLocation
+    // Non-required parameters
+    allowBlobPublicAccess: false
+    storageAccountKind: parStorageAccount.storageAccountKind
+    storageAccountSku: parStorageAccount.storageAccountSku
   }
 }
 
-output appServicePlanName string = varAppServicePlanName
 output resourceGroupName string = parTargetResourceGroup
 output tags object = modTags.outputs.tags
+output storageAccountName string = varStorageAccountLogStorageAccountName

@@ -6,14 +6,14 @@
       "value": {
         "orgPrefix": "anoa",
         "templateVersion": "v1.0",
-        "deployEnvironment": "appsvcsplan"
+        "deployEnvironment": "dev"
       }
     },
     "parTags": {
       "value": {
         "organization": "anoa",
         "templateVersion": "v1.0",
-        "deployEnvironment": "appsvcsplan",
+        "deployEnvironment": "dev",
         "deploymentType": "NoOpsBicep"
       }
     },
@@ -22,16 +22,10 @@
     },
     "parTargetResourceGroup": {
       "value": "<<example-rg>>"
-    },
-    "parTargetVNetName": {
-      "value": "<<example-vnet>>"
-    },
-    "parTargetSubnetName": {
-      "value": "<<example-subnet>>"
-    },
-    "parContainerRegistry": {
+    },    
+    "parDataBricksWorkspace": {
       "value": {
-        "name": "anoaeastusdevacr",
+        "name": "anoaeastusdevdbws",
         "acrSku": "Premium",
         "enableResourceLock": true        
       }
