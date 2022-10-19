@@ -1,0 +1,28 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parHubVirtualNetworkName": {
+            "value": "anoa-eastus-workload-hub-vnet"
+        },
+        "parSpokes": {
+            "value": [
+                {
+                    "name": "operations",
+                    "virtualNetworkResourceId": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-workload-operations-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-workload-operations-vnet",
+                    "virtualNetworkName": "anoa-eastus-workload-operations-vnet"
+                },                
+                {
+                    "name": "sharedServices",
+                    "virtualNetworkResourceId": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-workload-sharedservices-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-workload-sharedservices-vnet",
+                    "virtualNetworkName": "anoa-eastus-workload-sharedservices-vnet"
+                },                
+                {
+                    "name": "identity",
+                    "virtualNetworkResourceId": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-workload-identity-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-workload-identity-vnet",
+                    "virtualNetworkName": "anoa-eastus-workload-identity-vnet"
+                }
+            ]
+        }
+    }
+}

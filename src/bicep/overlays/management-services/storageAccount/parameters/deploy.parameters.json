@@ -6,14 +6,14 @@
         "value": {
           "orgPrefix": "anoa",
           "templateVersion": "v1.0",
-          "deployEnvironment": "dev"
+          "deployEnvironment": "appsvcsplan"
         }
       },
       "parTags": {
         "value": {
           "organization": "anoa",
           "templateVersion": "v1.0",
-          "deployEnvironment": "dev",
+          "deployEnvironment": "appsvcsplan",
           "deploymentType": "NoOpsBicep"
         }
       },
@@ -21,12 +21,17 @@
         "value": "<<subscriptionId>>"
       },
       "parTargetResourceGroup": {
-        "value": "<<target-rg>>"
+        "value": "<<example-rg>>"
       },
-      "parStorageAccount": {
+      "parAppServicePlan": {
         "value": {
-            "storageAccountKind": "Storage",
-            "storageAccountSku": "Standard_LRS"
+            "appServicePlanSku": {
+              "capacity": "1",
+              "family": "S",
+              "name": "S1",
+              "size": "S1",
+              "tier": "Standard"
+            }
         }
       }
     }

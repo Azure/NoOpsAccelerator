@@ -24,8 +24,6 @@ The subscription and resource group can be changed by providing the resource gro
 * A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
 * Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
 
-## Parameters
-
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
 Required Parameters | Type | Allowed Values | Description
@@ -52,7 +50,7 @@ For example, deploying using the `az deployment sub create` command in the Azure
 ### Azure CLI
 
 ```bash
-# For Azure Commerical regions
+# For Azure global regions
 az login
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
@@ -63,11 +61,11 @@ az deployment sub create \
 --location eastus \
 --parameters @platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json
 cd overlays
-cd defender
+cd app-service-plan
 az deployment sub create \
-   --name deploy-defender
-   --template-file overlays/defender/deploy.bicep \
-   --parameters @overlays/defender/deploy.parameters.json \
+   --name deploy-AppServicePlan
+   --template-file overlays/app-service-plan/deploy.bicep \
+   --parameters @overlays/app-service-plan/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -75,64 +73,48 @@ az deployment sub create \
 OR
 
 ```bash
-# For Azure Government regions
+# For Azure IL regions
 az deployment sub create \
-  --name deploy-defender
-  --template-file overlays/defender/deploy.bicep \
-  --parameters @overlays/defender/deploy.parameters.json \
+  --template-file overlays/app-service-plan/deploy.bicep \
+  --parameters @overlays/app-service-plan/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
+  --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
 ```
 
 ### PowerShell
 
 ```powershell
-# For Azure Commerical regions
+# For Azure global regions
 New-AzSubscriptionDeployment `
-  -TemplateFile overlays/defender/deploy.bicepp `
-  -TemplateParameterFile overlays/defender/deploy.parameters.example.json `
+  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
+  -TemplateFile overlays/app-service-plan/deploy.bicepp `
+  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
+  -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
 ```
 
 OR
 
 ```powershell
-# For Azure Government regions
+# For Azure IL regions
 New-AzSubscriptionDeployment `
-  -TemplateFile overlays/defender/deploy.bicepp `
-  -TemplateParameterFile overlays/defender/deploy.parameters.example.json `
+  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
+  -TemplateFile overlays/app-service-plan/deploy.bicepp `
+  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
+  -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
 
 ## Extending the Overlay
 
-By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [Microsoft Defender for Cloud `[Microsoft.Security/azureSecurityCenter]`](../../../azresources/Modules/Microsoft.Security/defenderForCloud/readme.md)
+By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [`App Service Plans `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
 
 ## Air-Gapped Clouds
 
 For air-gapped clouds it may be convenient to transfer and deploy the compiled ARM template instead of the Bicep template if the Bicep CLI tools are not available or if it is desirable to transfer only one file into the air gap.
-
-## Validate the deployment
-
-Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
-
-Configure the default group using:
-
-```bash
-az configure --defaults group=anoa-eastus-hub-defender-rg.
-```
-
-```bash
-az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-hub-defender-rg
-```
-
-OR
-
-```powershell
-Get-AzResource -ResourceGroupName anoa-eastus-hub-defender-rg
-```
 
 ## Cleanup
 
@@ -140,28 +122,12 @@ The Bicep/ARM deployment of NoOps Accelerator - Microsoft Defender for Cloud dep
 
 ### Delete Resource Groups
 
-```bash
-az group delete --name anoa-eastus-hub-defender-rg
-```
-
-OR
-
-```powershell
-Remove-AzResourceGroup -Name anoa-eastus-hub-defender-rg
-```
+Remove-AzResourceGroup -Name anoa-eastus-workload-app-service-plan-rg
 
 ### Delete Deployments
 
-```bash
-az deployment delete --name deploy-defender
-```
-
-OR
-
-```powershell
-Remove-AzSubscriptionDeployment -Name deploy-defender
-```
+Remove-AzSubscriptionDeployment -Name deploy-AppServicePlan
 
 ## Example Output in Azure
 
-![Example Deployment Output](media/defenderExampleDeploymentOutput.png "Example Deployment Output in Azure Commerical regions")
+![Example Deployment Output](media/aspExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")

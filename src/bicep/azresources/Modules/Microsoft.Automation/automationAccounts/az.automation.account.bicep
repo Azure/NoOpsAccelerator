@@ -164,7 +164,7 @@ resource cMKKeyVaultKey 'Microsoft.KeyVault/vaults/keys@2021-10-01' existing = i
   scope: resourceGroup(split(cMKKeyVaultResourceId, '/')[2], split(cMKKeyVaultResourceId, '/')[4])
 }
 
-resource automationAccount 'Microsoft.Automation/automationAccounts@2021-06-22' = {
+resource automationAccount 'Microsoft.Automation/automationAccounts@2020-01-13-preview' = {
   name: name
   location: location
   tags: tags
@@ -353,7 +353,7 @@ resource automationAccount_diagnosticSettings 'Microsoft.Insights/diagnosticSett
   scope: automationAccount
 }
 
-module automationAccount_privateEndpoints '../../Microsoft.Network/privateEndpoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+module automationAccount_privateEndpoints '../../Microsoft.Network/privateEndpoint/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-AutomationAccount-PrivateEndpoint-${index}'
   params: {
     groupIds: [

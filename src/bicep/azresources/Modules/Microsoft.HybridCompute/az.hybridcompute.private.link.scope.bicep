@@ -10,7 +10,7 @@ param tags object = {}
 @description('Optional. Indicates whether machines associated with the private link scope can also use public Azure Arc service endpoints.')
 param publicNetworkAccess string
 
-resource privateLinkScope 'Microsoft.HybridCompute/privateLinkScopes@2022-05-10-preview' = {
+resource privateLinkScope 'Microsoft.HybridCompute/privatelinkscopes@2022-03-10' = {
   name: name
   location: location
   tags: tags

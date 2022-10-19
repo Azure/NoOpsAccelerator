@@ -1,11 +1,11 @@
 
-# AZ CLI Examples
+# AZ CLI
 
 # Create Base64 script value
 script64=$(cat script.sh | base64)
 
 # Hub/Spoke - Change variables to match your deployment
-az deployment sub create --name deploy-hub1spoke-network --location EastUS --template-file deploy.bicep  --parameters @parameters/deploy.parameters.json --subscription <<subscriptionId>>
+az deployment sub create --name deploy-hubspoke-aks-network --location EastUS --template-file deploy.bicep  --parameters @parameters/deploy.parameters.json --subscription 896f5276-df9a-4317-a791-469396bef7fa
 
 # Clean Up
 # Delete Resource Locks - Change variables to match your deployment
@@ -26,7 +26,7 @@ az group delete -n anoa-eastus-aks-sharedservices-rg -y
 az group delete -n anoa-eastus-aks-artifacts-rg -y
 
 # Delete Deployments - Change variables to match your deployment
-az deployment sub delete -n deploy-hub1spoke-network
+az deployment sub delete -n deploy-hubspoke-aks-network
 
 # AZ PowerShell
 # Hub/Spoke - Change variables to match your deployment
@@ -42,4 +42,4 @@ Remove-AzResourceGroup -Name anoa-eastus-aks-sharedservices-rg
 Remove-AzResourceGroup -Name anoa-eastus-aks-artifacts-rg
 
 # Delete Deployments - Change variables to match your deployment
-Remove-AzSubscriptionDeployment -Name deploy-hub1spoke-network
+Remove-AzSubscriptionDeployment -Name deploy-hubspoke-aks-network

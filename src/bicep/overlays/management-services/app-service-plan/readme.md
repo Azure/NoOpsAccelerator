@@ -17,8 +17,6 @@ The subscription and resource group can be changed by providing the resource gro
 * A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
 * Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
 
-## Parameters
-
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
 Required Parameters | Type | Allowed Values | Description
@@ -34,16 +32,6 @@ Optional Parameters | Type | Allowed Values | Description
 | :-- | :-- | :-- | :-- |
 None
 
-## Outputs
-
-This overlay will generate the following outputs:
-
-| Output Name | Type | Allowed Values | Description
-| :-- | :-- | :-- | :-- |
-outAppServicePlanName | string | '' | App Service Plan Name
-outResourceGroupName | string | '' | App Service Plan Resource Group Name
-outTags object | {object} | Required tags values used with App Service Plan overlay.
-
 ## Deploy the Overlay
 
 Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process from deploying Platform Hub/Spoke Design and then adding an Azure App Service Plan post-deployment.
@@ -54,14 +42,10 @@ Once you have the hub/spoke output values, you can pass those in as parameters t
 
 For example, deploying using the `az deployment sub create` command in the Azure CLI:
 
-<h3>Overlay Example: App Service Plan</h3>
-
-<details>
-
-<summary>via Bash</summary>
+### Azure CLI
 
 ```bash
-# For Azure Commerical regions
+# For Azure global regions
 az login
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
@@ -76,7 +60,7 @@ cd app-service-plan
 az deployment sub create \
    --name deploy-AppServicePlan
    --template-file overlays/app-service-plan/deploy.bicep \
-   --parameters @overlays/app-service-plan/parameters/deploy.parameters.json \
+   --parameters @overlays/app-service-plan/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -84,31 +68,23 @@ az deployment sub create \
 OR
 
 ```bash
-# For Azure Government regions
+# For Azure IL regions
 az deployment sub create \
   --template-file overlays/app-service-plan/deploy.bicep \
-  --parameters @overlays/app-service-plan/parameters/deploy.parameters.json \
+  --parameters @overlays/app-service-plan/deploy.parameters.json \
   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
   --resource-group anoa-usgovvirginia-platforms-hub-rg \
   --location 'usgovvirginia'
 ```
 
-
-</details>
-<p>
-
-<details>
-
-<summary>via Powershell</summary>
-
 ### PowerShell
 
 ```powershell
-# For Azure Commerical regions
+# For Azure global regions
 New-AzSubscriptionDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/app-service-plan/deploy.bicepp `
-  -TemplateParameterFile overlays/app-service-plan/parameters/deploy.parameters.example.json `
+  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
@@ -117,17 +93,15 @@ New-AzSubscriptionDeployment `
 OR
 
 ```powershell
-# For Azure Government regions
+# For Azure IL regions
 New-AzSubscriptionDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/app-service-plan/deploy.bicepp `
-  -TemplateParameterFile overlays/app-service-plan/parameters/deploy.parameters.example.json `
+  -TemplateParameterFile overlays/app-service-plan/deploy.parameters.example.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
   -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
-</details>
-<p>
 
 ## Extending the Overlay
 
@@ -141,17 +115,9 @@ For air-gapped clouds it may be convenient to transfer and deploy the compiled A
 
 Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
 
-Configure the default group using:
-
 ```bash
-az configure --defaults group=anoa-eastus-dev-appplan-rg.
+az resource list --resource-group anoa-eastus-dev-appplan-rg
 ```
-
-```bash
-az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-dev-appplan-rg
-```
-
-OR
 
 ```powershell
 Get-AzResource -ResourceGroupName anoa-eastus-dev-appplan-rg
@@ -167,8 +133,6 @@ The Bicep/ARM deployment of NoOps Accelerator - Azure App Service Plan deploymen
 az group delete --name anoa-eastus-dev-appplan-rg
 ```
 
-OR
-
 ```powershell
 Remove-AzResourceGroup -Name anoa-eastus-dev-appplan-rg
 ```
@@ -179,18 +143,12 @@ Remove-AzResourceGroup -Name anoa-eastus-dev-appplan-rg
 az deployment delete --name deploy-AppServicePlan
 ```
 
-OR
-
 ```powershell
 Remove-AzSubscriptionDeployment -Name deploy-AppServicePlan
 ```
 
+
+
 ## Example Output in Azure
 
 ![Example Deployment Output](media/aspExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
-
-### References
-
-* [Azure App Service plan Documentation](https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans/)
-* [Azure App Service Overview](https://docs.microsoft.com/en-us/azure/app-service/overview)
-* [Manage an App Service plan in Azure](https://docs.microsoft.com/en-us/azure/app-service/app-service-plan-manage)

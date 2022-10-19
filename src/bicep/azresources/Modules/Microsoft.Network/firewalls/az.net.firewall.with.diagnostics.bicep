@@ -1,5 +1,4 @@
 /* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
-
 @description('Required. Name of the Azure Firewall.')
 param name string
 
@@ -21,10 +20,16 @@ param azureSkuTier string = 'Standard'
 param vNetId string
 
 @description('Optional. The public ip resource ID to associate to the AzureFirewallSubnet. If empty, then the public ip that is created as part of this module will be applied to the AzureFirewallSubnet.')
-param azureFirewallSubnetPublicIpId string = ''
+param firewallClientIpConfigurationName string = ''
 
 @description('Optional. The public ip resource ID to associate to the AzureFirewallSubnet. If empty, then the public ip that is created as part of this module will be applied to the AzureFirewallSubnet.')
-param azureFirewallMgmtSubnetPublicIpId string = ''
+param firewallManagementIpConfigurationName string = ''
+
+@description('Optional. The public ip resource ID to associate to the AzureFirewallSubnet. If empty, then the public ip that is created as part of this module will be applied to the AzureFirewallSubnet.')
+param azureFirewallClientSubnetPublicIpId string = ''
+
+@description('Optional. The public ip resource ID to associate to the AzureFirewallSubnet. If empty, then the public ip that is created as part of this module will be applied to the AzureFirewallSubnet.')
+param azureFirewallManagementSubnetPublicIpId string = ''
 
 @description('Optional. This is to add any additional public ip configurations on top of the public ip with subnet ip configuration.')
 param additionalPublicIpConfigurations array = []
@@ -96,7 +101,6 @@ param roleAssignments array = []
 @description('Optional. Tags of the Azure Firewall resource.')
 param tags object = {}
 
-
 @description('Optional. The name of firewall logs that will be streamed.')
 @allowed([
   'AzureFirewallApplicationRule'
@@ -135,55 +139,31 @@ var additionalPublicIpConfigurations_var = [for ipConfiguration in additionalPub
 // 2. Use new public ip created in this module
 // 3. Do not use a public ip if isCreateDefaultPublicIP is false
 
-var subnet_var = {
+var clientSubnet_var = {
   subnet: {
     id: '${vNetId}/subnets/AzureFirewallSubnet' // The subnet name must be AzureFirewallSubnet
   }
 }
 
-var mgmtSubnet_var = {
-  subnet: {
-    id: '${vNetId}/subnets/AzureFirewallManagementSubnet' // The subnet name must be AzureFirewallManagementSubnet
-  }
-}
-
-var existingPip = {
+var existingClientPip = {
   publicIPAddress: {
-    id: azureFirewallSubnetPublicIpId
-  }
-}
-
-var existingMgmtPip = {
-  publicIPAddress: {
-    id: azureFirewallMgmtSubnetPublicIpId
+    id: azureFirewallClientSubnetPublicIpId
   }
 }
 
 var newPip = {
-  publicIPAddress: (empty(azureFirewallSubnetPublicIpId) && isCreateDefaultPublicIP) ? {
-    id: publicIPAddress.outputs.resourceId
-  } : null
-}
-
-var newMgmtPip = {
-  publicIPAddress: (empty(azureFirewallMgmtSubnetPublicIpId) && isCreateDefaultPublicIP) ? {
+  publicIPAddress: (empty(azureFirewallClientSubnetPublicIpId) && isCreateDefaultPublicIP) ? {
     id: publicIPAddress.outputs.resourceId
   } : null
 }
 
 var ipConfigurations = concat([
     {
-      name: !empty(azureFirewallSubnetPublicIpId) ? last(split(azureFirewallSubnetPublicIpId, '/')) : publicIPAddress.outputs.name
+      name: firewallClientIpConfigurationName
       //Use existing public ip, new public ip created in this module, or none if isCreateDefaultPublicIP is false
-      properties: union(subnet_var, !empty(azureFirewallSubnetPublicIpId) ? existingPip : {}, (isCreateDefaultPublicIP ? newPip : {}))
+      properties: union(clientSubnet_var, !empty(azureFirewallClientSubnetPublicIpId) ? existingClientPip : {}, (isCreateDefaultPublicIP ? newPip : {}))
     }
   ], additionalPublicIpConfigurations_var)
-
-var mgmtIpConfigurations = {
-      name: !empty(azureFirewallMgmtSubnetPublicIpId) ? last(split(azureFirewallMgmtSubnetPublicIpId, '/')) : publicIPAddress.outputs.name
-      //Use existing public ip, new public ip created in this module, or none if isCreateDefaultPublicIP is false
-      properties: union(mgmtSubnet_var, !empty(azureFirewallMgmtSubnetPublicIpId) ? existingMgmtPip : {}, (isCreateDefaultPublicIP ? newMgmtPip : {}))
-    }
 
 // ----------------------------------------------------------------------------
 
@@ -206,10 +186,8 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
   }
 }]
 
-
-
 // create a public ip address if one is not provided and the flag is true
-module publicIPAddress '../publicIPAddress/az.net.public.ip.address.bicep' = if (empty(azureFirewallSubnetPublicIpId) && isCreateDefaultPublicIP) {
+module publicIPAddress '../publicIPAddress/az.net.public.ip.address.bicep' = if (empty(azureFirewallClientSubnetPublicIpId) && isCreateDefaultPublicIP) {
   name: '${uniqueString(deployment().name, location)}-Firewall-PIP'
   params: {
     name: contains(publicIPAddressObject, 'name') ? (!(empty(publicIPAddressObject.name)) ? publicIPAddressObject.name : '${name}-pip') : '${name}-pip'
@@ -223,15 +201,7 @@ module publicIPAddress '../publicIPAddress/az.net.public.ip.address.bicep' = if 
     ]) : [
       'AllMetrics'
     ]
-    diagnosticLogCategoriesToEnable: contains(publicIPAddressObject, 'diagnosticLogCategoriesToEnable') ? (!(empty(publicIPAddressObject.diagnosticLogCategoriesToEnable)) ? publicIPAddressObject.diagnosticLogCategoriesToEnable : [
-      'DDoSProtectionNotifications'
-      'DDoSMitigationFlowLogs'
-      'DDoSMitigationReports'
-    ]) : [
-      'DDoSProtectionNotifications'
-      'DDoSMitigationFlowLogs'
-      'DDoSMitigationReports'
-    ]
+    diagnosticLogCategoriesToEnable: diagnosticLogCategoriesToEnable
     location: location
     diagnosticStorageAccountId: diagnosticStorageAccountId
     diagnosticLogsRetentionInDays: diagnosticLogsRetentionInDays
@@ -255,7 +225,17 @@ resource azureFirewall 'Microsoft.Network/azureFirewalls@2021-08-01' = {
       id: firewallPolicyId
     }
     ipConfigurations: ipConfigurations
-    managementIpConfiguration: mgmtIpConfigurations
+    managementIpConfiguration: {
+      name: firewallManagementIpConfigurationName
+      properties: {
+        publicIPAddress: {
+          id: azureFirewallManagementSubnetPublicIpId
+        }
+        subnet: {
+          id: '${vNetId}/subnets/AzureFirewallManagementSubnet' // The subnet name must be AzureFirewallManagementSubnet
+        }
+      }
+    }
     sku: {
       name: azureSkuName
       tier: azureSkuTier
@@ -264,9 +244,6 @@ resource azureFirewall 'Microsoft.Network/azureFirewalls@2021-08-01' = {
     natRuleCollections: natRuleCollections
     networkRuleCollections: networkRuleCollections
   }
-  dependsOn: [
-    publicIPAddress
-  ]
 }
 
 resource azureFirewall_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
@@ -298,8 +275,6 @@ module azureFirewall_roleAssignments './rbac/roleAssignments.bicep' = [for (role
     principalIds: roleAssignment.principalIds
     principalType: contains(roleAssignment, 'principalType') ? roleAssignment.principalType : ''
     roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
-    condition: contains(roleAssignment, 'condition') ? roleAssignment.condition : ''
-    delegatedManagedIdentityResourceId: contains(roleAssignment, 'delegatedManagedIdentityResourceId') ? roleAssignment.delegatedManagedIdentityResourceId : ''
     resourceId: azureFirewall.id
   }
 }]

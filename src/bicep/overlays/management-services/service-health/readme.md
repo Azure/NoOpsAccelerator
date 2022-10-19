@@ -20,8 +20,6 @@ The subscription and resource group can be changed by providing the resource gro
 
 * A virtual network and subnet is deployed. (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
 * Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
- 
-## Parameters
 
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
@@ -50,7 +48,7 @@ For example, deploying using the `az deployment sub create` command in the Azure
 ### Azure CLI
 
 ```bash
-# For Azure Commerical regions
+# For Azure global regions
 az login
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
@@ -73,7 +71,7 @@ az deployment sub create \
 OR
 
 ```bash
-# For Azure Government regions
+# For Azure IL regions
 az deployment sub create \
   --template-file overlays/service-health/deploy.bicep \
   --parameters @overlays/service-health/deploy.parameters.json \
@@ -85,7 +83,7 @@ az deployment sub create \
 ### PowerShell
 
 ```powershell
-# For Azure Commerical regions
+# For Azure global regions
 New-AzSubscriptionDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/service-health/deploy.bicepp `
@@ -98,7 +96,7 @@ New-AzSubscriptionDeployment `
 OR
 
 ```powershell
-# For Azure Government regions
+# For Azure IL regions
 New-AzSubscriptionDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/service-health/deploy.bicepp `

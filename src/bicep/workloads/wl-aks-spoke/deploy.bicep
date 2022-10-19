@@ -3,7 +3,7 @@ SUMMARY: Workload Module to deploy a Azure Kubernetes Service to an target sub.
 DESCRIPTION: The following components will be options in this deployment
               Azure Kubernetes Service
 AUTHOR/S: jspinella
-
+VERSION: 1.x.x
 */
 
 /*
@@ -51,40 +51,30 @@ param parDeploymentNameSuffix string = utcNow()
 
 // WORKLOAD PARAMETERS
 
-@description('Required values used with the workload, Please review the Read Me for required parameters')
-param parWorkloadSpoke object
+@description('The subscription ID for the Hub Network and resources. It defaults to the deployment subscription.')
+param parWorkload object
 
 // HUB NETWORK PARAMETERS
 
 @description('The subscription ID for the Hub Network.')
 param parHubSubscriptionId string
 
-// Hub Resource Group Name
-// (JSON Parameter)
-// ---------------------------
-// "parHubResourceGroupName": {
-//   "value": "anoa-eastus-platforms-hub-rg"
-// }
 @description('The resource group name for the Hub Network.')
 param parHubResourceGroupName string
 
-// Hub Virtual Network Name
-// (JSON Parameter)
-// ---------------------------
-// "parHubResourceGroupName": {
-//   "value": "anoa-eastus-platforms-hub-rg"
-// }
 @description('The virtual network name for the Hub Network.')
 param parHubVirtualNetworkName string
 
-// Hub Virtual Network Resource Id
-// (JSON Parameter)
-// ---------------------------
-// "parHubVirtualNetworkResourceId": {
-//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-vnet"
-// }
 @description('The virtual network resource Id for the Hub Network.')
 param parHubVirtualNetworkResourceId string
+
+// FIREWALL PARAMETERS
+
+@description('The virtual network name for the Hub Network.')
+param parHubFirewallName string
+
+@description('The firewall private IP address for the Hub Network.')
+param parFirewallPrivateIPAddress string
 
 // LOGGING PARAMETERS
 
@@ -116,7 +106,7 @@ param parLogAnalyticsWorkspaceName string
 //   }
 // }
 @description('Defines the Container Registry.')
-param parContainerRegistry object
+param parContainerRegistry object 
 
 // Azure Kubernetes Service - Cluster
 // Example (JSON)
@@ -163,21 +153,12 @@ param parKubernetesCluster object
 //   }
 // },  
 @description('Account for access to Storage')
-param parWorkloadStorageAccountAccess object
-
-
-// Telemetry - Azure customer usage attribution
-// Reference:  https://docs.microsoft.com/azure/marketplace/azure-partner-customer-usage-attribution
-var telemetry = json(loadTextContent('../../azresources/Modules/Global/telemetry.json'))
-module telemetryCustomerUsageAttribution '../../azresources/Modules/Global/partnerUsageAttribution/customer-usage-attribution-subscription.bicep' = if (telemetry.customerUsageAttribution.enabled) {
-  name: 'pid-${telemetry.customerUsageAttribution.modules.workloads.aks}'
-  scope: subscription(parWorkloadSpoke.subscriptionId)
-}
+param parStorageAccountAccess object
 
 //=== TAGS === 
 
 var referential = {
-  workload: parWorkloadSpoke.name
+  workload: parWorkload.name
 }
 
 @description('Resource group tags')
@@ -190,12 +171,14 @@ module modTags '../../azresources/Modules/Microsoft.Resources/tags/az.resources.
 }
 
 //=== Workload Tier 3 Buildout === 
-module modTier3 '../../overlays/management-services/workloadSpoke/deploy.bicep' = {
+module modTier3 '../../azresources/hub-spoke/tier3/anoa.lz.workload.network.bicep' = {
   name: 'deploy-wl-vnet-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parWorkloadSpoke.subscriptionId)
+  scope: subscription(parWorkload.subscriptionId)
   params: {
     //Required Parameters
-    parRequired:parRequired
+    parWorkloadName: parWorkload.name
+    parWorkloadShortName: parWorkload.shortName
+    parDeployEnvironment: parRequired.deployEnvironment
     parLocation: parLocation
     parTags: modTags.outputs.tags
 
@@ -206,15 +189,21 @@ module modTier3 '../../overlays/management-services/workloadSpoke/deploy.bicep' 
     parHubResourceGroupName: parHubResourceGroupName
 
     //WorkLoad Parameters
-    parWorkloadSpoke: parWorkloadSpoke    
+    parWorkloadSubscriptionId: parWorkload.subscriptionId
+    parWorkloadVirtualNetworkAddressPrefix: parWorkload.network.virtualNetworkAddressPrefix
+    parWorkloadSubnetAddressPrefix: parWorkload.network.subnetAddressPrefix
+  
+    //Firewall Parameters
+    parFirewallPrivateIPAddress: parFirewallPrivateIPAddress
 
     //Logging Parameters
     parLogAnalyticsWorkspaceName: parLogAnalyticsWorkspaceName
     parLogAnalyticsWorkspaceResourceId: parLogAnalyticsWorkspaceResourceId
-    parEnableActivityLogging: true
 
     //Storage Parameters
-    parWorkloadStorageAccountAccess: parWorkloadStorageAccountAccess
+    parStorageAccountAccess: parStorageAccountAccess
+    enableActivityLogging: true     
+ 
   }
 }
 
@@ -224,19 +213,16 @@ module modTier3 '../../overlays/management-services/workloadSpoke/deploy.bicep' 
 
 module modAcrDeploy '../../overlays/management-services/containerRegistry/deploy.bicep' = {
   name: 'deploy-aks-acr-${parLocation}-${parDeploymentNameSuffix}'
-  scope: subscription(parWorkloadSpoke.subscriptionId)
+  scope: subscription(parWorkload.subscriptionId)
   params: {
     parLocation: parLocation
     parContainerRegistry: parContainerRegistry
     parRequired: parRequired
     parTags: modTags.outputs.tags
-    parTargetResourceGroup: modTier3.outputs.workloadResourceGroupName
-    parTargetSubscriptionId: parWorkloadSpoke.subscriptionId
+    parTargetResourceGroup:  modTier3.outputs.workloadResourceGroupName
+    parTargetSubscriptionId: parWorkload.subscriptionId
     parTargetSubnetName: modTier3.outputs.subnetNames[0]
     parTargetVNetName: modTier3.outputs.virtualNetworkName
-    parHubVirtualNetworkResourceId: parHubVirtualNetworkResourceId
-    parHubResourceGroupName: parHubResourceGroupName
-    parHubSubscriptionId: parHubSubscriptionId
   }
   dependsOn: [
     modTier3
@@ -244,8 +230,8 @@ module modAcrDeploy '../../overlays/management-services/containerRegistry/deploy
 }
 
 // Create a AKS Cluster
-module modDeployAzureKS '../../overlays/management-services/kubernetesPrivateCluster-Kubnet/deploy.bicep' = {
-  scope: subscription(parWorkloadSpoke.subscriptionId)
+module modDeployAzureKS '../../overlays/management-services/kubernetesCluster/deploy.bicep' = {
+  scope: subscription(parWorkload.subscriptionId)
   name: 'deploy-aks-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     parLocation: parLocation
@@ -255,10 +241,9 @@ module modDeployAzureKS '../../overlays/management-services/kubernetesPrivateClu
     parTargetResourceGroup: modTier3.outputs.workloadResourceGroupName
     parTargetSubnetName: modTier3.outputs.subnetNames[0]
     parTargetVNetName: modTier3.outputs.virtualNetworkName
-    parTargetSubscriptionId: parWorkloadSpoke.subscriptionId
+    parTargetSubscriptionId: parWorkload.subscriptionId
     parHubVirtualNetworkResourceId: parHubVirtualNetworkResourceId
-    parHubResourceGroupName: parHubResourceGroupName
-    parHubSubscriptionId: parHubSubscriptionId
+    parLogAnalyticsWorkspaceResourceId: parLogAnalyticsWorkspaceResourceId
   }
   dependsOn: [
     modTier3

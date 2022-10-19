@@ -1,0 +1,27 @@
+
+# AZ CLI
+# Hub/Spoke
+az deployment group create --name deploy-aks-tier3 --location EastUS --template-file anoa.lz.workload.aks.bicep  --parameters @parameters/anoa.lz.workload.aks.example.json --subscription xxxxxx-xxxxx-xxxxx-xxxxx-xxxxxxx
+
+# Clean Up
+# Delete Resource Groups - Change Names to match your deployment
+az group delete -n anoa-eastus-platforms-logging-rg -y
+
+# Delete Deployments
+az deployment sub delete -n deploy-hubspoke-network
+
+# AZ PowerShell
+# Hub/Spoke
+New-AzSubscriptionDeployment -TemplateFile .\anoa.hubspoke.bicep -TemplateParameterFile .\parameters\anoa.hubspoke.parameters.example.json -Location "EastUS" -Name deploy-hubspoke-network
+
+# Clean Up
+# Delete Resource Groups
+Remove-AzResourceGroup -Name anoa-eastus-platforms-logging-rg
+Remove-AzResourceGroup -Name anoa-eastus-platforms-hub-rg
+Remove-AzResourceGroup -Name anoa-eastus-platforms-identity-rg
+Remove-AzResourceGroup -Name anoa-eastus-platforms-operations-rg
+Remove-AzResourceGroup -Name anoa-eastus-platforms-sharedservices-rg
+Remove-AzResourceGroup -Name anoa-eastus-platforms-artifacts-rg
+
+# Delete Deployments
+Remove-AzSubscriptionDeployment -Name deploy-hubspoke-network

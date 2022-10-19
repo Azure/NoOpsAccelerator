@@ -1,4 +1,3 @@
-// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
 @description('Required. Name of the Public IP Prefix.')
 @minLength(1)
 param name string

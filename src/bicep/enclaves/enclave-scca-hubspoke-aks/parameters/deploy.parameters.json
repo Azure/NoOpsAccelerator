@@ -6,7 +6,7 @@
       "value": {
         "orgPrefix": "anoa",
         "templateVersion": "v1.0",
-        "deployEnvironment": "dev"
+        "deployEnvironment": "aks"
       }
     },
     "parTags": {
@@ -14,188 +14,385 @@
         "organization": "anoa",
         "region": "eastus",
         "templateVersion": "v1.0",
-        "deployEnvironment": "dev",
+        "deployEnvironment": "aks",
         "deploymentType": "NoOpsBicep"
+      }
+    },
+    "parTenantId": {
+      "value": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx"
+    },
+    "parRootMg": {
+      "value": "ANOA"
+    },
+    "parRequireAuthorizationForGroupCreation": {
+      "value": true
+    },
+    "parManagementGroups": {
+      "value": [
+        {
+          "name": "anoa",
+          "displayName": "ANOA",
+          "parentMGName": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx"
+        },
+        {
+          "name": "anoa-lzs",
+          "displayName": "anoa-lzs",
+          "parentMGName": "anoa"
+        },
+        {
+          "name": "anoa-lzs-sandbox",
+          "displayName": "anoa-lzs-sandbox",
+          "parentMGName": "anoa-lzs"
+        },
+        {
+          "name": "anoa-lzs-workloads",
+          "displayName": "anoa-lzs-workloads",
+          "parentMGName": "anoa-lzs"
+        },
+        {
+          "name": "anoa-lzs-internal",
+          "displayName": "anoa-lzs-internal",
+          "parentMGName": "anoa-lzs-workloads"
+        },
+        {
+          "name": "anoa-lzs-internal-dev",
+          "displayName": "anoa-lzs-internal-nonprod",
+          "parentMGName": "anoa-lzs-internal"
+        },
+        {
+          "name": "anoa-lzs-internal-prod",
+          "displayName": "anoa-lzs-internal-prod",
+          "parentMGName": "anoa-lzs-internal"
+        },
+        {
+          "name": "anoa-platform",
+          "displayName": "anoa-platform",
+          "parentMGName": "anoa"
+        },
+        {
+          "name": "anoa-transport",
+          "displayName": "anoa-transport",
+          "parentMGName": "anoa-platform"
+        },
+        {
+          "name": "anoa-management",
+          "displayName": "anoa-management",
+          "parentMGName": "anoa-platform"
+        },
+        {
+          "name": "anoa-identity",
+          "displayName": "anoa-identity",
+          "parentMGName": "anoa-platform"
+        }
+      ]
+    },
+    "parSubscriptions": {
+      "value": [
+        {
+          "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+          "managementGroupName": "anoa-management"
+        }
+      ]
+    },
+    "parBulitInPolicy": {
+      "value": {
+        "policies": [
+          {
+            "enabled": false,
+            "name": "Location",
+            "policyAssignmentManagementGroupId": "anoa",
+            "enforcementMode": "Default",
+            "allowedLocations": [
+              "EastUS",
+              "WestUS",
+              "usgovvirginia",
+              "usgovarizona"
+            ]
+          }
+        ]
+      }
+    },
+    "parCustomPolicy": {
+      "value": {
+        "policies": [
+          {
+            "enabled": true,
+            "name": "Custom - Compute Governance Initiative",
+            "policyDefinitionManagementGroupId": "anoa",
+            "policyAssignmentManagementGroupId": "anoa",
+            "policySource": "ANOA",
+            "policyCategory": "Compute"
+          },
+          {
+            "enabled": true,
+            "name": "Custom - Data Protection Governance Initiative",
+            "policyDefinitionManagementGroupId": "anoa",
+            "policySource": "ANOA",
+            "policyCategory": "Data Protection"
+          },
+          {
+            "enabled": true,
+            "name": "Custom - Identity Governance Initiative",
+            "policyDefinitionManagementGroupId": "anoa",
+            "policySource": "ANOA",
+            "policyCategory": "IAM"
+          },
+          {
+            "enabled": true,
+            "name": "Custom - Key Vault Governance Initiative",
+            "policyDefinitionManagementGroupId": "anoa",
+            "policySource": "ANOA",
+            "policyCategory": "Key Vault"
+          },
+          {
+            "enabled": true,
+            "name": "Custom - Network Governance Initiative",
+            "policyDefinitionManagementGroupId": "anoa",
+            "policySource": "ANOA",
+            "policyCategory": "Network"
+          },
+          {
+            "enabled": true,
+            "name": "Custom - Security Governance Initiative",
+            "policyDefinitionManagementGroupId": "anoa",
+            "policySource": "ANOA",
+            "policyCategory": "Security"
+          },
+          {
+            "enabled": false,
+            "name": "Custom - SQL Governance Initiative",
+            "policyDefinitionManagementGroupId": "anoa",
+            "policySource": "ANOA",
+            "policyCategory": "SQL"
+          },
+          {
+            "enabled": true,
+            "name": "Custom - Storage Governance Initiative",
+            "policyDefinitionManagementGroupId": "anoa",
+            "policySource": "ANOA",
+            "policyCategory": "Storage"
+          },
+          {
+            "enabled": true,
+            "name": "Custom - Tagging Governance Initiative",
+            "policyDefinitionManagementGroupId": "anoa",
+            "policySource": "ANOA",
+            "policyCategory": "Tagging"
+          }
+        ]
+      }
+    },
+    "parRoleDefinitionInfo": {
+      "value": {
+        "definitions": [
+          {
+            "roleID": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+            "roleName": "Custom - VM Operator",
+            "roleDescription": "Start and Stop Virtual Machines and reader",
+            "actions": [
+              "Microsoft.Compute/virtualMachines/read",
+              "Microsoft.Compute/virtualMachines/start/action",
+              "Microsoft.Compute/virtualMachines/restart/action",
+              "Microsoft.Resources/subscriptions/resourceGroups/read",
+              "Microsoft.Compute/virtualMachines/deallocate/action",
+              "Microsoft.Compute/virtualMachineScaleSets/deallocate/action",
+              "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/deallocate/action",
+              "Microsoft.Compute/virtualMachines/powerOff/action"
+            ],
+            "notActions": [],
+            "dataActions": [],
+            "notDataActions": [],
+            "scopeType": "ManagementGroup",
+            "scopeName": "anoalz"
+          },
+          {
+            "roleID": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+            "roleName": "Custom - Network Operations (NetOps)",
+            "roleDescription": "Platform-wide global connectivity management: virtual networks, UDRs, NSGs, NVAs, VPN, Azure ExpressRoute, and others.",
+            "actions": [
+              "Microsoft.Network/virtualNetworks/read",
+              "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/read",
+              "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/write",
+              "Microsoft.Network/virtualNetworks/virtualNetworkPeerings/delete",
+              "Microsoft.Network/virtualNetworks/peer/action",
+              "Microsoft.Resources/deployments/operationStatuses/read",
+              "Microsoft.Resources/deployments/write",
+              "Microsoft.Resources/deployments/read"
+            ],
+            "notActions": [],
+            "dataActions": [],
+            "notDataActions": [],
+            "scopeType": "ManagementGroup",
+            "scopeName": "anoalz"
+          },
+          {
+            "roleID": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+            "roleName": "Custom - Security Operations (SecOps)",
+            "roleDescription": "Security Administrator role with a horizontal view across the entire Azure estate and the Azure Key Vault purge policy.",
+            "actions": [
+              "*/read",
+              "*/register/action",
+              "Microsoft.KeyVault/locations/deletedVaults/purge/action",
+              "Microsoft.PolicyInsights/*",
+              "Microsoft.Authorization/policyAssignments/*",
+              "Microsoft.Authorization/policyDefinitions/*",
+              "Microsoft.Authorization/policyExemptions/*",
+              "Microsoft.Authorization/policySetDefinitions/*",
+              "Microsoft.Insights/alertRules/*",
+              "Microsoft.Resources/deployments/*",
+              "Microsoft.Security/*",
+              "Microsoft.Support/*"
+            ],
+            "notActions": [],
+            "dataActions": [],
+            "notDataActions": [],
+            "scopeType": "ManagementGroup",
+            "scopeName": "anoalz"
+          },
+          {
+            "roleID": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+            "roleName": "Custom - Landing Zone Application Owner",
+            "roleDescription": "Contributor role granted for application/operations team at resource group level.",
+            "actions": [
+              "*"
+            ],
+            "notActions": [
+              "Microsoft.Authorization/*/write",
+              "Microsoft.Network/publicIPAddresses/write",
+              "Microsoft.Network/virtualNetworks/write",
+              "Microsoft.KeyVault/locations/deletedVaults/purge/action"
+            ],
+            "dataActions": [],
+            "notDataActions": [],
+            "scopeType": "ManagementGroup",
+            "scopeName": "anoalz"
+          },
+          {
+            "roleID": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+            "roleName": "Custom - Landing Zone Subscription Owner",
+            "roleDescription": "Delegated role for subscription owner generated from subscription Owner role.",
+            "actions": [
+              "*"
+            ],
+            "notActions": [
+              "Microsoft.Authorization/*/write",
+              "Microsoft.Network/vpnGateways/*",
+              "Microsoft.Network/expressRouteCircuits/*",
+              "Microsoft.Network/routeTables/write",
+              "Microsoft.Network/vpnSites/*"
+            ],
+            "dataActions": [],
+            "notDataActions": [],
+            "scopeType": "ManagementGroup",
+            "scopeName": "anoalz"
+          },
+          {
+            "roleID": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
+            "roleName": "Custom - Storage Operator",
+            "roleDescription": "Custom Storage Operator role for deploying virtual machines.",
+            "actions": [
+              "Microsoft.Authorization/*/read",
+              "Microsoft.Insights/alertRules/*",
+              "Microsoft.Insights/diagnosticSettings/*",
+              "Microsoft.Network/virtualNetworks/subnets/joinViaServiceEndpoint/action",
+              "Microsoft.ResourceHealth/availabilityStatuses/read",
+              "Microsoft.Resources/deployments/*",
+              "Microsoft.Resources/subscriptions/resourceGroups/read",
+              "Microsoft.Storage/storageAccounts/*",
+              "Microsoft.Support/*",
+              "Microsoft.Storage/storageAccounts/listkeys/action"
+            ],
+            "notActions": [],
+            "scopeType": "ManagementGroup",
+            "scopeName": "anoalz"
+          }
+        ]
       }
     },
     "parHub": {
       "value": {
-        "subscriptionId": "<<subscriptionId>>",
+        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
         "virtualNetworkAddressPrefix": "10.0.100.0/24",
         "subnetAddressPrefix": "10.0.100.128/27",
-        "subnets": [
-          {
-            "name": "AzureFirewallSubnet",
-            "addressPrefix": "10.0.100.0/26",
-            "serviceEndpoints": []
-          },
-          {
-            "name": "AzureFirewallManagementSubnet",
-            "addressPrefix": "10.0.100.64/26",
-            "serviceEndpoints": []
-          }
-        ],
         "virtualNetworkDiagnosticsLogs": [],
         "virtualNetworkDiagnosticsMetrics": [],
         "networkSecurityGroupRules": [],
-        "networkSecurityGroupDiagnosticsLogs": [
-          "NetworkSecurityGroupEvent",
-          "NetworkSecurityGroupRuleCounter"
+        "networkSecurityGroupDiagnosticsLogs":[
+          {
+            "category": "NetworkSecurityGroupEvent",
+            "enabled": true
+          },
+          {
+            "category": "NetworkSecurityGroupRuleCounter",
+            "enabled": true
+          }
         ],
         "subnetServiceEndpoints": [
           {
             "service": "Microsoft.Storage"
           }
-        ],
-        "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": false,
-          "principalIds": [
-            "<<principalId>>"
-          ],
-          "roleDefinitionIdOrName": "Contributor"
-        }
+        ]
       }
     },
     "parOperationsSpoke": {
       "value": {
-        "subscriptionId": "<<subscriptionId>>",
+        "subscriptionId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
         "virtualNetworkAddressPrefix": "10.0.115.0/26",
         "subnetAddressPrefix": "10.0.115.0/27",
+        "sourceAddressPrefixes": [],
         "virtualNetworkDiagnosticsLogs": [],
         "virtualNetworkDiagnosticsMetrics": [],
-        "networkSecurityGroupRules": [],
-        "publicIPAddressDiagnosticsLogs": [
-          "DDoSProtectionNotifications",
-          "DDoSMitigationFlowLogs",
-          "DDoSMitigationReports"
+        "networkSecurityGroupRules": [
+          {
+            "name": "Allow-Traffic-From-Spokes",
+            "properties": {
+              "access": "Allow",
+              "description": "Allow traffic from spokes",
+              "destinationAddressPrefix": "10.0.115.0/26",
+              "destinationPortRanges": [
+                "22",
+                "80",
+                "443",
+                "3389"
+              ],
+              "direction": "Inbound",
+              "priority": 200,
+              "protocol": "*",
+              "sourceAddressPrefixes": [],
+              "sourcePortRange": "*"
+            },
+            "type": "string"
+          }
         ],
-        "networkSecurityGroupDiagnosticsLogs": [
-          "NetworkSecurityGroupEvent",
-          "NetworkSecurityGroupRuleCounter"
+        "publicIPAddressDiagnosticsLogs": [
+          {
+            "category": "DDoSProtectionNotifications",
+            "enabled": true
+          },
+          {
+            "category": "DDoSMitigationFlowLogs",
+            "enabled": true
+          },
+          {
+            "category": "DDoSMitigationReports",
+            "enabled": true
+          }
+        ],
+        "networkSecurityGroupDiagnosticsLogs":[
+          {
+            "category": "NetworkSecurityGroupEvent",
+            "enabled": true
+          },
+          {
+            "category": "NetworkSecurityGroupRuleCounter",
+            "enabled": true
+          }
         ],
         "subnetServiceEndpoints": [
           {
             "service": "Microsoft.Storage"
           }
-        ],
-        "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": false,
-          "principalIds": [
-            "<<principalId>>"
-          ],
-          "roleDefinitionIdOrName": "Contributor"
-        }
-      }
-    },
-    "parSourceAddresses": {
-      "value": [
-        "10.0.100.0/24",
-        "10.0.115.0/26"
-      ]
-    },
-    "parAksSpoke": {
-      "value": {
-        "name": "app",
-        "shortName": "app",
-        "subscriptionId": "<<subscriptionId>>",
-        "enableDdosProtectionPlan": false,
-        "network": {
-          "virtualNetworkAddressPrefix": "10.0.125.0/26",
-          "subnetAddressPrefix": "10.0.125.0/26",
-          "virtualNetworkDiagnosticsLogs": [],
-          "virtualNetworkDiagnosticsMetrics": [],
-          "networkSecurityGroupRules": [],
-          "NetworkSecurityGroupDiagnosticsLogs": [
-            "NetworkSecurityGroupEvent",
-            "NetworkSecurityGroupRuleCounter"
-          ],
-          "subnetServiceEndpoints": [
-            {
-              "service": "Microsoft.Storage"
-            }
-          ],
-          "subnets": [],
-          "routeTable": {
-            "disableBgpRoutePropagation": false,
-            "routes": [
-              {
-                "name": "wl-routetable",
-                "properties": {
-                  "addressPrefix": "0.0.0.0/0",
-                  "nextHopIpAddress": "10.0.100.4",
-                  "nextHopType": "VirtualAppliance"
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
-    "parContainerRegistry": {
-      "value": {
-        "name": "anoaeastusdevacr",
-        "acrSku": "Premium",
-        "enableResourceLock": true
-      }
-    },
-    "parKubernetesCluster": {
-      "value": {
-        "name": "Contoso",
-        "enableSystemAssignedIdentity": false,
-        "aksClusterKubernetesVersion": "1.24.3",
-        "enableRBAC": true,
-        "enableResourceLock": false,
-        "enablePodIdentity": false,
-        "aksClusterSkuTier": "Free",
-        "enableIngressApplicationGateway": false,
-        "primaryAgentPoolProfile": {
-          "name": "systempool",
-          "vmSize": "Standard_DS2_v2",
-          "osDiskSizeGB": 30,
-          "osDiskType": "Managed",
-          "enableAutoScaling": true,
-          "count": 10,
-          "osType": "Linux",
-          "osSKU": "Ubuntu",
-          "type": "VirtualMachineScaleSets",
-          "mode": "System",
-          "availabilityZones": []
-        },
-        "networkProfile": {          
-          "aksClusterLoadBalancerSku": "standard",
-          "aksClusterPodCidr": "10.244.0.0/16",
-          "aksClusterServiceCidr": "172.16.1.0/24",
-          "aksClusterDnsServiceIP": "172.16.1.10",
-          "aksClusterDockerBridgeCidr": "170.10.0.1/30",
-          "aksClusterOutboundType": "userDefinedRouting"
-        },
-        "apiServerAccessProfile": {
-          "enablePrivateCluster": true,
-          "enablePrivateClusterPublicFQDN": false
-        },
-        "aadProfile": {
-          "aadProfileTenantId": "<<TenantId>>",
-          "aadProfileAdminGroupObjectIDs": [
-            "<<GroupObjectID>>"
-          ],
-          "enableAadProfileEnableAzureRBAC": true,
-          "enableAadProfileManaged": true
-        },
-        "addonProfiles": {
-          "omsagent": {
-            "enable": true,
-            "config": {
-              "logAnalyticsWorkspaceResourceID": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
-            }
-          },
-          "enableResourceLock": true,
-          "enableAzurePolicy": true,
-          "azureKeyvaultSecretsProvider": true
-        },
-        "servicePrincipalProfile": {
-          "clientId": "<<clientId>>",
-          "secret": "<<secret>>"
-        }
+        ]
       }
     },
     "parNetworkArtifacts": {
@@ -203,7 +400,7 @@
         "enable": false,
         "artifactsKeyVault": {
           "keyVaultPolicies": {
-            "objectId": "<<objectId>>",
+            "objectId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx",
             "permissions": {
               "keys": [
                 "get",
@@ -214,39 +411,50 @@
                 "all"
               ]
             },
-            "tenantId": "<<tenantId>>"
+            "tenantId": "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx"
           }
-        },
-        "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": false,
-          "principalIds": [
-            "<<principalIds>>"
-          ],
-          "roleDefinitionIdOrName": "Contributor"
         }
       }
     },
     "parDdosStandard": {
       "value": {
-        "enable": false
+        "enabled": false
       }
     },
     "parAzureFirewall": {
       "value": {
         "enable": true,
+        "clientSubnetName": "AzureFirewallSubnet",
+        "clientSubnetAddressPrefix": "10.0.100.0/26",
+        "clientSubnetServiceEndpoints": [],
         "clientPublicIPAddressAvailabilityZones": [],
+        "managementSubnetName": "AzureFirewallManagementSubnet",
+        "managementSubnetAddressPrefix": "10.0.100.64/26",
+        "managementSubnetServiceEndpoints": [],
         "managementPublicIPAddressAvailabilityZones": [],
         "supernetIPAddress": "10.0.96.0/19",
         "skuTier": "Premium",
         "threatIntelMode": "Alert",
         "intrusionDetectionMode": "Alert",
         "publicIPAddressDiagnosticsLogs": [
-          "DDoSProtectionNotifications",
-          "DDoSMitigationFlowLogs",
-          "DDoSMitigationReports"
+          {
+            "category": "DDoSProtectionNotifications",
+            "enabled": true
+          },
+          {
+            "category": "DDoSMitigationFlowLogs",
+            "enabled": true
+          },
+          {
+            "category": "DDoSMitigationReports",
+            "enabled": true
+          }
         ],
         "publicIPAddressDiagnosticsMetrics": [
-          "AllMetrics"
+          {
+            "category": "AllMetrics",
+            "enabled": true
+          }
         ],
         "diagnosticsLogs": [
           "AzureFirewallApplicationRule",
@@ -256,48 +464,42 @@
         "diagnosticsMetrics": [
           "AllMetrics"
         ],
-        "storageAccountAccess": {
-          "value": {
-            "enableRoleAssignmentForStorageAccount": false,
-            "principalIds": [
-              "<<principalId>>"
-            ],
-            "roleDefinitionIdOrName": "Contributor"
-          }
-        }
+        "applicationRuleCollections": [],
+        "networkRuleCollections": []
+      }
+    },
+    "parStorageAccountAccess": {
+      "value": {
+        "enableRoleAssignmentForStorageAccount": false,
+        "principalIds": [
+          "xxxxxxx-xxxx-xxxx-xxxx-xxxxxxx"
+        ],
+        "roleDefinitionIdOrName": "Contributor"
       }
     },
     "parLogging": {
       "value": {
-        "enableSentinel": true,
+        "enableSentinel": "true",
         "logAnalyticsWorkspaceCappingDailyQuotaGb": -1,
         "logAnalyticsWorkspaceRetentionInDays": 30,
         "logAnalyticsWorkspaceSkuName": "PerGB2018",
-        "logStorageSkuName": "Standard_GRS",
-        "storageAccountAccess": {
-          "enableRoleAssignmentForStorageAccount": false,
-          "principalIds": [
-            "<<principalId>>"
-          ],
-          "roleDefinitionIdOrName": "Contributor"
-        }
+        "logStorageSkuName": "Standard_GRS"
       }
     },
     "parRemoteAccess": {
       "value": {
         "enable": true,
+        "enableJumpBoxes": true,
         "bastion": {
           "sku": "Standard",
           "subnetAddressPrefix": "10.0.100.160/27",
           "publicIPAddressAvailabilityZones": [],
-          "encryptionAtHost": false,
           "linux": {
-            "enable": true,
-            "vmName": "bastion-linux",
             "vmAdminUsername": "azureuser",
-            "disablePasswordAuthentication": false,
+            "enableVmPasswordAuthentication": true,
+            "vmAuthenticationType": "password",
             "vmAdminPasswordOrKey": "Rem0te@2020246",
-            "vmSize": "Standard_DS1_v2",
+            "vmSize": "Standard_B2s",
             "vmOsDiskCreateOption": "FromImage",
             "vmOsDiskType": "Standard_LRS",
             "vmImagePublisher": "Canonical",
@@ -307,22 +509,16 @@
             "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
           },
           "windows": {
-            "enable": true,
-            "vmName": "bastion-windows",
             "vmAdminUsername": "azureuser",
-            "vmAdminPassword": "Rem0te@2020246",
+            "VmAdminPassword": "Rem0te@2020246",
             "vmSize": "Standard_DS1_v2",
             "vmOsDiskCreateOption": "FromImage",
-            "vmStorageAccountType": "StandardSSD_LRS",
+            "VmStorageAccountType": "StandardSSD_LRS",
             "vmImagePublisher": "MicrosoftWindowsServer",
             "vmImageOffer": "WindowsServer",
             "vmImageSku": "2019-datacenter",
             "vmImageVersion": "latest",
             "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
-          },
-          "customScriptExtension": {
-            "install": false,
-            "script64": ""
           }
         }
       }
@@ -330,19 +526,8 @@
     "parSecurityCenter": {
       "value": {
         "enableDefender": true,
-        "alertNotifications": "Off",
-        "alertsToAdminsNotifications": "Off",
         "emailSecurityContact": "anoa@microsoft.com",
         "phoneSecurityContact": "5555555555"
-      }
-    },
-    "parWorkloadLogStorageAccountAccess": {
-      "value": {
-        "enableRoleAssignmentForStorageAccount": false,
-        "principalIds": [
-          "xxxxxx-xxxxx-xxxxx-xxxx-xxxxxxx"
-        ],
-        "roleDefinitionIdOrName": "Group"
       }
     }
   }

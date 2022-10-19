@@ -1,96 +1,88 @@
 # Overlays: NoOps Accelerator - Management Groups
 
+### Module Tested on
+
+* Azure Commercial ✔️
+* Azure Government ✔️
+* Azure Government Secret ✔️
+* Azure Government Top Secret ❔
+
+> ✔️ = tested,  ❔= currently testing
+
+## Navigation
+
+  - [Overview](#overview)
+  - [Prerequisites](#prerequisites)
+  - [Architecture](#architecture)
+  - [Deployment](#deployment)
+  - [Parameters](#parameters)
+  - [Outputs](#outputs)
+  - [Resource types](#resource-types)
+  - [Air-Gapped Clouds](#air-gapped-clouds)
+  - [Cleanup](#cleanup)
+  - [Example Output in Azure](#example-output-in-azure)
+
 ## Overview
 
-The Enclave Management Groups module deploys a management group hierarchy in a tenant under the `Tenant Root Group`.  This is accomplished through a tenant-scoped Azure Resource Manager (ARM) deployment.  The heirarchy can be modifed by editing `deploy.parameters.json`.
+The Enclave Management Groups module deploys a management group hierarchy in a tenant under the `Tenant Root Group`.  This is accomplished through a tenant-scoped Azure Resource Manager (ARM) deployment.  The heirarchy can be modifed by editing `deploy.enclave.mg.parameters.json`.
 
 >NOTE: This module setups up a enclave management group structure suitable for the Hub/ 3 Spoke Design. You can create other parameter files that can be used for other organizational requirement.
 
-Read on to understand what this overlay does, and when you're ready, collect all of the pre-requisites, then deploy the overlay
+Module deploys the following resources:
+
+* Enclave Management Groups
+
+The hierarchy created by the deployment (`deploy.enclave.mg.parameters.json`) is:
+
+* Tenant Root Group
+  * Intermediate Level Management Group (defined by parameter in `parRootMg`)
+    * Platform
+      * Management
+      * Transport
+      * Identity
+    * Landing Zones
+      * Workloads
+        * internal
+          * NonProd
+          * Prod
+    * Sandbox
 
 ## Architecture
 
-Azure NoOps Accelerator recommends the following Management Group structure. This structure can be customized based on your organization's requirements.
+![Enclave Management Groups](../../../../docs/media/MgmtGroups_Policies_v0.1.jpg)
 
-* Workloads will be split by 2 groups of archtypes (INTERNAL, PARTNERS).
-* Sandbox management group is used for any new subscriptions that will be created. This will remove the subscription sprawl from the Root Tenant Group and will pull all subscriptions into the security compliance.
+## Deployment
 
-The hierarchy created by the deployment ([Azure Parameters template located in "management-groups/parameters" folder](../../overlays/management-groups/parameters/deploy.parameters.json)) is:
+The docs on Management Groups: <https://docs.microsoft.com/en-us/azure/bastion/bastion-overview>
 
-![Enclave Management Groups](../management-groups/media/01%20-%20Management%20Group%20Design.jpg)
+In this overlay, the management groups are created at the `Tenant Root Group` through a tenant-scoped deployment.
+The following module usage examples are retrieved from the content of the files hosted in the module's `.test` folder.
+   >**Note**: The name of each example is based on the name of the file from which it is taken.
+   >**Note**: Each example lists all the required parameters first, followed by the rest - each in alphabetical order.
 
-## About Management Groups
-
-The docs on Management Groups: <https://learn.microsoft.com/en-us/azure/governance/management-groups/overview>. By default, this overlay will deploy resources into tenant.  
-
-The subscription and resource group can be changed by providing the resource group name (Param: parTargetSubscriptionId/parTargetResourceGroup) and ensuring that the Azure context is set the proper subscription.  
-
-## Pre-requisites
-
-* A organization tenant is available.
-* Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
-
-## Parameters
-
-See below for information on how to use the appropriate deployment parameters for use with this overlay:
-
-Required Parameters | Type | Allowed Values | Description
-| :-- | :-- | :-- | :-- |
-| `parRootMg` | string | `anoa` | Prefix for the management group hierarchy.  This management group will be created as part of the deployment. |
-| `parManagementGroups` | array  | none | Set Parameter to true to Apply Top Level Management Group Prefix of deployment |
-
-Optional Parameters | Type | Allowed Values | Description
-| :-- | :-- | :-- | :-- |
-| `parRequireAuthorizationForGroupCreation` | bool | `false` |Display name for top level management group.  This name will be applied to the management group prefix defined in `parRootMg` parameter. |
-
-## Outputs
-
-This overlay will generate the following outputs:
-
-| Output Name | Type | Description |
-| :-- | :-- | :-- |
-None
-
-## Deploy the Overlay
-
-Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed.
-
-The commands below assume you are deploying in Azure Commercial and show the entire process deploying Management Groups.
-
-For example, deploying using the `az deployment mg create` command in the Azure CLI:
-
-<h3>Overlay Example: Management Groups</h3>
+<h3>Example 1: Azure</h3>
 
 <details>
 
 <summary>via Bash</summary>
 
 ```bash
-# For Azure Commerical regions
-az login
-cd src/bicep/overlays
-cd management-groups
+# For Azure global regions
 az deployment mg create \
    --template-file overlays/management-groups/deploy.bicep \
-   --parameters @overlays/management-groups/deploy.parameters.json \
+   --parameters @overlays/management-groups/deploy.enclave.mg.parameters.json \
    --location 'eastus'
 ```
 
 ```bash
-# For Azure Government regions
-
-# change Azure Clouds
-az cloud set --name AzureUSGovernment
-
-#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
-az login
+# For Azure IL regions
 az deployment mg create \
   --template-file overlays/management-groups/deploy.bicep \
-  --parameters @overlays/management-groups/deploy.parameters.json \
+  --parameters @overlays/management-groups/deploy.enclave.mg.parameters.json \
   --location 'usgovvirginia'
 ```
-</details>
 
+</details>
 <p>
 
 <details>
@@ -98,84 +90,56 @@ az deployment mg create \
 <summary>via Powershell</summary>
 
 ```powershell
-# For Azure Commerical regions
-
-#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
-Connect-AzAccount
-
-#Fetch the list of available Tenant Ids.
-Get-AzTenant
-
-#Grab the tenant Id Switch to another active directory tenant.
-Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
-
+# For Azure global regions
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/deploy.bicepp `
-  -TemplateParameterFile overlays/management-groups/deploy.parameters.json `
+  -TemplateParameterFile overlays/management-groups/deploy.enclave.mg.parameters.json `
   -Location 'eastus'
 ```
 
 OR
 
 ```powershell
-# For Azure Government regions
-
-#sign in to Azure  from Powershell, this will redirect you to a web browser for authentication, if required
-Connect-AzAccount
-
-#Fetch the list of available Tenant Ids.
-Get-AzTenant
-
-#Grab the tenant Id Switch to another active directory tenant.
-Set-AzContext -TenantId XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
-
+# For Azure IL regions
 New-AzManagementGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/management-groups/deploy.bicepp `
-  -TemplateParameterFile overlays/management-groups/deploy.parameters.json `
+  -TemplateParameterFile overlays/management-groups/deploy.enclave.mg.parameters.json.json `
   -Location  'usgovvirginia'
 ```
 </details>
 <p>
 
-<p>
-  <details>
-    <summary>via Azure CLI</summary>
+## Parameters
 
-```bash
-# For Azure Commerical regions
+The module requires the following inputs:
 
-# Sign into AZ CLI, this will redirect you to a web browser for authentication, if required
-az login
+**Required parameters**
+| Parameter Name | Type | Description |
+| :-- | :-- | :-- |
+| `parRootMg` | string | Prefix for the management group hierarchy.  This management group will be created as part of the deployment. |
+| `parManagementGroups` | array   | Set Parameter to true to Apply Top Level Management Group Prefix of deployment |
 
-az deployment mg create
- --template-file deploy.bicep
- --parameters @parameters/deploy.parameters.json
- --location eastus
- --name deploy-enclave-mg
- --management-group-id '<< your tenant id >>'
-```
+**Conditional parameters**
+| Parameter Name | Type | Default Value | Description |
+| :-- | :-- | :-- | :-- |
+| `parRequireAuthorizationForGroupCreation` | bool | Display name for top level management group.  This name will be applied to the management group prefix defined in `parRootMg` parameter. |
 
-```bash
-# For Azure Government regions
+## Outputs
 
-# change Azure Clouds
-az cloud set --name AzureUSGovernment
+This module will generate the following outputs:
 
-#sign  into AZ CLI, this will redirect you to a web browser for authentication, if required
-az login
+| Output Name | Type | Description |
+| :-- | :-- | :-- |
+None
 
-az deployment mg create
- --template-file deploy.bicep
- --parameters @parameters/deploy.parameters.json
- --location eastus
- --name deploy-enclave-mg
- --management-group-id '<< your tenant id >>'
-```
+## Resource types
 
-  </details>
-</p>
+| Resource Type | API Version |
+| :-- | :-- |
+| `Microsoft.Management/managementGroups` | [2021-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Management/2021-04-01/managementGroups) |
+| `Microsoft.Management/managementGroups/subscriptions` | [2021-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Management/2021-04-01/managementGroups/subscriptions) |
 
 ## Air-Gapped Clouds
 
@@ -193,4 +157,4 @@ az account management-group hierarchy-settings delete --name GroupName
 
 ## Example Output in Azure
 
-![Example Deployment Output](media/mgExampleManagementStructure.png "Example Deployment Output in Azure global regions")
+![Example Deployment Output](media/mgExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")

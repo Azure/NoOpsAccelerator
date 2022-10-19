@@ -99,41 +99,17 @@ param parRemoteAccess object
 
 // HUB NETWORK PARAMETERS
 
-// Hub Subnet Resource Id
-// (JSON Parameter)
-// ---------------------------
-// "parHubSubnetResourceId": {
-//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-snet"
-// }
-@description('The name of the The Hub Subnet Resource Id')
-param parHubSubnetResourceId string = ''
-
-// Hub Virtual Network Name
-// (JSON Parameter)
-// ---------------------------
-// "parHubVirtualNetworkName": {
-//   "value": "anoa-eastus-platforms-hub-vnet"
-// }
-@description('The Hub Virtual Network Name for the Hub Network.')
+@description('The Hub Virtual Network Name')
 param parHubVirtualNetworkName string
 
-// Hub Network Security Group Resource Id
-// (JSON Parameter)
-// ---------------------------
-// "parHubNetworkSecurityGroupResourceId": {
-//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/networkSecurityGroups/anoa-eastus-platforms-hub-nsg"
-// }
+@description('The Hub Subnet Resource Id')
+param parHubSubnetResourceId string
+
 @description('The Hub Network Security Group Resource Id')
 param parHubNetworkSecurityGroupResourceId string
 
 // LOGGING PARAMETERS
 
-// Logging Log Analytics Workspace Id
-// (JSON Parameter)
-// ---------------------------
-// "parLogAnalyticsWorkspaceId": {
-//   "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-platforms-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-platforms-logging-log"
-// }
 @description('Log Analytics Workspace Id Needed for NSG, VNet and Activity Logging')
 param parLogAnalyticsWorkspaceId string
 
@@ -199,6 +175,7 @@ resource resHubVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-02-01' exi
 
 resource resBastionSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
   name: '${parHubVirtualNetworkName}/AzureBastionSubnet'
+
   properties: {
     addressPrefix: parRemoteAccess.bastion.subnetAddressPrefix
   }
@@ -322,7 +299,7 @@ module modLinuxNetworkInterface '../../../azresources/Modules/Microsoft.Network/
 module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/virtualmachines/az.com.virtual.machine.bicep' = if (parRemoteAccess.bastion.linux.enable) {
   name: 'deploy-ra-linux-vm-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: '${toLower(parRequired.orgPrefix)}-${toLower(parRemoteAccess.bastion.linux.vmName)}'
+    name: parRemoteAccess.bastion.linux.vmName
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
@@ -385,7 +362,7 @@ module modWindowsNetworkInterface '../../../azresources/Modules/Microsoft.Networ
 module modAvSet '../../../azresources/Modules/Microsoft.Compute/availabilitySets/az.com.availabilty.set.bicep' = {
   name: 'deploy-ra-win-avset-${parLocation}-${parDeploymentNameSuffix}'
   params: {
-    name: '${toLower(parRequired.orgPrefix)}-${parRemoteAccess.bastion.windows.vmName}-avset'
+    name: '${parRemoteAccess.bastion.windows.vmName}-avset'
     location: parLocation
     availabilitySetSku: 'Aligned'
   }

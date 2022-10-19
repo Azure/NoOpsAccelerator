@@ -1,5 +1,3 @@
-// Copyright (c) Microsoft Corporation. Licensed under the MIT license.
-
 @description('Required. The name of the disk that is being created.')
 param name string
 

@@ -1,0 +1,36 @@
+{
+    "resourceTypes": {
+        "type": "Array",
+        "metadata": {
+            "description": "Azure resource types to audit for locks e.g. 'microsoft.network/expressroutecircuits' and 'microsoft.network/expressroutegateways'",
+            "displayName": "Resource types to audit for locks"
+        }
+    },
+    "lockLevel": {
+        "type": "Array",
+        "metadata": {
+            "description": "Resource lock level to audit for",
+            "displayName": "Lock level"
+        },
+        "allowedValues": [
+            "ReadOnly",
+            "CanNotDelete"
+        ],
+        "defaultValue": [
+            "ReadOnly",
+            "CanNotDelete"
+        ]
+    },
+    "effect": {
+        "type": "String",
+        "metadata": {
+            "displayName": "Effect",
+            "description": "Enable or disable the execution of the policy"
+        },
+        "allowedValues": [
+            "AuditIfNotExists",
+            "Disabled"
+        ],
+        "defaultValue": "AuditIfNotExists"
+    }
+}

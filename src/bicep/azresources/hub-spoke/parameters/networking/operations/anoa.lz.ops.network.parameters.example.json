@@ -1,0 +1,45 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parOrgPrefix": {
+            "value": "anoa"
+        },
+        "parTemplateVersion": {
+            "value": "v1.0"
+        },
+        "parOperationsSubscriptionId": {
+            "value": "xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx"
+        },
+        "parDeployEnvironment": {
+            "value": "workload"
+        },
+        "parOperationsVirtualNetworkAddressPrefix": {
+            "value": "0.0.0.0/26"
+        },
+        "parOperationsSubnetAddressPrefix": {
+            "value": "0.0.0.0/27"
+        },         
+        "parFirewallPrivateIPAddress": {
+            "value": "0.0.0.0"
+        },       
+        "enableActivityLogging": {
+            "value": true
+        },
+        "parAddRoleAssignmentForStorageAccount": {
+            "value": true
+        },
+        "parStorageAccountAccessObjectId": {
+            "value": "xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx"
+        },
+        "parStorageAccountAccessType": {
+            "value": "Group"
+        },
+        "parLogAnalyticsWorkspaceResourceId": {
+            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-workload-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-workload-logging-log"
+        },
+        "parLogAnalyticsWorkspaceName": {
+            "value": "anoa-eastus-workload-logging-log"
+        }
+    }
+}

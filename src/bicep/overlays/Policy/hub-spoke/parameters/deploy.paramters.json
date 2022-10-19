@@ -1,0 +1,107 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parPolicy": {
+            "value": {
+                "bulitInPolicy": {
+                    "policies": [
+                        {
+                            "enabled": false,
+                            "name": "Location",
+                            "policyAssignmentManagementGroupId": "anoa",
+                            "enforcementMode": "Default",
+                            "allowedLocations": [
+                                "EastUS"
+                            ]
+                        },
+                        {
+                            "enabled": false,
+                            "name": "NIST SP 800-53 R5",
+                            "policyAssignmentManagementGroupId": "anoa",
+                            "enforcementMode": "Default",
+                            "requiredRetentionDays": "30"
+                        },
+                        {
+                            "enabled": false,
+                            "name": "FedRAMP Moderate",
+                            "policyAssignmentManagementGroupId": "anoa",
+                            "enforcementMode": "Default",
+                            "requiredRetentionDays": "30"
+                        }
+                    ]
+                },
+                "customPolicy": {
+                    "value": {
+                        "policies": [
+                            {
+                                "enabled": true,
+                                "name": "Custom - Compute Governance Initiative",
+                                "policyDefinitionManagementGroupId": "anoa",
+                                "policyAssignmentManagementGroupId": "anoa",
+                                "policySource": "ANOA",
+                                "policyCategory": "Compute"
+                            },
+                            {
+                                "enabled": true,
+                                "name": "Custom - Data Protection Governance Initiative",
+                                "policyDefinitionManagementGroupId": "anoa",
+                                "policySource": "ANOA",
+                                "policyCategory": "Data Protection"
+                            },
+                            {
+                                "enabled": true,
+                                "name": "Custom - Identity Governance Initiative",
+                                "policyDefinitionManagementGroupId": "anoa",
+                                "policySource": "ANOA",
+                                "policyCategory": "IAM"
+                            },
+                            {
+                                "enabled": true,
+                                "name": "Custom - Key Vault Governance Initiative",
+                                "policyDefinitionManagementGroupId": "anoa",
+                                "policySource": "ANOA",
+                                "policyCategory": "Key Vault"
+                            },
+                            {
+                                "enabled": true,
+                                "name": "Custom - Network Governance Initiative",
+                                "policyDefinitionManagementGroupId": "anoa",
+                                "policySource": "ANOA",
+                                "policyCategory": "Network"
+                            },
+                            {
+                                "enabled": true,
+                                "name": "Custom - Security Governance Initiative",
+                                "policyDefinitionManagementGroupId": "anoa",
+                                "policySource": "ANOA",
+                                "policyCategory": "Security"
+                            },
+                            {
+                                "enabled": true,
+                                "name": "Custom - SQL Governance Initiative",
+                                "policyDefinitionManagementGroupId": "anoa",
+                                "policySource": "ANOA",
+                                "policyCategory": "SQL"
+                            },
+                            {
+                                "enabled": true,
+                                "name": "Custom - Storage Governance Initiative",
+                                "policyDefinitionManagementGroupId": "anoa",
+                                "policySource": "ANOA",
+                                "policyCategory": "Storage"
+                            },
+                            {
+                                "enabled": true,
+                                "name": "Custom - Tagging Governance Initiative",
+                                "policyDefinitionManagementGroupId": "anoa",
+                                "policySource": "ANOA",
+                                "policyCategory": "Tagging"
+                            }
+                        ]
+                    }
+                }
+            }
+        }        
+    }
+}

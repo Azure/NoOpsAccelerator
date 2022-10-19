@@ -62,7 +62,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-02-01' existing 
 // Deployments //
 // =========== //
 
-resource appSettings 'Microsoft.Web/sites/config@2021-01-15' = {
+resource appSettings 'Microsoft.Web/sites/config@2020-12-01' = {
   name: 'appsettings'
   kind: kind
   parent: app

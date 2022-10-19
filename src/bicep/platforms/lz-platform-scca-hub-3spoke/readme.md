@@ -1,207 +1,175 @@
 # NoOps Accelerator - Platforms - SCCA Compliant Hub - 3 Spoke
 
+Module Tested on:
+
+* Azure Commercial ✔️
+* Azure Government ✔️
+* Azure Government Secret ❔
+* Azure Government Top Secret ❔
+
+> ✔️ = tested,  ❔= currently testing
+
+## Navigation
+
+- [NoOps Accelerator - Platforms - SCCA Compliant Hub - 3 Spoke](#noops-accelerator---platforms---scca-compliant-hub---3-spoke)
+  - [Authored & Tested With](#authored--tested-with)
+  - [Navigation](#navigation)
+  - [Overview](#overview)
+  - [Architecture](#architecture)
+  - [Pre-requisites](#pre-requisites)
+  - [Deployment examples](#deployment-examples)
+  - [Parameters](#parameters)
+    - [Parameter Usage: `appSettingsKeyValuePairs`](#parameter-usage-appsettingskeyvaluepairs)
+  - [Outputs](#outputs)
+  - [Resource Types](#resource-types)
+
 ## Overview
 
-This platform module deploys Hub 3 Spoke landing zone.
+This platform module deploys Hub/Spoke landing zone.
 
-> NOTE: This is only the landing zone deployment. The workloads will be deployed with the enclave or can be deployed after the landing zone is created.
+> NOTE: This is only the landing zone. The workloads will be deployed with the enclave or can be deployed after the landing zone is created.
 
 Read on to understand what this landing zone does, and when you're ready, collect all of the pre-requisites, then deploy the landing zone.
 
 ## Architecture
 
- ![Hub/Spoke landing zone Architecture](./media/hub-3spoke-network-topology-architecture.jpg)
-
-## About Hub 3 Spoke Landing Zone
-
-The docs on Hub/Spoke Landing Zone: <https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans>.
-
-### What is a Landing Zone?
-
-A **landing zone** is networking infrastructure configured to provide a secure environment for hosting workloads.
-
-[![Landing Zones Azure Academy Video](https://img.youtube.com/vi/9BKgz9Rl1eo/0.jpg)](https://youtu.be/9BKgz9Rl1eo "Don't let this happen to you 😮 Build A Landing Zone 👍 - Click to Watch!")
-
-### Hub/Spoke Networking
-
-Hub/ 3 Spoke Networking (like Mission Landing Zone) is set up in a hub and spoke design, separated by tiers: T0 (Identity and Authorization), T1 (Infrastructure Operations), T2 (DevSecOps and Shared Services), and multiple T3s (Workloads). Access control can be configured to allow separation of duties between all tiers.
-
-### Firewall
-
-All network traffic is directed through the firewall residing in the Network Hub resource group. The firewall is configured as the default route for all the T0 (Identity and Authorization) through T3 (workload/team environments) resource groups as follows:
-
-|Name         |Address prefix| Next hop type| Next hop IP address|
-|-------------|--------------|-----------------|-----------------|
-|default_route| 0.0.0.0/0    |Virtual Appliance|10.0.100.4*       |
-
-*-example IP for firewall
-
-The default firewall configured for Hub/ 1 Spoke Landing Zone is [Azure Firewall Premium](https://docs.microsoft.com/en-us/azure/firewall/premium-features).
-
-Presently, there are two firewall rules configured to ensure access to the Azure Portal and to facilitate interactive logon via PowerShell and Azure CLI, all other traffic is restricted by default. Below are the collection of rules configured for Azure Commercial and Azure Government clouds:
-
-|Rule Collection Priority | Rule Collection Name | Rule name | Source | Port     | Protocol                               |
-|-------------------------|----------------------|-----------|--------|----------|----------------------------------------|
-|100                      | AllowAzureCloud      | AzureCloud|*       |   *      |Any                                     |
-|110                      | AzureAuth            | msftauth  |  *     | Https:443| aadcdn.msftauth.net, aadcdn.msauth.net |
-
-### Tagging
-
-Organize cloud resources to meet the needs of governance, operational management, and accounting. Resources can be managed and found more quickly with the aid of well-defined metadata tagging protocols. By using charge back and show back accounting procedures, these conventions also assist in tying cloud usage charges to specific business teams.
-
-A tagging strategy include business and operational details:
-
-* The business side of this strategy ensures that tags include the organizational information needed to identify the teams. Use a resource along with the business owners who are responsible for resource costs.
-* The operational side ensures that tags include information that IT teams use to identify the workload, application, environment, criticality, and other information useful for managing resources.
+ ![Hub/Spoke landing zone Architecture](../../../bicep/)
 
 ## Pre-requisites
 
-### Subscriptions
+* One or more Azure subscriptions where you or an identity you manage has Owner RBAC permissions
+* For deployments in the Azure Portal you need access to the portal in the cloud you want to deploy to, such as <https://portal.azure.com> or <https://portal.azure.us>.
+* For deployments in BASH or a Windows shell, then a terminal instance with the AZ CLI installed is required. For example, Azure Cloud Shell, the MLZ development container, or a command shell on your local machine with the AZ CLI installed.
+* For PowerShell deployments you need a PowerShell terminal with the Azure Az PowerShell module installed.
 
-Most customers will deploy each tier to a separate Azure subscription, but multiple subscriptions are not required. A single subscription deployment is good for a testing and evaluation, or possibly a small IT Admin team.
+>NOTE: The AZ CLI will automatically install the Bicep tools when a command is run that needs them, or you can manually install them following the instructions here.
 
-### Operational Network Artifacts
+## Deployment examples
 
-If needed, The Operational Network Artifacts are used when operations wants to seperate all key, secrets and operations storage from the hub/spoke model.
+The following module usage examples are retrieved from the content of the files hosted in the module's `lz-platform-hub-spoke` folder.
 
-### DDOS
+   >**Note**: The name of each example is based on the name of the file from which it is taken.
+   >**Note**: Each example lists all the required parameters first, followed by the rest - each in alphabetical order.
 
-If needed, You can dpeloy an DDOS Standard configuration if a firewall is not needed.
+<h3>Example 1: Base</h3>
+
+<details>
+
+<summary>via Bicep module</summary>
+
+```bicep
+module sites './Microsoft.Web/sites/az.web.app.bicep' = {
+  name: '${uniqueString(deployment().name)}-sites'
+  params: {
+    // Required parameters
+    kind: 'functionapp'
+    name: '<<namePrefix>>-az-fa-min-001'
+    serverFarmResourceId: '/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Web/serverFarms/adp-<<namePrefix>>-az-asp-x-001'
+    // Non-required parameters
+    siteConfig: {
+      alwaysOn: true
+    }
+  }
+}
+```
+
+</details>
+
+<h3>Example 2: Artifacts</h3>
+
+<details>
+
+<summary>via Bicep module</summary>
+
+```bicep
+module sites './Microsoft.Web/sites/az.web.app.bicep' = {
+  name: '${uniqueString(deployment().name)}-sites'
+  params: {
+    // Required parameters
+    kind: 'functionapp'
+    name: '<<namePrefix>>-az-fa-min-001'
+    serverFarmResourceId: '/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Web/serverFarms/adp-<<namePrefix>>-az-asp-x-001'
+    // Non-required parameters
+    siteConfig: {
+      alwaysOn: true
+    }
+  }
+}
+```
+
+</details>
 
 ## Parameters
 
-See below for information on how to use the appropriate deployment parameters for use with this landing zone:
-
-Required Parameters | Type | Allowed Values | Description
+**Required parameters**
+| Parameter Name | Type | Allowed Values | Description |
 | :-- | :-- | :-- | :-- |
-parRequired | object | {object} | Required values used with all resources.
-parTags | object | {object} | Required tags values used with all resources.
-parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
-parHub | object | {object} | Hub Virtual network configuration. See [azresources/hub-spoke-core/vdss/hub/readme.md](../../azresources/hub-spoke-core/vdss/hub/readme.md)
-parOperationsSpoke | object | {object} | Operations Spoke Virtual network configuration. See [See azresources/hub-spoke-core/vdms/operations/readme.md](../../azresources/hub-spoke-core/vdms/operations/readme.md)
-parIdentitySpoke | object | {object} | Identity Spoke Virtual network configuration. See [See azresources/hub-spoke-core/vdss/identity/readme.md](../../azresources/hub-spoke-core/vdss/identity/readme.md)
-parSharedServicesSpoke | object | {object} | Shared Services Spoke Virtual network configuration. See [See azresources/hub-spoke-core/vdms/sharedservices/readme.md](../../azresources/hub-spoke-core/vdms/sharedservices/readme.md)
-parAzureFirewall | object | {object} | Azure Firewall configuration. Azure Firewall is deployed in Forced Tunneling mode where a route table must be added as the next hop.
-parLogging | object | {object} | Enables logging parmeters and Microsoft Sentinel within the Log Analytics Workspace created in this deployment. See [azresources/hub-spoke-core/vdms/logging/readme.md](../../azresources/hub-spoke-core/vdms/logging/readme.md)
-parRemoteAccess | object | {object} | When set to "true", provisions Azure Bastion Host. It defaults to "false". See [overlays/management-services/bastion/readme.md](../../overlays/management-services/bastion/readme.md)
+| `name` | string |  | Name of the site. |
+| `location` | string | `[resourceGroup().location]` |  | Location for all Resources. |
 
-Optional Parameters | Type | Allowed Values | Description
-| :-- | :-- | :-- | :-- |
-parNetworkArtifacts | object | {object} | Optional. Enables Operations Network Artifacts Resource Group with KV and Storage account for the ops subscriptions used in the deployment. This overlay allows Bastion keys to be added if Basion Host is enabled. See [azresources/hub-spoke-core/vdss/networkArtifacts/readme.md](../../azresources/hub-spoke-core/vdss/networkArtifacts/readme.md)
-parSecurityCenter | object | {object} | Microsoft Defender for Cloud.  It includes email and phone. See [overlays/management-services/defender/readme.md](../../overlays/management-services/defender/readme.md)
-parDdosStandard | bool | `false` | DDOS Standard configuration.
+**Optional parameters**
+| Parameter Name | Type | Default Value | Allowed Values | Description |
+| :-- | :-- | :-- | :-- | :-- |
+| `appInsightId` | string | `''` |  | Resource ID of the app insight to leverage for this resource. |
+| `appServiceEnvironmentId` | string | `''` |  | The resource ID of the app service environment to use for this resource. |
+| `appSettingsKeyValuePairs` | object | `{object}` |  | The app settings-value pairs except for AzureWebJobsStorage, AzureWebJobsDashboard, APPINSIGHTS_INSTRUMENTATIONKEY and APPLICATIONINSIGHTS_CONNECTION_STRING. |
+| `authSettingV2Configuration` | object | `{object}` |  | The auth settings V2 configuration. |
+| `clientAffinityEnabled` | bool | `True` |  | If client affinity is enabled. |
+| `diagnosticEventHubAuthorizationRuleId` | string | `''` |  | Resource ID of the diagnostic event hub authorization rule for the Event Hubs namespace in which the event hub should be created or streamed to. |
+| `diagnosticEventHubName` | string | `''` |  | Name of the diagnostic event hub within the namespace to which logs are streamed. Without this, an event hub is created for each log category. |
+| `diagnosticLogCategoriesToEnable` | array | `[if(equals(parameters('kind'), 'functionapp'), createArray('FunctionAppLogs'), createArray('AppServiceHTTPLogs', 'AppServiceConsoleLogs', 'AppServiceAppLogs', 'AppServiceAuditLogs', 'AppServiceIPSecAuditLogs', 'AppServicePlatformLogs'))]` | `[AppServiceAppLogs, AppServiceAuditLogs, AppServiceConsoleLogs, AppServiceHTTPLogs, AppServiceIPSecAuditLogs, AppServicePlatformLogs, FunctionAppLogs]` | The name of logs that will be streamed. |
+| `diagnosticLogsRetentionInDays` | int | `365` |  | Specifies the number of days that logs will be kept for; a value of 0 will retain data indefinitely. |
+| `diagnosticMetricsToEnable` | array | `[AllMetrics]` | `[AllMetrics]` | The name of metrics that will be streamed. |
+| `diagnosticSettingsName` | string | `[format('{0}-diagnosticSettings', parameters('name'))]` |  | The name of the diagnostic setting, if deployed. |
+| `diagnosticStorageAccountId` | string | `''` |  | Resource ID of the diagnostic storage account. |
+| `diagnosticWorkspaceId` | string | `''` |  | Resource ID of log analytics workspace. |
+| `httpsOnly` | bool | `True` |  | Configures a site to accept only HTTPS requests. Issues redirect for HTTP requests. |
+| `lock` | string | `''` | `['', CanNotDelete, ReadOnly]` | Specify the type of lock. |
+| `privateEndpoints` | array | `[]` |  | Configuration details for private endpoints. For security reasons, it is recommended to use private endpoints whenever possible. |
+| `roleAssignments` | array | `[]` |  | Array of role assignment objects that contain the 'roleDefinitionIdOrName' and 'principalId' to define RBAC role assignments on this resource. In the roleDefinitionIdOrName attribute, you can provide either the display name of the role definition, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'. |
+| `setAzureWebJobsDashboard` | bool | `[if(contains(parameters('kind'), 'functionapp'), true(), false())]` |  | For function apps. If true the app settings "AzureWebJobsDashboard" will be set. If false not. In case you use Application Insights it can make sense to not set it for performance reasons. |
+| `siteConfig` | object | `{object}` |  | The site config object. |
+| `storageAccountId` | string | `''` |  | Required if app of kind functionapp. Resource ID of the storage account to manage triggers and logging function executions. |
+| `storageAccountRequired` | bool | `False` |  | Checks if Customer provided storage account is required. |
+| `systemAssignedIdentity` | bool | `False` |  | Enables system assigned managed identity on the resource. |
+| `tags` | object | `{object}` |  | Tags of the resource. |
+| `userAssignedIdentities` | object | `{object}` |  | The ID(s) to assign to the resource. |
+| `virtualNetworkSubnetId` | string | `''` |  | Azure Resource Manager ID of the Virtual network and subnet to be joined by Regional VNET Integration. This must be of the form /subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}. |
 
-## Deploy the Landing Zone
 
-Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process deploying Platform Hub/Spoke Design.
+### Parameter Usage: `appSettingsKeyValuePairs`
 
-For example, deploying using the `az deployment sub create` command in the Azure CLI:
+AzureWebJobsStorage, AzureWebJobsDashboard, APPINSIGHTS_INSTRUMENTATIONKEY and APPLICATIONINSIGHTS_CONNECTION_STRING are set separately (check parameters storageAccountId, setAzureWebJobsDashboard, appInsightId).
+For all other app settings key-value pairs use this object.
 
-### Azure CLI
+<details>
 
-```bash
-# For Azure Commerical regions
-az login
-cd src/bicep
-cd platforms/lz-platform-scca-hub-3spoke
-az deployment sub create \ 
---name contoso \
---subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
---template-file platforms/lz-platform-scca-hub-3spoke/deploy.bicep \
---location eastus \
---parameters @platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json
+<summary>via Bicep module</summary>
+
+```json
+
 ```
 
-OR
+</details>
 
-```bash
-# For Azure Government regions
-az deployment sub create \
-  --template-file platforms/lz-platform-scca-hub-3spoke/deploy.bicep \
-  --parameters @platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json \
-  --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-  --resource-group anoa-usgovvirginia-platforms-hub-rg \
-  --location 'usgovvirginia'
-```
+## Outputs
 
-### PowerShell
+| Output Name | Type | Description |
+| :-- | :-- | :-- |
+| `location` | string | The location the resource was deployed into. |
+| `name` | string | The name of the site. |
+| `resourceGroupName` | string | The resource group the site was deployed into. |
+| `resourceId` | string | The resource ID of the site. |
+| `systemAssignedPrincipalId` | string | The principal ID of the system assigned identity. |
 
-```powershell
-# For Azure Commerical regions
-New-AzSubscriptionDeployment `
-  -TemplateFile platforms/lz-platform-scca-hub-3spoke/deploy.bicep `
-  -TemplateParameterFile platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.example.json `
-  -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -Location 'eastus'
-```
+## Resource Types
 
-OR
-
-```powershell
-# For Azure Government regions
-New-AzSubscriptionDeployment `
-  -TemplateFile platforms/lz-platform-scca-hub-3spoke/deploy.bicep `
-  -TemplateParameterFile platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.example.json `
-  -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -Location  'usgovvirginia'
-```
-
-## Extending the Landing Zone
-
-By default, this Landing Zone has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the Landing Zone, please refer to the Landing Zone description located in AzResources here: [`Hub-Spoke-Core`](../../azresources/hub-spoke-core/readme.md)
-
-## Air-Gapped Clouds
-
-For air-gapped clouds it may be convenient to transfer and deploy the compiled ARM template instead of the Bicep template if the Bicep CLI tools are not available or if it is desirable to transfer only one file into the air gap.
-
-## Validate the deployment
-
-Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
-
-Configure the default group using:
-
-```bash
-az configure --defaults group=anoa-eastus-platforms-hub-rg.
-```
-
-```bash
-az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-platforms-hub-rg
-```
-
-```powershell
-Get-AzResource -ResourceGroupName anoa-eastus-platforms-hub-rg
-```
-
-## Cleanup
-
-The Bicep/ARM deployment of NoOps Accelerator - Hub/Spoke deployment can be deleted with these steps:
-
-### Delete Resource Groups
-
-```bash
-az group delete -n anoa-eastus-platforms-logging-rg -y
-az group delete -n anoa-eastus-platforms-hub-rg -y
-az group delete -n anoa-eastus-platforms-identity-rg -y
-az group delete -n anoa-eastus-platforms-operations-rg -y
-az group delete -n anoa-eastus-platforms-sharedservices-rg -y
-az group delete -n anoa-eastus-platforms-artifacts-rg -y
-```
-
-```powershell
-Remove-AzResourceGroup -Name anoa-eastus-platforms-logging-rg
-Remove-AzResourceGroup -Name anoa-eastus-platforms-hub-rg
-Remove-AzResourceGroup -Name anoa-eastus-platforms-identity-rg
-Remove-AzResourceGroup -Name anoa-eastus-platforms-operations-rg
-Remove-AzResourceGroup -Name anoa-eastus-platforms-sharedservices-rg
-Remove-AzResourceGroup -Name anoa-eastus-platforms-artifacts-rg
-```
-
-### Delete Deployments
-
-```bash
-az deployment sub delete -n deploy-hubspoke-network
-```
-
-```powershell
-Remove-AzSubscriptionDeployment -Name deploy-hubspoke-network
-```
+| Resource Type | API Version |
+| :-- | :-- |
+| `Microsoft.Authorization/locks` | [2017-04-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2017-04-01/locks) |
+| `Microsoft.Authorization/roleAssignments` | [2020-10-01-preview](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2020-10-01-preview/roleAssignments) |
+| `Microsoft.Insights/diagnosticSettings` | [2021-05-01-preview](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Insights/2021-05-01-preview/diagnosticSettings) |
+| `Microsoft.Network/privateEndpoints` | [2021-08-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-08-01/privateEndpoints) |
+| `Microsoft.Network/privateEndpoints/privateDnsZoneGroups` | [2021-08-01](https://docs.microsoft.com/en-us/azure/templates/Microsoft.Network/2021-08-01/privateEndpoints/privateDnsZoneGroups) |
+| `Microsoft.App/containerApps` | [2021-03-01](https://docs.microsoft.com/en-us/azure/templates/microsoft.app/2022-03-01/containerapps) |
+| `Microsoft.App/managedEnvironments` | [2021-03-01](https://docs.microsoft.com/en-us/azure/templates/microsoft.app/2022-03-01/managedenvironments) |

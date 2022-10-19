@@ -1,0 +1,136 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "parOrgPrefix": {
+      "value": "anoa"
+    },
+    "parTemplateVersion": {
+      "value": "v1.0"
+    },
+    "parHubSubscriptionId": {
+      "value": "xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx"
+    },
+    "parDeployEnvironment": {
+      "value": "workload"
+    },
+    "parSupportedClouds": {
+      "value": [
+        "AzureCloud",
+        "AzureUSGovernment"
+      ]
+    },
+    "parDeployddosProtectionPlan": {
+      "value": false
+    },
+    "parAzureFirewallEnabled": {
+      "value": true
+    },
+    "parHubVirtualNetworkAddressPrefix": {
+      "value": "0.0.0.0/24"
+    },
+    "parHubSubnetAddressPrefix": {
+      "value": "0.0.0.0/27"
+    },
+    "parFirewallClientSubnetAddressPrefix": {
+      "value": "0.0.0.0/26"
+    },
+    "parFirewallManagementSubnetAddressPrefix": {
+      "value": "0.0.0.0/26"
+    },
+    "parFirewallClientSubnetName": {
+      "value": "AzureFirewallSubnet"
+    },
+    "parHubVirtualNetworkDiagnosticsLogs": {
+      "value": []
+    },
+    "parHubVirtualNetworkDiagnosticsMetrics": {
+      "value": []
+    },
+    "parHubNetworkSecurityGroupRules": {
+      "value": []
+    },
+    "parHubNetworkSecurityGroupDiagnosticsLogs": {
+      "value": [
+        "NetworkSecurityGroupEvent",
+        "NetworkSecurityGroupRuleCounter"
+      ]
+    },
+    "parHubNetworkSecurityGroupDiagnosticsMetrics": {
+      "value": []
+    },
+    "parHubSubnetServiceEndpoints": {
+      "value": [
+        {
+          "service": "Microsoft.Storage"
+        }        
+      ]
+    },
+    "parLogStorageSkuName": {
+      "value": "Standard_GRS"
+    },
+    "parFirewallSkuTier": {
+      "value": "Premium"
+    },
+    "parFirewallThreatIntelMode": {
+      "value": "Alert"
+    },
+    "parFirewallIntrusionDetectionMode": {
+      "value": "Alert"
+    },
+    "parFirewallDiagnosticsLogs": {
+      "value": [
+        "AzureFirewallApplicationRule",
+        "AzureFirewallNetworkRule",
+        "AzureFirewallDnsProxy"
+      ]
+    },
+    "parFirewallDiagnosticsMetrics": {
+      "value": [
+        "AllMetrics"
+      ]
+    },
+    "parFirewallClientSubnetServiceEndpoints": {
+      "value": []
+    },
+    "parFirewallClientPublicIPAddressAvailabilityZones": {
+      "value": []
+    },
+    "parFirewallManagementSubnetServiceEndpoints": {
+      "value": []
+    },
+    "parFirewallManagementPublicIPAddressAvailabilityZones": {
+      "value": []
+    },
+    "parFirewallSupernetIPAddress": {
+      "value": "10.8.4.0/22"
+    },
+    "parPublicIPAddressDiagnosticsLogs": {
+      "value": [
+        "DDoSProtectionNotifications",
+        "DDoSMitigationFlowLogs",
+        "DDoSMitigationReports"
+      ]
+    },
+    "parPublicIPAddressDiagnosticsMetrics": {
+      "value": [
+        "AllMetrics"
+      ]
+    },
+    "parAddRoleAssignmentForStorageAccount": {
+      "value": true
+    },
+    "parStorageAccountAccessObjectId": {
+      "value": "xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx"
+    },
+    "parStorageAccountAccessType": {
+      "value": "Group"
+    },
+    "parLogAnalyticsWorkspaceResourceId": {
+      "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-workload-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-workload-logging-log"
+    },
+    "parLogAnalyticsWorkspaceName": {
+      "value": "anoa-eastus-workload-logging-log"
+    }
+  }
+}

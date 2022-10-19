@@ -24,7 +24,7 @@ param parLocation string = deployment().location
 // Subscription Budget
 // Example parameter (JSON)
 // ---------------------------
-// "parSubscriptionBudget": {
+// "subscriptionBudget": {
 //   "value": {
 //       "TargetBudgetSubs": [
 //          {
@@ -47,13 +47,13 @@ param parDeploymentNameSuffix string = utcNow()
 
 // SUBSCRIPTION BUDGET
 
-module modBudget '../../../azresources/Modules/Microsoft.Consumption/budgets/az.comsumption.sub.budget.bicep' = [for sub in parSubscriptionBudget.TargetBudgetSubs: if (!empty(parSubscriptionBudget) && parSubscriptionBudget.TargetBudgetSubs.createBudget) {
+module modBudget '../../../azresources/Modules/Microsoft.Consumption/budgets/az.comsumption.sub.budget.bicep' = [for sub in parSubscriptionBudget.TargetBudgetSubs: if (!empty(parSubscriptionBudget) && parSubscriptionBudget.createBudget) {
   name: 'deploy-budget-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(sub.subscriptionId)
   params: {
-    name: sub.name
-    amount: sub.amount
+    name: parSubscriptionBudget.name
+    amount: parSubscriptionBudget.amount
     category: 'Cost'      
-    contactEmails: sub.contactEmails
+    contactEmails: parSubscriptionBudget.contactEmails
   }
 }]

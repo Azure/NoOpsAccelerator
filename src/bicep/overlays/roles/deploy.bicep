@@ -27,7 +27,7 @@ targetScope = 'managementGroup'
 
 // REQUIRED PARAMETERS
 param parRoleDefinitionInfo object
-param parAssignableScopeManagementGroupId string
+param parDefaultManagementGroupIdForRoleDefinitions string
 
 param parLocation string = deployment().location
 
@@ -44,13 +44,13 @@ module telemetryCustomerUsageAttribution '../../azresources//Modules/Global/part
 }
 
 //module to trigger custom role vm_operator 
-module role_definitions '../../azresources/Modules/Microsoft.Authorization/roleDefinitions/az.auth.role.definition.bicep' = [for (definitionInfo, i) in parRoleDefinitionInfo.definitions: {
+module role_definitions '../../azresources/Modules/Microsoft.Authorization/roleDefinitions/az.auth.role.definition.bicep' = [for (definitionInfo, i) in array(parRoleDefinitionInfo): {
   name: 'enclave-RoleDef-${i}-${parDeploymentNameSuffix}'
   params: {    
     location: parLocation
-    roleName: definitionInfo.roleName
+    roleName:  definitionInfo.roleName
     actions: definitionInfo.actions
-    description: definitionInfo.roleDescription
-    managementGroupId: parAssignableScopeManagementGroupId   
+    managementGroupId: parDefaultManagementGroupIdForRoleDefinitions   
   }
 }]
+

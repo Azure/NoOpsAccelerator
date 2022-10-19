@@ -6,14 +6,14 @@
             "value": {
                 "orgPrefix": "anoa",
                 "templateVersion": "v1.0",
-                "deployEnvironment": "dev"
+                "deployEnvironment": "appsvcsplan"
             }
         },
         "parTags": {
             "value": {
                 "organization": "anoa",
                 "templateVersion": "v1.0",
-                "deployEnvironment": "dev",
+                "deployEnvironment": "appsvcsplan",
                 "deploymentType": "NoOpsBicep"
             }
         },

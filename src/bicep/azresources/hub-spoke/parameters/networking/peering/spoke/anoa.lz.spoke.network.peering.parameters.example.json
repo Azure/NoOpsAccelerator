@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parSpokeName": {
+            "value": "identity"
+        },
+        "parSpokeResourceGroupName": {
+            "value": "anoa-eastus-workload-identity-rg"
+        },
+        "parSpokeVirtualNetworkName": {
+            "value": "anoa-eastus-workload-identity-vnet"
+        },
+        "parHubVirtualNetworkName": {
+            "value": "anoa-eastus-workload-hub-vnet"
+        },
+        "parHubVirtualNetworkResourceId": {
+            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-workload-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-workload-hub-vnet"
+        }
+    }
+}

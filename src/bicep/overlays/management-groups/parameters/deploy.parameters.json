@@ -13,60 +13,71 @@
           {
             "name": "anoa",
             "displayName": "ANOA",
-            "parentMGName": "<<tenantId>>"
+            "parentMGName": "0ff59ae6-406c-4aba-a174-fddb35d8dd6f"
           },
           {
-            "name": "platform",
-            "displayName": "platform",
+            "name": "anoa-lzs",
+            "displayName": "anoa-lzs",
+            "parentMGName": "anoa"
+          },          
+          {
+            "name": "anoa-lzs-sandbox",
+            "displayName": "anoa-lzs-sandbox",
+            "parentMGName": "anoa-lzs"
+          },          
+          {
+            "name": "anoa-lzs-workloads",
+            "displayName": "anoa-lzs-workloads",
+            "parentMGName": "anoa-lzs"
+          },
+          {
+            "name": "anoa-lzs-internal",
+            "displayName": "anoa-lzs-internal",
+            "parentMGName": "anoa-lzs-workloads"
+          },          
+          {
+            "name": "anoa-lzs-internal-dev",
+            "displayName": "anoa-lzs-internal-nonprod",
+            "parentMGName": "anoa-lzs-internal"
+          },          
+          {
+            "name": "anoa-lzs-internal-prod",
+            "displayName": "anoa-lzs-internal-prod",
+            "parentMGName": "anoa-lzs-internal"
+          },
+          {
+            "name": "anoa-platform",
+            "displayName": "anoa-platform",
             "parentMGName": "anoa"
           },
           {
-            "name": "workloads",
-            "displayName": "workloads",
-            "parentMGName": "anoa"
+            "name": "anoa-transport",
+            "displayName": "anoa-transport",
+            "parentMGName": "anoa-platform"
           },
           {
-            "name": "sandbox",
-            "displayName": "sandbox",
-            "parentMGName": "anoa"
-          },     
+            "name": "anoa-management",
+            "displayName": "anoa-management",
+            "parentMGName": "anoa-platform"
+          }
+          ,
           {
-            "name": "identity",
-            "displayName": "identity",
-            "parentMGName": "platform"
-          },
-          {
-            "name": "transport",
-            "displayName": "transport",
-            "parentMGName": "platform"
-          },
-          {
-            "name": "management",
-            "displayName": "management",
-            "parentMGName": "platform"
-          },
-          {
-            "name": "internal",
-            "displayName": "internal",
-            "parentMGName": "workloads"
-          },
-          {
-            "name": "partners",
-            "displayName": "partners",
-            "parentMGName": "workloads"
+            "name": "anoa-identity",
+            "displayName": "anoa-identity",
+            "parentMGName": "anoa-platform"
           }
         ]
       },
       "parSubscriptions":{
         "value": [
           {
-            "subscriptionId": "<<subscriptionId>>",
-            "managementGroupName": "management"
+            "subscriptionId": "c24647bf-0c86-4408-8d29-6a67262a2701",
+            "managementGroupName": "anoa-management"
           }
         ]
       },
       "parTenantId":{
-        "value": "<<tenantid>>"
+        "value": "0ff59ae6-406c-4aba-a174-fddb35d8dd6f"
       }
     }
   }

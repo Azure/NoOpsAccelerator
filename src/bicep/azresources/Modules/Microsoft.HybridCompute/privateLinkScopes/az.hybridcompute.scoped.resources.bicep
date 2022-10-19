@@ -7,7 +7,7 @@ param name string
 @description('The resource id of the scoped Azure monitor resource.')
 param linkedResourceId string
 
-resource privateLinkScope 'Microsoft.HybridCompute/privateLinkScopes@2022-05-10-preview' existing = {
+resource privateLinkScope 'Microsoft.HybridCompute/privateLinkScopes@2022-03-10' existing = {
   name: privateLinkScopeName
 }
 

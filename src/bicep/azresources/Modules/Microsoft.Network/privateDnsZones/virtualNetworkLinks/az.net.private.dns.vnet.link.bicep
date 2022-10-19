@@ -17,6 +17,9 @@ param registrationEnabled bool = false
 @description('Required. Link to another virtual network resource ID.')
 param virtualNetworkResourceId string
 
+
+
+
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' existing = {
   name: privateDnsZoneName
 }

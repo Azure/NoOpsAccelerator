@@ -17,8 +17,6 @@ The subscription and resource group can be changed by providing the resource gro
 * A hub/spoke LZ deployment (a deployment of [deploy.bicep](../../../../bicep/platforms/lz-platform-scca-hub-3spoke/deploy.bicep))
 * Decide if the optional parameters is appropriate for your deployment. If it needs to change, override one of the optional parameters.
 
-## Parameters
-
 See below for information on how to use the appropriate deployment parameters for use with this overlay:
 
 Required Parameters | Type | Allowed Values | Description
@@ -28,7 +26,7 @@ parTags | object | {object} | Required tags values used with all resources.
 parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
 parDataBricksWorkspace | object | {object} | Defines the Data Bricks Workspace.
 parTargetSubscriptionId | string | `xxxxxx-xxxx-xxxx-xxxxx-xxxxxx` | The target subscription ID for the target Network and resources. It defaults to the deployment subscription.
-parTargetResourceGroup | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group in which the Data Bricks Workspace will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
+parTargetResourceGroup | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group in which the key vault will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
 parTargetVNetName | string | `anoa-eastus-platforms-hub-vnet` | The name of the VNet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
 parTargetSubnetName | string | `anoa-eastus-platforms-hub-snet` | The name of the Subnet in which the aks will be deployed. If unchanged or not specified, the NoOps Accelerator shared services resource group is used.
 
@@ -49,7 +47,7 @@ For example, deploying using the `az deployment sub create` command in the Azure
 ### Azure CLI
 
 ```bash
-# For Azure Commerical regions
+# For Azure global regions
 az login
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
@@ -72,7 +70,7 @@ az deployment sub create \
 OR
 
 ```bash
-# For Azure Government regions
+# For Azure IL regions
 az deployment group create \
   --template-file overlays/containerRegistry/deploy.bicep \
   --parameters @overlays/containerRegistry/deploy.parameters.json \
@@ -84,7 +82,7 @@ az deployment group create \
 ### PowerShell
 
 ```powershell
-# For Azure Commerical regions
+# For Azure global regions
 New-AzGroupDeployment `
   -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/containerRegistry/deploy.bicepp `
@@ -97,11 +95,13 @@ New-AzGroupDeployment `
 OR
 
 ```powershell
-# For Azure Government regions
+# For Azure IL regions
 New-AzGroupDeployment `
+  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
   -TemplateFile overlays/containerRegistry/deploy.bicepp `
   -TemplateParameterFile overlays/containerRegistry/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
+  -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
 
@@ -113,59 +113,22 @@ By default, this overlay has the minium parmeters needed to deploy the service. 
 
 For air-gapped clouds it may be convenient to transfer and deploy the compiled ARM template instead of the Bicep template if the Bicep CLI tools are not available or if it is desirable to transfer only one file into the air gap.
 
-## Validate the deployment
-
-Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resources in the resource group.
-
-Configure the default group using:
-
-```bash
-az configure --defaults group=anoa-eastus-databricks-rg.
-```
-
-```bash
-az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-groupanoa-eastus-databricks-rg
-```
-
-OR
-
-```powershell
-Get-AzResource -ResourceGroupName anoa-eastus-databricks-rg
-```
-
 ## Cleanup
 
 The Bicep/ARM deployment of NoOps Accelerator - Azure Data Bricks Workspace deployment can be deleted with these steps:
 
 ### Delete Resource Groups
 
-```bash
-az group delete --name anoa-eastus-databricks-rg
-```
-
-OR
-
-```powershell
-Remove-AzResourceGroup -Name anoa-eastus-databricks-rg
-```
+Remove-AzResourceGroup -Name anoa-eastus-workload-aks-rg
 
 ### Delete Deployments
 
-```bash
-az deployment delete --name deploy-databricks
-```
-
-OR
-
-```powershell
-Remove-AzSubscriptionDeployment -Name deploy-databricks
-```
+Remove-AzSubscriptionDeployment -Name deploy-AKS-Network
 
 ## Example Output in Azure
 
-![Example Deployment Output](media/databricksExampleDeploymentOutput.png "Example Deployment Output in Azure commerical regions")
+![Example Deployment Output](media/acrExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
 
 ### References
 
-* [What is Azure Databricks?](https://learn.microsoft.com/en-us/azure/databricks/scenarios/what-is-azure-databricks)
-* [What is Databricks Data Science & Engineering?](https://learn.microsoft.com/en-us/azure/databricks/scenarios/what-is-azure-databricks-ws)
+* [Azure Data Bricks Workspace service tiers(Sku's)](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-skus)

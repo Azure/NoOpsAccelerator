@@ -1,0 +1,12 @@
+{
+    "name": "Audit resource locks",
+    "description": "This policy audits if a resource lock 'CanNotDelete' or 'ReadOnly' has been applied to the specified resource types.",
+    "policyType": "Custom",
+    "mode": "All",
+    "metadata": {
+        "category": "Custom",
+        "source": "NoOps Accelerator Governance Policy",
+        "author": "Microsoft",
+        "version": "1.0.0"
+    }
+}

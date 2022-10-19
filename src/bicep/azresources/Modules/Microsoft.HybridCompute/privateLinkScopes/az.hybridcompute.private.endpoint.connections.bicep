@@ -7,7 +7,7 @@ param name string
 @description('The name of Private endpoint which the connection belongs to.')
 param privateEndpointName string
 
-resource privateLinkScope 'Microsoft.HybridCompute/privateLinkScopes@2022-05-10-preview' existing = {
+resource privateLinkScope 'Microsoft.HybridCompute/privatelinkscopes@2022-03-10' existing = {
   name: privateLinkScopeName
 }
 
