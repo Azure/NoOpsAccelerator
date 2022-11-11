@@ -13,7 +13,8 @@
           "sccahubspokeaks": "434fc92b-dbc0-4770-8642-f611851881bd"
         },
         "workloads": {
-          "aks": "8790e990-91e2-49ba-8362-f6d9e208a193"
+          "aks": "8790e990-91e2-49ba-8362-f6d9e208a193",
+          "takvm": "8ada4ac4-5732-4510-8f54-3f0417e6240f"
         }
       }
     }
