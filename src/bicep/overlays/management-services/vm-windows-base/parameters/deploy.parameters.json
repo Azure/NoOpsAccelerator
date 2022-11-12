@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "parRequired": {
+      "value": {
+        "orgPrefix": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "dev"
+      }
+    },
+    "parTags": {
+      "value": {
+        "organization": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "dev",
+        "deploymentType": "NoOpsBicep"
+      }
+    },
+    "parTargetSubscriptionId": {
+      "value": "<<subscriptionId>>"
+    },
+    "parTargetSubnetResourceId": {
+      "value": "<<targetSubnetResourceId>>"
+    },
+    "parLogAnalyticsWorkspaceId": {
+      "value": "<<logAnalyticsWorkspaceId>>"
+    },
+    "parTargetNetworkSecurityGroupResourceId": {
+      "value": "<<targetNetworkSecurityGroupResourceId>>"
+    },
+    "parWindowsVM": {
+      "value": {
+        "vmName": "windows-vm",
+        "vmAdminUsername": "azureuser",
+        "vmAdminPassword": "Rem0te@2020246",
+        "vmSize": "Standard_DS1_v2",
+        "vmOsDiskCreateOption": "FromImage",
+        "vmStorageAccountType": "StandardSSD_LRS",
+        "vmImagePublisher": "MicrosoftWindowsServer",
+        "vmImageOffer": "WindowsServer",
+        "vmImageSku": "2019-datacenter",
+        "vmImageVersion": "latest",
+        "encryptionAtHost": true,
+        "enableAcceleratedNetworking": true
+      }
+    }
+  }
+}
