@@ -1,14 +1,14 @@
-# Overlays: Centos VM Base
+# Overlays: Windows VM Base
 
 ## Overview
 
-This overlay module deploys an Centos VM Base.
+This overlay module deploys an Windows VM with a Server 2022 Base.
 
 Read on to understand what this overlay does, and when you're ready, collect all of the pre-requisites, then deploy the overlay
 
-## About Centos VM Base
+## About Windows VM Base
 
-The docs on Azure Centos VM Base: <https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans>. By default, this overlay will deploy resources into standard default hub/spoke subscriptions and resource groups.  
+The docs on Azure Windows VM Base: <https://learn.microsoft.com/en-us/azure/virtual-machines/overview>. By default, this overlay will deploy resources into standard default hub/spoke subscriptions and resource groups.  
 
 The subscription and resource group can be changed by providing the resource group name (Param: parTargetSubscriptionId/parTargetResourceGroup) and ensuring that the Azure context is set the proper subscription.  
 
@@ -26,9 +26,11 @@ Required Parameters | Type | Allowed Values | Description
 parRequired | object | {object} | Required values used with all resources.
 parTags | object | {object} | Required tags values used with all resources.
 parLocation | string | `[deployment().location]` | The region to deploy resources into. It defaults to the deployment location.
-parAppServicePlan | object | {object} | The oject parameters of the Centos VM Base.
-parTargetSubscriptionId | string | xxxxx-xxxx-xxxx-xxxx-xxxxxx |  The subscription ID for the Target Network and resources. It defaults to the deployment subscription.
-parTargetResourceGroupName | string | '' | The name of the resource group where the Centos VM Base will be deployed.   If not specified, the resource group name will default to the shared services resource group name and subscription.
+parWindowsVM | object | {object} | The oject parameters of the Windows VM Base.
+parTargetSubscriptionId | string | `xxxxx-xxxx-xxxx-xxxx-xxxxxx` |  The subscription ID for the Target Network and resources. It defaults to the deployment subscription.
+parTargetResourceGroupName | string | `anoa-eastus-platforms-hub-rg` | The name of the resource group where the Windows VM Base will be deployed.   If not specified, the resource group name will default to the shared services resource group name and subscription.
+parTargetSubnetResourceId | string | `/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-snet` | The resource ID of the subnet in the Hub Virtual Network for hosting virtual machines
+parLogAnalyticsWorkspaceId | string | `/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-platforms-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-platforms-logging-log` | Log Analytics Workspace Resource Id Needed for Windows VM Base
 
 Optional Parameters | Type | Allowed Values | Description
 | :-- | :-- | :-- | :-- |
@@ -40,13 +42,13 @@ This overlay will generate the following outputs:
 
 | Output Name | Type | Allowed Values | Description
 | :-- | :-- | :-- | :-- |
-outAppServicePlanName | string | '' | Centos VM Base Name
-outResourceGroupName | string | '' | Centos VM Base Resource Group Name
-outTags object | {object} | Required tags values used with Centos VM Base overlay.
+outWindowsVMName | string | '' | Windows VM Base Name
+outResourceGroupName | string | '' | Windows VM Base Resource Group Name
+outTags object | {object} | Required tags values used with Windows VM Base overlay.
 
 ## Deploy the Overlay
 
-Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process from deploying Platform Hub/Spoke Design and then adding an Azure Centos VM Base post-deployment.
+Connect to the appropriate Azure Environment and set appropriate context, see getting started with Azure PowerShell or Azure CLI for help if needed. The commands below assume you are deploying in Azure Commercial and show the entire process from deploying Platform Hub/Spoke Design and then adding an Azure Windows VM Base post-deployment.
 
 > NOTE: Since you can deploy this overlay post-deployment, you can also build this overlay within other deployment models such as Platforms & Workloads.
 
@@ -54,7 +56,7 @@ Once you have the hub/spoke output values, you can pass those in as parameters t
 
 For example, deploying using the `az deployment sub create` command in the Azure CLI:
 
-<h3>Overlay Example: Centos VM Base</h3>
+<h3>Overlay Example: Windows VM Base</h3>
 
 <details>
 
@@ -62,21 +64,32 @@ For example, deploying using the `az deployment sub create` command in the Azure
 
 ```bash
 # For Azure Commerical regions
+
+# When deploying to Azure cloud, first set the cloud.
+az cloudset --name AzureCloud
+
+# Set Platform connectivity subscription ID as the the current subscription 
+$ConnectivitySubscriptionId="[your platform management subscription ID]"
+az account set --subscription $ConnectivitySubscriptionId
+
+#log in
 az login
 cd src/bicep
 cd platforms/lz-platform-scca-hub-3spoke
 az deployment sub create \ 
---name contoso \
+--name deploy-windows-network \
 --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
---template-file platforms/lz-platform-scca-hub-3spoke/deploy.bicep \
+--template-file deploy.bicep \
 --location eastus \
---parameters @platforms/lz-platform-scca-hub-3spoke/parameters/deploy.parameters.json
+--parameters @parameters/deploy.parameters.json
+
+
 cd overlays
-cd app-service-plan
+cd vm-windows-base
 az deployment sub create \
-   --name deploy-AppServicePlan
-   --template-file overlays/app-service-plan/deploy.bicep \
-   --parameters @overlays/app-service-plan/parameters/deploy.parameters.json \
+   --name deploy-windows-overlay
+   --template-file deploy.bicep \
+   --parameters @parameters/deploy.parameters.json \
    --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
    --location 'eastus'
 ```
@@ -85,12 +98,24 @@ OR
 
 ```bash
 # For Azure Government regions
-az deployment sub create \
-  --template-file overlays/app-service-plan/deploy.bicep \
-  --parameters @overlays/app-service-plan/parameters/deploy.parameters.json \
-  --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
-  --resource-group anoa-usgovvirginia-platforms-hub-rg \
-  --location 'usgovvirginia'
+
+# When deploying to another cloud, like Azure US Government, first set the cloud and log in.
+az cloudset --name AzureGovernment
+
+# Set Platform connectivity subscription ID as the the current subscription
+$ConnectivitySubscriptionId="[your platform management subscription ID]"
+az account set --subscription $ConnectivitySubscriptionId
+
+az login
+cd src/bicep
+cd overlays
+cd vm-windows-base
+az deployment group create \
+  --name deploy-windows-overlay
+   --template-file deploy.bicep \
+   --parameters @parameters/deploy.parameters.json \
+   --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx \
+   --location 'usgovvirginia'
 ```
 
 
@@ -105,12 +130,22 @@ az deployment sub create \
 
 ```powershell
 # For Azure Commerical regions
+# When deploying to Azure cloud, first set the cloud and log in.
+Connect-AzAccount -EnvironmentName AzureCloud
+
+# Set Platform connectivity subscription ID as the the current subscription
+$ConnectivitySubscriptionId = "[your platform management subscription ID]"
+Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId
+
+cd src/bicep
+cd overlays
+cd vm-windows-base
+
 New-AzSubscriptionDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/app-service-plan/deploy.bicepp `
-  -TemplateParameterFile overlays/app-service-plan/parameters/deploy.parameters.example.json `
+  -Name deploy-windows-overlay `
+  -TemplateFile deploy.bicepp `
+  -TemplateParameterFile parameters/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-eastus-platforms-hub-rg `
   -Location 'eastus'
 ```
 
@@ -118,12 +153,23 @@ OR
 
 ```powershell
 # For Azure Government regions
+
+# When deploying to another cloud, like Azure US Government, first set the cloud and log in.
+Connect-AzAccount -EnvironmentName AzureUSGovernment
+
+# Set Platform connectivity subscription ID as the the current subscription
+$ConnectivitySubscriptionId = "[your platform management subscription ID]"
+Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId
+
+cd src/bicep
+cd overlays
+cd vm-windows-base
+
 New-AzSubscriptionDeployment `
-  -ManagementGroupId xxxxxxx-xxxx-xxxxxx-xxxxx-xxxx
-  -TemplateFile overlays/app-service-plan/deploy.bicepp `
-  -TemplateParameterFile overlays/app-service-plan/parameters/deploy.parameters.example.json `
+  -Name deploy-windows-overlay `
+  -TemplateFile deploy.bicepp `
+  -TemplateParameterFile parameters/deploy.parameters.json `
   -Subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxx `
-  -ResourceGroup anoa-usgovvirginia-platforms-hub-rg `
   -Location  'usgovvirginia'
 ```
 </details>
@@ -131,7 +177,7 @@ New-AzSubscriptionDeployment `
 
 ## Extending the Overlay
 
-By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [`Centos VM Bases `[Microsoft.Web/serverfarms]`](D:\source\repos\NoOpsAccelerator\src\bicep\azresources\Modules\Microsoft.Web\serverfarms\readme.md)
+By default, this overlay has the minium parmeters needed to deploy the service. If you like to add addtional parmeters to the service, please refer to the module description located in AzResources here: [Virtual Machines `[Microsoft.Compute/virtualMachines]`](../../../azresources/Modules/Microsoft.Compute/virtualmachines/readme.md)
 
 ## Air-Gapped Clouds
 
@@ -144,53 +190,53 @@ Use the Azure portal, Azure CLI, or Azure PowerShell to list the deployed resour
 Configure the default group using:
 
 ```bash
-az configure --defaults group=anoa-eastus-dev-appplan-rg.
+az configure --defaults group=anoa-eastus-dev-windows-rg.
 ```
 
 ```bash
-az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-dev-appplan-rg
+az resource list --location eastus --subscription xxxxxx-xxxx-xxxx-xxxx-xxxxxxxx --resource-group anoa-eastus-dev-windows-rg
 ```
 
 OR
 
 ```powershell
-Get-AzResource -ResourceGroupName anoa-eastus-dev-appplan-rg
+Get-AzResource -ResourceGroupName anoa-eastus-dev-windows-rg
 ```
 
 ## Cleanup
 
-The Bicep/ARM deployment of NoOps Accelerator - Azure Centos VM Base deployment can be deleted with these steps:
+The Bicep/ARM deployment of NoOps Accelerator - Azure Windows VM Base deployment can be deleted with these steps:
 
 ### Delete Resource Groups
 
 ```bash
-az group delete --name anoa-eastus-dev-appplan-rg
+az group delete --name anoa-eastus-dev-windows-rg
 ```
 
 OR
 
 ```powershell
-Remove-AzResourceGroup -Name anoa-eastus-dev-appplan-rg
+Remove-AzResourceGroup -Name anoa-eastus-dev-windows-rg
 ```
 
 ### Delete Deployments
 
 ```bash
-az deployment delete --name deploy-AppServicePlan
+az deployment delete --name deploy-windows-network
+az deployment delete --name deploy-windows-overlay
 ```
 
 OR
 
 ```powershell
-Remove-AzSubscriptionDeployment -Name deploy-AppServicePlan
+Remove-AzSubscriptionDeployment -Name deploy-windows-network
+Remove-AzSubscriptionDeployment -Name deploy-windows-overlay
 ```
 
 ## Example Output in Azure
 
-![Example Deployment Output](media/aspExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
+![Example Deployment Output](media/windowsExampleDeploymentOutput.png "Example Deployment Output in Azure global regions")
 
 ### References
 
-* [Azure App Service plan Documentation](https://docs.microsoft.com/en-us/azure/app-service/overview-hosting-plans/)
-* [Azure App Service Overview](https://docs.microsoft.com/en-us/azure/app-service/overview)
-* [Manage an App Service plan in Azure](https://docs.microsoft.com/en-us/azure/app-service/app-service-plan-manage)
+* [Virtual machines in Azure Documentation](https://learn.microsoft.com/en-us/azure/virtual-machines/overview/)
