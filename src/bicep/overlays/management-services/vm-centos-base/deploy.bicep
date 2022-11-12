@@ -82,6 +82,15 @@ param parTargetResourceGroup string = ''
 @description('The name of the virtual network in which the Centos VM will be deployed. If unchanged or not specified, the NoOps Accelerator will create an virtual network to be used.')
 param parTargetSubnetResourceId string = ''
 
+// Target Netowrk Security Group Resource Id
+// (JSON Parameter)
+// ---------------------------
+// "parTargetNetworkSecurityGroupResourceId": {
+//   "value": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/networkSecurityGroups/anoa-eastus-platforms-hub-nsg"
+// }
+@description('The name of the network security group in which the Windows VM will be deployed. If unchanged or not specified, the NoOps Accelerator will create an network security group to be used.')
+param parTargetNetworkSecurityGroupResourceId string = ''
+
 // Log Analytics Workspace Id
 // (JSON Parameter)
 // ---------------------------
@@ -113,11 +122,15 @@ var varNamingConvention = '${toLower(parRequired.orgPrefix)}-${toLower(parLocati
 // RESOURCE NAME CONVENTIONS WITH ABBREVIATIONS
 
 var varResourceGroupNamingConvention = replace(varNamingConvention, varResourceToken, 'rg')
+var varIpConfigurationNamingConvention = replace(varNamingConvention, varResourceToken, 'ipconf')
+var varNetworkInterfaceNamingConvention = replace(varNamingConvention, varResourceToken, 'nic')
 
 // CENTOS VM NAMES
 
 var varCentosVMName = 'CentosVM'
 var varCentosVMResourceGroupName = replace(varResourceGroupNamingConvention, varNameToken, varCentosVMName)
+var varCentosNetworkInterfaceName = replace(varNetworkInterfaceNamingConvention, varNameToken, varCentosVMName)
+var varCentosNetworkInterfaceIpConfigurationName = replace(varIpConfigurationNamingConvention, varNameToken, varCentosVMName)
 
 //=== TAGS === 
 
@@ -129,7 +142,7 @@ var referential = {
 
 @description('Resource group tags')
 module modTags '../../../azresources/Modules/Microsoft.Resources/tags/az.resources.tags.bicep' = {
-  name: 'deploy-appsvcs-tags--${parLocation}-${parDeploymentNameSuffix}'
+  name: 'deploy-centos-tags--${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parTargetSubscriptionId)
   params: {
     tags: union(parTags, referential)
@@ -142,6 +155,24 @@ module modTags '../../../azresources/Modules/Microsoft.Resources/tags/az.resourc
 resource rgCentosVMRg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: (!empty(parTargetResourceGroup)) ? parTargetResourceGroup : varCentosVMResourceGroupName
   location: parLocation
+}
+
+module modCentosNetworkInterface '../../../azresources/Modules/Microsoft.Network/networkInterfaces/az.net.network.interface.bicep' = {
+  name: 'deploy-linux-net-interface-${parLocation}-${parDeploymentNameSuffix}'
+  scope: resourceGroup(parTargetSubscriptionId, rgCentosVMRg.name)
+  params: {
+    name: varCentosNetworkInterfaceName
+    location: parLocation
+    tags: (empty(parTags)) ? modTags : parTags
+    networkSecurityGroupResourceId: parTargetNetworkSecurityGroupResourceId
+    ipConfigurations: [
+      {
+        name: varCentosNetworkInterfaceIpConfigurationName
+        subnetResourceId: parTargetSubnetResourceId
+        privateIPAllocationMethod: parCentosVM.networkInterfacePrivateIPAddressAllocationMethod
+      }
+    ]
+  }
 }
 
 // Create Centos VM

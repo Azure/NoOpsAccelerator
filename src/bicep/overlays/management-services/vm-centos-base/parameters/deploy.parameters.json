@@ -26,6 +26,9 @@
     "parLogAnalyticsWorkspaceId": {
       "value": "<<logAnalyticsWorkspaceId>>"
     },
+    "parTargetNetworkSecurityGroupResourceId": {
+      "value": "<<targetNetworkSecurityGroupResourceId>>"
+    },
     "parCentosVM": {
       "value": {
         "vmName": "centos-vm",
