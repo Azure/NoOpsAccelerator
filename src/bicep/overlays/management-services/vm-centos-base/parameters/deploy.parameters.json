@@ -20,6 +20,12 @@
     "parTargetSubscriptionId": {
       "value": "<<subscriptionId>>"
     },
+    "parTargetSubnetResourceId": {
+      "value": "<<targetSubnetResourceId>>"
+    },
+    "parLogAnalyticsWorkspaceId": {
+      "value": "<<logAnalyticsWorkspaceId>>"
+    },
     "parCentosVM": {
       "value": {
         "vmName": "centos-vm",
