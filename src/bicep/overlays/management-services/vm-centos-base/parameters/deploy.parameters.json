@@ -1,0 +1,41 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "parRequired": {
+      "value": {
+        "orgPrefix": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "dev"
+      }
+    },
+    "parTags": {
+      "value": {
+        "organization": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "dev",
+        "deploymentType": "NoOpsBicep"
+      }
+    },
+    "parTargetSubscriptionId": {
+      "value": "<<subscriptionId>>"
+    },
+    "parCentosVM": {
+      "value": {
+        "vmName": "centos-vm",
+        "vmAdminUsername": "azureuser",
+        "disablePasswordAuthentication": false,
+        "vmAdminPasswordOrKey": "Rem0te@2020246",
+        "vmSize": "Standard_DS1_v2",
+        "vmOsDiskCreateOption": "FromImage",
+        "vmOsDiskType": "Standard_LRS",
+        "vmImagePublisher": "OpenLogic",
+        "vmImageOffer": "CentOS",
+        "vmImageSku": "8.0",
+        "vmImageVersion": "latest",
+        "encryptionAtHost": true,
+        "enableAcceleratedNetworking": true
+      }
+    }
+  }
+}
