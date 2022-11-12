@@ -26,6 +26,9 @@
     "parLogAnalyticsWorkspaceId": {
       "value": "<<logAnalyticsWorkspaceId>>"
     },
+    "parTargetNetworkSecurityGroupResourceId": {
+      "value": "<<targetNetworkSecurityGroupResourceId>>"
+    },
     "parLinuxVM": {
       "value": {
         "vmName": "linux-vm",
