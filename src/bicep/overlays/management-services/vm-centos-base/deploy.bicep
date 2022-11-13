@@ -97,6 +97,7 @@ param parTargetNetworkSecurityGroupResourceId string = ''
 // "parLogAnalyticsWorkspaceId": {
 //   "value": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.OperationalInsights/workspaces/anoa-eastus-platforms-hub-rg-logs"
 // }
+@description('The name of the log analytics workspace in which the Windows VM will be deployed. If unchanged or not specified, the NoOps Accelerator will create an log analytics workspace to be used.')
 param parLogAnalyticsWorkspaceId string = ''
 
 // RESOURCE NAMING PARAMETERS
@@ -216,7 +217,7 @@ module modCentosVirtualMachine '../../../azresources/Modules/Microsoft.Compute/v
       }
     }
     osType: 'Linux'
-    vmSize: parCentosVM.vmSize
+    vmSize: parCentosVM.vmSize     
   }
 }
 
