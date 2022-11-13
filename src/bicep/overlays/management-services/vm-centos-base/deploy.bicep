@@ -51,7 +51,7 @@ param parLocation string = deployment().location
 // CENTOS VM PARAMETERS
 
 @description('Defines the Centos VM.')
-param parCentosVM object 
+param parVirtualMachine object 
 
 // TARGETS PARAMETERS
 
@@ -170,7 +170,7 @@ module modCentosNetworkInterface '../../../azresources/Modules/Microsoft.Network
       {
         name: varCentosNetworkInterfaceIpConfigurationName
         subnetResourceId: parTargetSubnetResourceId
-        privateIPAllocationMethod: parCentosVM.networkInterfacePrivateIPAddressAllocationMethod
+        privateIPAllocationMethod: parVirtualMachine.networkInterfacePrivateIPAddressAllocationMethod
       }
     ]
   }
@@ -181,21 +181,21 @@ module modCentosVirtualMachine '../../../azresources/Modules/Microsoft.Compute/v
   name: 'deploy-centos-vm-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parTargetSubscriptionId, rgCentosVMRg.name)
   params: {   
-    name: parCentosVM.vmName 
+    name: parVirtualMachine.vmName 
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
-    disablePasswordAuthentication: parCentosVM.disablePasswordAuthentication
-    adminUsername: parCentosVM.vmAdminUsername    
-    adminPassword: parCentosVM.vmAdminPasswordOrKey
+    disablePasswordAuthentication: parVirtualMachine.disablePasswordAuthentication
+    adminUsername: parVirtualMachine.vmAdminUsername    
+    adminPassword: parVirtualMachine.vmAdminPasswordOrKey
 
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
-    encryptionAtHost: parCentosVM.encryptionAtHost
+    encryptionAtHost: parVirtualMachine.encryptionAtHost
     imageReference: {
-      offer: parCentosVM.vmImageOffer
-      publisher: parCentosVM.vmImagePublisher
-      sku: parCentosVM.vmImageSku
-      version: parCentosVM.vmImageVersion
+      offer: parVirtualMachine.vmImageOffer
+      publisher: parVirtualMachine.vmImagePublisher
+      sku: parVirtualMachine.vmImageSku
+      version: parVirtualMachine.vmImageVersion
     }
     nicConfigurations: [
       {
@@ -205,19 +205,19 @@ module modCentosVirtualMachine '../../../azresources/Modules/Microsoft.Compute/v
             subnetResourceId: parTargetSubnetResourceId
           }
         ]
-        nicSuffix: '${parCentosVM.vmName}-nic-01'
-        enableAcceleratedNetworking: parCentosVM.enableAcceleratedNetworking
+        nicSuffix: '${parVirtualMachine.vmName}-nic-01'
+        enableAcceleratedNetworking: parVirtualMachine.enableAcceleratedNetworking
       }
     ]
     osDisk: {
       diskSizeGB: '128'
-      createOption: parCentosVM.vmOsDiskCreateOption
+      createOption: parVirtualMachine.vmOsDiskCreateOption
       managedDisk: {
-        storageAccountType: parCentosVM.vmOsDiskType
+        storageAccountType: parVirtualMachine.vmOsDiskType
       }
     }
     osType: 'Linux'
-    vmSize: parCentosVM.vmSize     
+    vmSize: parVirtualMachine.vmSize     
   }
 }
 
