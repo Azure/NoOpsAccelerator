@@ -29,19 +29,19 @@
     "parTargetNetworkSecurityGroupResourceId": {
       "value": "<<targetNetworkSecurityGroupResourceId>>"
     },
-    "parLinuxVM": {
+    "parVirtualMachine": {
       "value": {
-        "vmName": "linux-vm",
-        "vmAdminUsername": "azureuser",
+        "name": "linux-vm",
+        "adminUsername": "azureuser",
         "disablePasswordAuthentication": false,
-        "vmAdminPasswordOrKey": "Rem0te@2020246",
-        "vmSize": "Standard_DS1_v2",
-        "vmOsDiskCreateOption": "FromImage",
-        "vmOsDiskType": "Standard_LRS",
-        "vmImagePublisher": "Canonical",
-        "vmImageOffer": "UbuntuServer",
-        "vmImageSku": "18.04-LTS",
-        "vmImageVersion": "latest",
+        "adminPasswordOrKey": "Rem0te@2020246",
+        "size": "Standard_DS1_v2",
+        "osDiskCreateOption": "FromImage",
+        "osDiskType": "Standard_LRS",
+        "imagePublisher": "Canonical",
+        "imageOffer": "UbuntuServer",
+        "imageSku": "18.04-LTS",
+        "imageVersion": "latest",
         "encryptionAtHost": true,
         "enableAcceleratedNetworking": true
       }

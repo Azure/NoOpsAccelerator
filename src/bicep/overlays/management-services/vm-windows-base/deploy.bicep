@@ -51,7 +51,7 @@ param parLocation string = deployment().location
 // WINDOWS VM PARAMETERS
 
 @description('Defines the Windows VM.')
-param parWindowsVM object 
+param parVirtualMachine object 
 
 // TARGETS PARAMETERS
 
@@ -170,7 +170,7 @@ module modWindowsNetworkInterface '../../../azresources/Modules/Microsoft.Networ
       {
         name: varWindowsNetworkInterfaceIpConfigurationName
         subnetResourceId: parTargetSubnetResourceId
-        privateIPAllocationMethod: parWindowsVM.networkInterfacePrivateIPAddressAllocationMethod
+        privateIPAllocationMethod: parVirtualMachine.networkInterfacePrivateIPAddressAllocationMethod
       }
     ]
 
@@ -183,21 +183,21 @@ module modWindowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/
   name: 'deploy-windows-vm-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parTargetSubscriptionId, rgWindowsVMRg.name)
   params: {   
-    name: parWindowsVM.vmName 
+    name: parVirtualMachine.name 
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
-    disablePasswordAuthentication: parWindowsVM.disablePasswordAuthentication
-    adminUsername: parWindowsVM.vmAdminUsername    
-    adminPassword: parWindowsVM.vmAdminPasswordOrKey
+    disablePasswordAuthentication: parVirtualMachine.disablePasswordAuthentication
+    adminUsername: parVirtualMachine.adminUsername    
+    adminPassword: parVirtualMachine.adminPasswordOrKey
 
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
-    encryptionAtHost: parWindowsVM.encryptionAtHost
+    encryptionAtHost: parVirtualMachine.encryptionAtHost
     imageReference: {
-      offer: parWindowsVM.vmImageOffer
-      publisher: parWindowsVM.vmImagePublisher
-      sku: parWindowsVM.vmImageSku
-      version: parWindowsVM.vmImageVersion
+      offer: parVirtualMachine.imageOffer
+      publisher: parVirtualMachine.imagePublisher
+      sku: parVirtualMachine.imageSku
+      version: parVirtualMachine.imageVersion
     }
     nicConfigurations: [
       {
@@ -207,19 +207,19 @@ module modWindowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/
             subnetResourceId: parTargetSubnetResourceId
           }
         ]
-        nicSuffix: '${parWindowsVM.vmName}-nic-01'
-        enableAcceleratedNetworking: parWindowsVM.enableAcceleratedNetworking
+        nicSuffix: '${parVirtualMachine.name}-nic-01'
+        enableAcceleratedNetworking: parVirtualMachine.enableAcceleratedNetworking
       }
     ]
     osDisk: {
       diskSizeGB: '128'
-      createOption: parWindowsVM.vmOsDiskCreateOption
+      createOption: parVirtualMachine.osDiskCreateOption
       managedDisk: {
-        storageAccountType: parWindowsVM.vmOsDiskType
+        storageAccountType: parVirtualMachine.osDiskType
       }
     }
     osType: 'Windows'
-    vmSize: parWindowsVM.vmSize
+    vmSize: parVirtualMachine.size
   }
 }
 

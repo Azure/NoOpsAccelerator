@@ -181,21 +181,21 @@ module modCentosVirtualMachine '../../../azresources/Modules/Microsoft.Compute/v
   name: 'deploy-centos-vm-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parTargetSubscriptionId, rgCentosVMRg.name)
   params: {   
-    name: parVirtualMachine.vmName 
+    name: parVirtualMachine.name 
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
     disablePasswordAuthentication: parVirtualMachine.disablePasswordAuthentication
-    adminUsername: parVirtualMachine.vmAdminUsername    
-    adminPassword: parVirtualMachine.vmAdminPasswordOrKey
+    adminUsername: parVirtualMachine.adminUsername    
+    adminPassword: parVirtualMachine.adminPasswordOrKey
 
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
     encryptionAtHost: parVirtualMachine.encryptionAtHost
     imageReference: {
-      offer: parVirtualMachine.vmImageOffer
-      publisher: parVirtualMachine.vmImagePublisher
-      sku: parVirtualMachine.vmImageSku
-      version: parVirtualMachine.vmImageVersion
+      offer: parVirtualMachine.imageOffer
+      publisher: parVirtualMachine.imagePublisher
+      sku: parVirtualMachine.imageSku
+      version: parVirtualMachine.imageVersion
     }
     nicConfigurations: [
       {
@@ -205,19 +205,19 @@ module modCentosVirtualMachine '../../../azresources/Modules/Microsoft.Compute/v
             subnetResourceId: parTargetSubnetResourceId
           }
         ]
-        nicSuffix: '${parVirtualMachine.vmName}-nic-01'
+        nicSuffix: '${parVirtualMachine.name}-nic-01'
         enableAcceleratedNetworking: parVirtualMachine.enableAcceleratedNetworking
       }
     ]
     osDisk: {
       diskSizeGB: '128'
-      createOption: parVirtualMachine.vmOsDiskCreateOption
+      createOption: parVirtualMachine.osDiskCreateOption
       managedDisk: {
-        storageAccountType: parVirtualMachine.vmOsDiskType
+        storageAccountType: parVirtualMachine.osDiskType
       }
     }
     osType: 'Linux'
-    vmSize: parVirtualMachine.vmSize     
+    vmSize: parVirtualMachine.size     
   }
 }
 

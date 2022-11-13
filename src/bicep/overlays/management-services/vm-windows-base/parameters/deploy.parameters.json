@@ -29,18 +29,18 @@
     "parTargetNetworkSecurityGroupResourceId": {
       "value": "<<targetNetworkSecurityGroupResourceId>>"
     },
-    "parWindowsVM": {
+    "parVirtualMachine": {
       "value": {
-        "vmName": "windows-vm",
-        "vmAdminUsername": "azureuser",
-        "vmAdminPassword": "Rem0te@2020246",
-        "vmSize": "Standard_DS1_v2",
-        "vmOsDiskCreateOption": "FromImage",
-        "vmStorageAccountType": "StandardSSD_LRS",
-        "vmImagePublisher": "MicrosoftWindowsServer",
-        "vmImageOffer": "WindowsServer",
-        "vmImageSku": "2019-datacenter",
-        "vmImageVersion": "latest",
+        "name": "windows-vm",
+        "adminUsername": "azureuser",
+        "adminPassword": "Rem0te@2020246",
+        "size": "Standard_DS1_v2",
+        "osDiskCreateOption": "FromImage",
+        "storageAccountType": "StandardSSD_LRS",
+        "imagePublisher": "MicrosoftWindowsServer",
+        "imageOffer": "WindowsServer",
+        "imageSku": "2019-datacenter",
+        "imageVersion": "latest",
         "encryptionAtHost": true,
         "enableAcceleratedNetworking": true
       }

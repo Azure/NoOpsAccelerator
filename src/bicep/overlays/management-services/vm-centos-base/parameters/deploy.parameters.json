@@ -29,19 +29,19 @@
     "parTargetNetworkSecurityGroupResourceId": {
       "value": "<<targetNetworkSecurityGroupResourceId>>"
     },
-    "parCentosVM": {
+    "parVirtualMachine": {
       "value": {
-        "vmName": "centos-vm",
-        "vmAdminUsername": "azureuser",
+        "name": "centos-vm",
+        "adminUsername": "azureuser",
         "disablePasswordAuthentication": false,
-        "vmAdminPasswordOrKey": "Rem0te@2020246",
-        "vmSize": "Standard_DS1_v2",
-        "vmOsDiskCreateOption": "FromImage",
-        "vmOsDiskType": "Standard_LRS",
-        "vmImagePublisher": "OpenLogic",
-        "vmImageOffer": "CentOS",
-        "vmImageSku": "8.0",
-        "vmImageVersion": "latest",
+        "adminPasswordOrKey": "Rem0te@2020246",
+        "size": "Standard_DS1_v2",
+        "osDiskCreateOption": "FromImage",
+        "osDiskType": "Standard_LRS",
+        "imagePublisher": "OpenLogic",
+        "imageOffer": "CentOS",
+        "imageSku": "8.0",
+        "imageVersion": "latest",
         "encryptionAtHost": true,
         "enableAcceleratedNetworking": true
       }

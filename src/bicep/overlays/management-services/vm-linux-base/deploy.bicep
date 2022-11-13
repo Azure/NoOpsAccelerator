@@ -51,7 +51,7 @@ param parLocation string = deployment().location
 // LINUX VM PARAMETERS
 
 @description('Defines the Linux VM.')
-param parLinuxVM object 
+param parVirtualMachine object 
 
 // TARGETS PARAMETERS
 
@@ -169,7 +169,7 @@ module modLinuxNetworkInterface '../../../azresources/Modules/Microsoft.Network/
       {
         name: varLinuxNetworkInterfaceIpConfigurationName
         subnetResourceId: parTargetSubnetResourceId
-        privateIPAllocationMethod: parLinuxVM.networkInterfacePrivateIPAddressAllocationMethod
+        privateIPAllocationMethod: parVirtualMachine.networkInterfacePrivateIPAddressAllocationMethod
       }
     ]
   }
@@ -180,21 +180,21 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
   name: 'deploy-linux-vm-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parTargetSubscriptionId, rgLinuxVMRg.name)
   params: {   
-    name: parLinuxVM.vmName 
+    name: parVirtualMachine.name 
     location: parLocation
     tags: (empty(parTags)) ? modTags : parTags
 
-    disablePasswordAuthentication: parLinuxVM.disablePasswordAuthentication
-    adminUsername: parLinuxVM.vmAdminUsername    
-    adminPassword: parLinuxVM.vmAdminPasswordOrKey
+    disablePasswordAuthentication: parVirtualMachine.disablePasswordAuthentication
+    adminUsername: parVirtualMachine.adminUsername    
+    adminPassword: parVirtualMachine.adminPasswordOrKey
 
     diagnosticWorkspaceId: parLogAnalyticsWorkspaceId
-    encryptionAtHost: parLinuxVM.encryptionAtHost
+    encryptionAtHost: parVirtualMachine.encryptionAtHost
     imageReference: {
-      offer: parLinuxVM.vmImageOffer
-      publisher: parLinuxVM.vmImagePublisher
-      sku: parLinuxVM.vmImageSku
-      version: parLinuxVM.vmImageVersion
+      offer: parVirtualMachine.imageOffer
+      publisher: parVirtualMachine.imagePublisher
+      sku: parVirtualMachine.imageSku
+      version: parVirtualMachine.imageVersion
     }
     nicConfigurations: [
       {
@@ -204,19 +204,19 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
             subnetResourceId: parTargetSubnetResourceId
           }
         ]
-        nicSuffix: '${parLinuxVM.vmName}-nic-01'
-        enableAcceleratedNetworking: parLinuxVM.enableAcceleratedNetworking
+        nicSuffix: '${parVirtualMachine.name}-nic-01'
+        enableAcceleratedNetworking: parVirtualMachine.enableAcceleratedNetworking
       }
     ]
     osDisk: {
       diskSizeGB: '128'
-      createOption: parLinuxVM.vmOsDiskCreateOption
+      createOption: parVirtualMachine.osDiskCreateOption
       managedDisk: {
-        storageAccountType: parLinuxVM.vmOsDiskType
+        storageAccountType: parVirtualMachine.osDiskType
       }
     }
     osType: 'Linux'
-    vmSize: parLinuxVM.vmSize
+    vmSize: parVirtualMachine.size
   }
 }
 
