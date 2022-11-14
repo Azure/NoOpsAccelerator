@@ -212,7 +212,7 @@ module modWindowsVirtualMachine '../../../azresources/Modules/Microsoft.Compute/
       }
     ]
     osDisk: {
-      diskSizeGB: '128'
+      diskSizeGB: parVirtualMachine.osDiskSizeGB
       createOption: parVirtualMachine.osDiskCreateOption
       managedDisk: {
         storageAccountType: parVirtualMachine.osDiskType

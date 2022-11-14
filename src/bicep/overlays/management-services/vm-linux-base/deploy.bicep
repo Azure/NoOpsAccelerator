@@ -209,7 +209,7 @@ module modLinuxVirtualMachine '../../../azresources/Modules/Microsoft.Compute/vi
       }
     ]
     osDisk: {
-      diskSizeGB: '128'
+      diskSizeGB: parVirtualMachine.osDiskSizeGB
       createOption: parVirtualMachine.osDiskCreateOption
       managedDisk: {
         storageAccountType: parVirtualMachine.osDiskType
