@@ -210,7 +210,7 @@ module modCentosVirtualMachine '../../../azresources/Modules/Microsoft.Compute/v
       }
     ]
     osDisk: {
-      diskSizeGB: '128'
+      diskSizeGB:  parVirtualMachine.osDiskSizeGB
       createOption: parVirtualMachine.osDiskCreateOption
       managedDisk: {
         storageAccountType: parVirtualMachine.osDiskType

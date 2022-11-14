@@ -37,6 +37,7 @@
         "adminPasswordOrKey": "Rem0te@2020246",
         "size": "Standard_DS1_v2",
         "osDiskCreateOption": "FromImage",
+        "osDiskSizeGB": 30,
         "osDiskType": "Standard_LRS",
         "imagePublisher": "OpenLogic",
         "imageOffer": "CentOS",
