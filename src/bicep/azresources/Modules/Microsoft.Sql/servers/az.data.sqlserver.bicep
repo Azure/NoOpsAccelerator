@@ -1,18 +1,9 @@
-/* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
-
 @description('Conditional. The administrator username for the server. Required if no `administrators` object for AAD authentication is provided.')
 param administratorLogin string = ''
 
 @description('Conditional. The administrator login password. Required if no `administrators` object for AAD authentication is provided.')
 @secure()
 param administratorLoginPassword string = ''
-
-@allowed([
-  'Enabled'
-  'Disabled'
-])
-@description('Conditional. The administrator username for the server. Required if no `administrators` object for AAD authentication is provided.')
-param publicNetworkAccess string = 'Enabled'
 
 @description('Optional. Location for all resources.')
 param location string = resourceGroup().location
@@ -40,12 +31,17 @@ param roleAssignments array = []
 @description('Optional. Tags of the resource.')
 param tags object = {}
 
+@description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
+param enableDefaultTelemetry bool = true
 
 @description('Optional. The databases to create in the server.')
 param databases array = []
 
 @description('Optional. The firewall rules to create in the server.')
 param firewallRules array = []
+
+@description('Optional. The virtual network rules to create in the server.')
+param virtualNetworkRules array = []
 
 @description('Optional. The security alert policies to create in the server.')
 param securityAlertPolicies array = []
@@ -64,6 +60,14 @@ param minimalTlsVersion string = '1.2'
 @description('Optional. Configuration details for private endpoints. For security reasons, it is recommended to use private endpoints whenever possible.')
 param privateEndpoints array = []
 
+@description('Optional. Whether or not public network access is allowed for this resource. For security reasons it should be disabled. If not specified, it will be disabled by default if private endpoints are set and neither firewall rules nor virtual network rules are set.')
+@allowed([
+  ''
+  'Enabled'
+  'Disabled'
+])
+param publicNetworkAccess string = ''
+
 var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentities) ? 'SystemAssigned,UserAssigned' : 'SystemAssigned') : (!empty(userAssignedIdentities) ? 'UserAssigned' : 'None')
 
 var identity = identityType != 'None' ? {
@@ -71,14 +75,10 @@ var identity = identityType != 'None' ? {
   userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : null
 } : null
 
-
-
 @description('Optional. The vulnerability assessment configuration.')
 param vulnerabilityAssessmentsObj object = {}
 
-
-
-resource server 'Microsoft.Sql/servers@2021-05-01-preview' = {
+resource server 'Microsoft.Sql/servers@2022-02-01-preview' = {
   location: location
   name: name
   tags: tags
@@ -96,7 +96,7 @@ resource server 'Microsoft.Sql/servers@2021-05-01-preview' = {
     } : null
     version: '12.0'
     minimalTlsVersion: minimalTlsVersion
-    publicNetworkAccess:  publicNetworkAccess
+    publicNetworkAccess: !empty(publicNetworkAccess) ? any(publicNetworkAccess) : (!empty(privateEndpoints) && empty(firewallRules) && empty(virtualNetworkRules) ? 'Disabled' : null)
   }
 }
 
@@ -116,6 +116,8 @@ module server_roleAssignments './rbac/roleAssignments.bicep' = [for (roleAssignm
     principalIds: roleAssignment.principalIds
     principalType: contains(roleAssignment, 'principalType') ? roleAssignment.principalType : ''
     roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
+    condition: contains(roleAssignment, 'condition') ? roleAssignment.condition : ''
+    delegatedManagedIdentityResourceId: contains(roleAssignment, 'delegatedManagedIdentityResourceId') ? roleAssignment.delegatedManagedIdentityResourceId : ''
     resourceId: server.id
   }
 }]
@@ -180,7 +182,17 @@ module server_firewallRules './firewallRules/az.data.sqlserver.firewall.rule.bic
     name: firewallRule.name
     serverName: server.name
     endIpAddress: contains(firewallRule, 'endIpAddress') ? firewallRule.endIpAddress : '0.0.0.0'
-    startIpAddress: contains(firewallRule, 'startIpAddress') ? firewallRule.startIpAddress : '0.0.0.0'
+    startIpAddress: contains(firewallRule, 'startIpAddress') ? firewallRule.startIpAddress : '0.0.0.0' 
+  }
+}]
+
+module server_virtualNetworkRules './virtualNetworkRules/deploy.bicep' = [for (virtualNetworkRule, index) in virtualNetworkRules: {
+  name: '${uniqueString(deployment().name, location)}-Sql-VirtualNetworkRules-${index}'
+  params: {
+    name: virtualNetworkRule.name
+    serverName: server.name
+    ignoreMissingVnetServiceEndpoint: contains(virtualNetworkRule, 'ignoreMissingVnetServiceEndpoint') ? virtualNetworkRule.ignoreMissingVnetServiceEndpoint : false
+    virtualNetworkSubnetId: virtualNetworkRule.virtualNetworkSubnetId
     
   }
 }]
@@ -196,7 +208,7 @@ module server_securityAlertPolicies './securityAlertPolicies/az.data.sqlserver.s
     retentionDays: contains(securityAlertPolicy, 'retentionDays') ? securityAlertPolicy.retentionDays : 0
     state: contains(securityAlertPolicy, 'state') ? securityAlertPolicy.state : 'Disabled'
     storageAccountAccessKey: contains(securityAlertPolicy, 'storageAccountAccessKey') ? securityAlertPolicy.storageAccountAccessKey : ''
-    storageEndpoint: contains(securityAlertPolicy, 'storageEndpoint') ? securityAlertPolicy.storageEndpoint : ''
+    storageEndpoint: contains(securityAlertPolicy, 'storageEndpoint') ? securityAlertPolicy.storageEndpoint : '' 
   }
 }]
 
@@ -209,6 +221,7 @@ module server_vulnerabilityAssessment './vulnerabilityAssessments/az.data.sqlser
     recurringScansEmailSubscriptionAdmins: contains(vulnerabilityAssessmentsObj, 'recurringScansEmailSubscriptionAdmins') ? vulnerabilityAssessmentsObj.recurringScansEmailSubscriptionAdmins : false
     recurringScansIsEnabled: contains(vulnerabilityAssessmentsObj, 'recurringScansIsEnabled') ? vulnerabilityAssessmentsObj.recurringScansIsEnabled : false
     vulnerabilityAssessmentsStorageAccountId: contains(vulnerabilityAssessmentsObj, 'vulnerabilityAssessmentsStorageAccountId') ? vulnerabilityAssessmentsObj.vulnerabilityAssessmentsStorageAccountId : ''
+    
   }
   dependsOn: [
     server_securityAlertPolicies
