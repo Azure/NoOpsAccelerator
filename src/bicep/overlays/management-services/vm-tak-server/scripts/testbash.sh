@@ -1,2 +1,3 @@
 #! /bin/bash
-echo "Successful execution" > /tmp/flag.txt
+source global_vars.sh
+echo $script_home > "/flag.txt"
