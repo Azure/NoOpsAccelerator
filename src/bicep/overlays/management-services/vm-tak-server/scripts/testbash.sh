@@ -1,3 +1,2 @@
 #! /bin/bash
-echo -e "Successful execution"
-touch ~/flag.txt
+echo "Successful execution" > /tmp/flag.txt
