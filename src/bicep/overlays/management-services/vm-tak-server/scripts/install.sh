@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source global_vars.sh
+# source global_vars.sh
 project="TakImage"
 
 # Add crontab entries to remove CentOS default repos on reboot and add init script
