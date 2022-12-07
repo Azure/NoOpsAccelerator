@@ -1,5 +1,5 @@
 # !/bin/bash
-echo "Running script (from GH) to begin the install process for TAK Server, it will take a while so please be patient."
+echo "Running script (from GHx) to begin the install process for TAK Server, it will take a while so please be patient."
 
 # source global_vars.sh add var here since global_var can not be read from vm extention 
 project="TakImage"
@@ -11,14 +11,14 @@ script_home=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 echo 'cd ~' >> /root/.bashrc
 
 # Install postgresql
-curl -fskSL -o "${RPM_DBsource}/postgresql14-14.6-1PGDG.rhel7.x86_64.rpm" "${script_home}/takdb.rpm"
+curl "${RPM_DBsource}/postgresql14-14.6-1PGDG.rhel7.x86_64.rpm" "${script_home}/takdb.rpm" -H Metadata:true
 
 [[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
 
 yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
 
 # Install Tak server
-curl -fskSL -o "${RPM_TAKsource}/takserver-4.7-RELEASE20.noarch.rpm" "${script_home}/takserver.rpm"
+curl "${RPM_TAKsource}/takserver-4.7-RELEASE20.noarch.rpm" "${script_home}/takserver.rpm" -H Metadata:true
 
 [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
 
