@@ -11,14 +11,14 @@ script_home=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 echo 'cd ~' >> /root/.bashrc
 
 # Install postgresql
-curl -fskSL -o "${RPM_source}/postgresql14-14.6-1PGDG.rhel7.x86_64.rpm" "${script_home}/takdb.rpm"
+curl -fskSL -o "${RPM_DBsource}/postgresql14-14.6-1PGDG.rhel7.x86_64.rpm" "${script_home}/takdb.rpm"
 
 [[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
 
 yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
 
 # Install Tak server
-curl -fskSL -o "${RPM_source}/takserver-4.7-RELEASE20.noarch.rpm" "${script_home}/takserver.rpm"
+curl -fskSL -o "${RPM_TAKsource}/takserver-4.7-RELEASE20.noarch.rpm" "${script_home}/takserver.rpm"
 
 [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
 
