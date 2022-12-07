@@ -9,7 +9,7 @@ RPM_DBsource="https://noopsblobstorage.blob.core.usgovcloudapi.net/anoatak/postg
 script_home=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
 
-# echo 'cd ~' >> /root/.bashrc
+echo 'cd ~' >> /root/.bashrc
 
 # Install postgres
 # yum -y install postgresql10-server unzip
