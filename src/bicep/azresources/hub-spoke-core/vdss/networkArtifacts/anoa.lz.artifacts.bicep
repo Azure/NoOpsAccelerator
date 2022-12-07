@@ -55,6 +55,10 @@ param parLogStorageSkuName string = 'Standard_GRS'
 @description('Account for access to Storage')
 param parArtifactsStorageAccountAccess object
 
+// RESOURCE LOCKS
+@description('Switch which allows enable resource locks on all resources. Default: true')
+param parEnableResourceLocks bool = true
+
 // VM KEYS
 @secure()
 param parLinuxVmAdminPasswordOrKey string
@@ -136,7 +140,7 @@ module modAftsStorageAccount '../../../Modules/Microsoft.Storage/storageAccounts
         roleDefinitionIdOrName: parArtifactsStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []
-    lock: 'CanNotDelete'
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
   dependsOn: [
     modAftsResourceGroup
@@ -182,6 +186,7 @@ module modAftsKeyVault '../../../Modules/Microsoft.KeyVault/vaults/az.sec.key.va
     enableVaultForDeployment: true
     enableVaultForDiskEncryption: true
     enableVaultForTemplateDeployment: true
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
   dependsOn: [
     modAftsResourceGroup

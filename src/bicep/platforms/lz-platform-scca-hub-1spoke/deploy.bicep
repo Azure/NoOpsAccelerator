@@ -413,6 +413,9 @@ module modLogAnalyticsWorkspace '../../azresources/hub-spoke-core/vdms/logging/a
 
     // RBAC for Storage Parameters
     parLoggingStorageAccountAccess: parLogging.storageAccountAccess
+
+    // Resource Locks for Logging
+    parEnableResourceLocks: parLogging.enableResourceLocks
   }
 }
 
@@ -438,6 +441,9 @@ module modArtifacts '../../azresources/hub-spoke-core/vdss/networkArtifacts/anoa
     parEnableBastionSecrets: parRemoteAccess.enable
     parLinuxVmAdminPasswordOrKey: parRemoteAccess.bastion.linux.vmAdminPasswordOrKey
     parWindowsVmAdminPassword: parRemoteAccess.bastion.windows.vmAdminPassword
+
+    // Resource Locks for Artifacts
+    parEnableResourceLocks: parNetworkArtifacts.enableResourceLocks
   }
 }
 
@@ -494,6 +500,9 @@ module modHubNetwork '../../azresources/hub-spoke-core/vdss/hub/anoa.lz.hub.netw
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
     parLogAnalyticsWorkspaceName: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
 
+    // Resource Locks for Hub
+    parEnableResourceLocks: parHub.enableResourceLocks
+
   }
 }
 
@@ -529,6 +538,9 @@ module modOperationsNetwork '../../azresources/hub-spoke-core/vdms/operations/an
     // Log Analytics Parameters
     parLogAnalyticsWorkspaceResourceId: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceResourceId
     parLogAnalyticsWorkspaceName: modLogAnalyticsWorkspace.outputs.outLogAnalyticsWorkspaceName
+
+    // Resource Locks for Operations
+    parEnableResourceLocks: parOperationsSpoke.enableResourceLocks
   }
 }
 
