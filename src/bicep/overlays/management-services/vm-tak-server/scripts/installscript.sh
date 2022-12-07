@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 echo "Running script to begin the install process for TAK Server, it will take a while so please be patient."
 
 # source global_vars.sh add var here since global_var can not be read from vm extention 
