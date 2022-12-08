@@ -17,9 +17,7 @@ variables:
   location: 'EastUS' # The default location to test deploy resources to
 
   ######################################
-  # global tokens settings
+  # Common folders and file paths
   ######################################
 
-  # this determines the starting prefix and ending suffix of the token in your file.
-  tokenPrefix: '<<'
-  tokenSuffix: '>>'
+  moduleTestFilePath: 'src/bicep/utilities/pipelineTools/staticValidation/module.tests.ps1'

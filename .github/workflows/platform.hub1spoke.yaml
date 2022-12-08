@@ -8,30 +8,21 @@ on:
         description: 'Remove deployed platform module'
         required: false
         default: true      
-  pull_request:
-     branches:
-      - test-Workflows
-     paths:
-      - '.github/actions/templates/**'
-      - '.github/workflows/platform.hub1spoke.yml'
-      - 'platforms/hub1spoke/**'
-      - 'utilities/pipelineTools/**'
-      - '!utilities/pipelineTools/deploymentRemoval/**'
-      - '!*/**/readme.md'
   push:
     branches:
       - test-Workflows
     paths:
       - '.github/actions/templates/**'
       - '.github/workflows/platform.hub1spoke.yml'
-      - 'platforms/hub1spoke/**'
-      - 'utilities/pipelineTools/**'
-      - '!utilities/pipelineTools/deploymentRemoval/**'
+      - 'src/bicep/platforms/hub1spoke/**'
+      - 'src/bicep/utilities/pipelineTools/**'
+      - '!src/bicep/utilities/pipelineTools/deploymentRemoval/**'
       - '!*/**/readme.md'
 
 env:
   variablesPath: 'settings.yml'
   modulePath: 'src/bicep/platforms/hub1spoke'
+  moduleTestFilePath: 'src/bicep/utilities/pipelineTools/staticValidation/platform.module.tests.ps1'
   workflowPath: '.github/workflows/platform.hub1spoke.yml'
   AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
   ARM_SUBSCRIPTION_ID: '${{ secrets.ARM_SUBSCRIPTION_ID }}'
