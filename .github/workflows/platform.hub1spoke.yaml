@@ -10,7 +10,7 @@ on:
         default: true      
   push:
     branches:
-      - main
+      - test-Workflows
     paths:
       - '.github/actions/templates/**'
       - '.github/workflows/platform.hub1spoke.yml'
