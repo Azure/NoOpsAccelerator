@@ -8,6 +8,9 @@ on:
         description: 'Remove deployed platform module'
         required: false
         default: true      
+  pull_request:
+     branches:
+      - test-Workflows
   push:
     branches:
       - test-Workflows
