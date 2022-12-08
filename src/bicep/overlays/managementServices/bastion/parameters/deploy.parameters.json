@@ -1,0 +1,77 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parRequired": {
+            "value": {
+                "orgPrefix": "anoa",
+                "templateVersion": "v1.0",
+                "deployEnvironment": "dev"
+            }
+        },
+        "parTags": {
+            "value": {
+                "organization": "anoa",
+                "templateVersion": "v1.0",
+                "deployEnvironment": "dev",
+                "deploymentType": "NoOpsBicep"
+            }
+        },
+        "parHubVirtualNetworkName": {
+            "value": "anoa-eastus-platforms-hub-vnet"
+        },
+        "parHubSubnetResourceId": {
+            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-platforms-hub-vnet/subnets/anoa-eastus-platforms-hub-snet"
+        },
+        "parHubNetworkSecurityGroupResourceId": {
+            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Network/networkSecurityGroups/anoa-eastus-platforms-hub-nsg"
+        },
+        "parLogAnalyticsWorkspaceId": {
+            "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-platforms-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-platforms-logging-log"
+        },
+        "parRemoteAccess": {
+            "value": {
+                "enable": true,
+                "bastion": {
+                    "sku": "Standard",
+                    "subnetAddressPrefix": "10.0.100.160/27",
+                    "publicIPAddressAvailabilityZones": [],
+                    "encryptionAtHost": false,
+                    "linux": {
+                        "enable": true,
+                        "vmName": "bastion-linux",
+                        "vmAdminUsername": "azureuser",
+                        "disablePasswordAuthentication": false,
+                        "vmAdminPasswordOrKey": "Rem0te@2020246",
+                        "vmSize": "Standard_DS1_v2",
+                        "vmOsDiskCreateOption": "FromImage",
+                        "vmOsDiskType": "Standard_LRS",
+                        "vmImagePublisher": "Canonical",
+                        "vmImageOffer": "UbuntuServer",
+                        "vmImageSku": "18.04-LTS",
+                        "vmImageVersion": "latest",
+                        "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
+                    },
+                    "windows": {
+                        "enable": true,
+                        "vmName": "bastion-windows",
+                        "vmAdminUsername": "azureuser",
+                        "vmAdminPassword": "Rem0te@2020246",
+                        "vmSize": "Standard_DS1_v2",
+                        "vmOsDiskCreateOption": "FromImage",
+                        "vmStorageAccountType": "StandardSSD_LRS",
+                        "vmImagePublisher": "MicrosoftWindowsServer",
+                        "vmImageOffer": "WindowsServer",
+                        "vmImageSku": "2019-datacenter",
+                        "vmImageVersion": "latest",
+                        "networkInterfacePrivateIPAddressAllocationMethod": "Dynamic"
+                    },
+                    "customScriptExtension": {
+                        "install": false,
+                        "script64": ""
+                    }
+                }
+            }
+        }
+    }
+}

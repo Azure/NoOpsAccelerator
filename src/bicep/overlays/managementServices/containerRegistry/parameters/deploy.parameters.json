@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "parRequired": {
+      "value": {
+        "orgPrefix": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "appsvcsplan"
+      }
+    },
+    "parTags": {
+      "value": {
+        "organization": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "appsvcsplan",
+        "deploymentType": "NoOpsBicep"
+      }
+    },
+    "parTargetSubscriptionId": {
+      "value": "<<subscriptionId>>"
+    },
+    "parTargetResourceGroup": {
+      "value": "<<example-rg>>"
+    },
+    "parTargetVNetName": {
+      "value": "<<example-vnet>>"
+    },
+    "parTargetSubnetName": {
+      "value": "<<example-subnet>>"
+    },
+    "parContainerRegistry": {
+      "value": {
+        "name": "anoaeastusdevacr",
+        "acrSku": "Premium",
+        "enableResourceLock": true        
+      }
+    }
+  }
+}

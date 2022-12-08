@@ -1,0 +1,35 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "parRequired": {
+        "value": {
+          "orgPrefix": "anoa",
+          "templateVersion": "v1.0",
+          "deployEnvironment": "dev"
+        }
+      },
+      "parTags": {
+        "value": {
+          "organization": "anoa",
+          "templateVersion": "v1.0",
+          "deployEnvironment": "dev",
+          "deploymentType": "NoOpsBicep"
+        }
+      },
+      "parTargetSubscriptionId": {
+        "value": "<<subscriptionId>>"
+      },    
+      "parAppServicePlan": {
+        "value": {
+            "appServicePlanSku": {
+              "capacity": "1",
+              "family": "S",
+              "name": "S1",
+              "size": "S1",
+              "tier": "Standard"
+            }
+        }
+      }
+    }
+}

@@ -1,0 +1,72 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {            
+      "parRootMg": {
+        "value": "ANOA"
+      },
+      "parRequireAuthorizationForGroupCreation": {
+        "value": true
+      },
+      "parManagementGroups": {
+        "value": [
+          {
+            "name": "anoa",
+            "displayName": "ANOA",
+            "parentMGName": "<<tenantId>>"
+          },
+          {
+            "name": "platform",
+            "displayName": "platform",
+            "parentMGName": "anoa"
+          },
+          {
+            "name": "workloads",
+            "displayName": "workloads",
+            "parentMGName": "anoa"
+          },
+          {
+            "name": "sandbox",
+            "displayName": "sandbox",
+            "parentMGName": "anoa"
+          },     
+          {
+            "name": "identity",
+            "displayName": "identity",
+            "parentMGName": "platform"
+          },
+          {
+            "name": "transport",
+            "displayName": "transport",
+            "parentMGName": "platform"
+          },
+          {
+            "name": "management",
+            "displayName": "management",
+            "parentMGName": "platform"
+          },
+          {
+            "name": "internal",
+            "displayName": "internal",
+            "parentMGName": "workloads"
+          },
+          {
+            "name": "partners",
+            "displayName": "partners",
+            "parentMGName": "workloads"
+          }
+        ]
+      },
+      "parSubscriptions":{
+        "value": [
+          {
+            "subscriptionId": "<<subscriptionId>>",
+            "managementGroupName": "management"
+          }
+        ]
+      },
+      "parTenantId":{
+        "value": "<<tenantid>>"
+      }
+    }
+  }

@@ -1,0 +1,166 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "parRequired": {
+      "value": {
+        "orgPrefix": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "dev"
+      }
+    },
+    "parTags": {
+      "value": {
+        "organization": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "dev",
+        "deploymentType": "NoOpsBicep"
+      }
+    },
+    "parHubResourceGroupName": {
+      "value": "anoa-eastus-platforms-hub-rg"
+    },
+    "parLogAnalyticsWorkspaceResourceId": {
+      "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourcegroups/anoa-eastus-platforms-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-platforms-logging-log"
+    },
+    "parHubLogStorageResourceId": {
+      "value": "/subscriptions/xxxxxxxx-xxxxxx-xxxxx-xxxxxx-xxxxxx/resourceGroups/anoa-eastus-platforms-hub-rg/providers/Microsoft.Storage/storageAccounts/anoasthubushz5jwfncpw4"
+    },
+    "parHubVirtualNetworkName": {
+      "value": "anoa-eastus-platforms-hub-vnet"
+    },
+    "parHubNetworkSecurityGroupName": {
+      "value": "anoa-eastus-platforms-hub-nsg"
+    },
+    "parHubRouteTableName": {
+      "value": "anoa-eastus-platforms-hub-snet-routetable"
+    },
+    "parAppGateway": {
+      "value": {
+        "FrontEndPorts": [
+          {
+            "name": "port443",
+            "properties": {
+              "port": 443
+            }
+          },
+          {
+            "name": "port4433",
+            "properties": {
+              "port": 4433
+            }
+          },
+          {
+            "name": "port80",
+            "properties": {
+              "port": 80
+            }
+          },
+          {
+            "name": "port8080",
+            "properties": {
+              "port": 8080
+            }
+          }
+        ],
+        "FrontEndIPConfigurations": [
+          {
+            "Name": "appgw-feip",
+            "PublicIPAddress": {
+              "Name": "anoa-eastus-platforms-appgw-pip",
+              "Sku": "Standard"
+            }
+          }
+        ],
+        "BackendAddressPools": [
+          {
+            "Name": "appgw-bepool"
+          }
+        ],
+        "BackendHttpSettingsCollection": [
+          {
+            "Name": "appgw-behttpsettings",
+            "Port": 443,
+            "Protocol": "Https",
+            "CookieBasedAffinity": "Disabled",
+            "PickHostNameFromBackendAddress": true,
+            "RequestTimeout": 30,
+            "Probe": {
+              "Name": "appgw-probe",
+              "Protocol": "Https",
+              "Path": "/",
+              "Interval": 30,
+              "Timeout": 30,
+              "UnhealthyThreshold": 3,
+              "PickHostNameFromBackendHttpSettings": true
+            }
+          }
+        ],
+        "HttpListeners": [
+          {
+            "name": "public443",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/applicationGateways/<<namePrefix>>-az-apgw-x-001/frontendIPConfigurations/public"
+              },
+              "frontendPort": {
+                "id": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/applicationGateways/<<namePrefix>>-az-apgw-x-001/frontendPorts/port443"
+              },
+              "sslCertificate": {
+                "id": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/applicationGateways/<<namePrefix>>-az-apgw-x-001/sslCertificates/<<namePrefix>>-az-apgw-x-001-ssl-certificate"
+              },
+              "protocol": "https",
+              "hostNames": [],
+              "requireServerNameIndication": false
+            }
+          },
+          {
+            "name": "private4433",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/applicationGateways/<<namePrefix>>-az-apgw-x-001/frontendIPConfigurations/private"
+              },
+              "frontendPort": {
+                "id": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/applicationGateways/<<namePrefix>>-az-apgw-x-001/frontendPorts/port4433"
+              },
+              "sslCertificate": {
+                "id": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/applicationGateways/<<namePrefix>>-az-apgw-x-001/sslCertificates/<<namePrefix>>-az-apgw-x-001-ssl-certificate"
+              },
+              "protocol": "https",
+              "hostNames": [],
+              "requireServerNameIndication": false
+            }
+          },
+          {
+            "name": "httpRedirect80",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/applicationGateways/<<namePrefix>>-az-apgw-x-001/frontendIPConfigurations/public"
+              },
+              "frontendPort": {
+                "id": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/applicationGateways/<<namePrefix>>-az-apgw-x-001/frontendPorts/port80"
+              },
+              "protocol": "Http",
+              "hostNames": [],
+              "requireServerNameIndication": false
+            }
+          },
+          {
+            "name": "httpRedirect8080",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/applicationGateways/<<namePrefix>>-az-apgw-x-001/frontendIPConfigurations/private"
+              },
+              "frontendPort": {
+                "id": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/Microsoft.Network/applicationGateways/<<namePrefix>>-az-apgw-x-001/frontendPorts/port8080"
+              },
+              "protocol": "Http",
+              "hostNames": [],
+              "requireServerNameIndication": false
+            }
+          }
+        ]
+      }
+    }
+  }
+}

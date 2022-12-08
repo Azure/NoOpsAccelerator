@@ -1,0 +1,103 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "parRequired": {
+      "value": {
+        "orgPrefix": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "dev"
+      }
+    },
+    "parTags": {
+      "value": {
+        "organization": "anoa",
+        "templateVersion": "v1.0",
+        "deployEnvironment": "dev",
+        "deploymentType": "NoOpsBicep"
+      }
+    },
+    "parHubSubscriptionId": {
+      "value": "<<subscriptionId>>"
+    },
+    "parHubResourceGroupName": {
+      "value": "anoa-eastus-dev-hub-rg"
+    },
+    "parHubVirtualNetworkResourceId": {
+      "value": "/subscriptions/<<subscriptionId>>/resourceGroups/anoa-eastus-dev-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-dev-hub-vnet"
+    },
+    "parTargetSubscriptionId": {
+      "value": "<<subscriptionId>>"
+    },
+    "parTargetResourceGroup": {
+      "value": "anoa-eastus-aks-app-rg"
+    },
+    "parTargetVNetName": {
+      "value": "anoa-eastus-aks-app-vnet"
+    },
+    "parTargetSubnetName": {
+      "value": "anoa-eastus-aks-app-snet"
+    },
+    "parKubernetesCluster": {
+      "value": {
+        "name": "Contoso",
+        "enableSystemAssignedIdentity": false,
+        "aksClusterKubernetesVersion": "1.24.3",
+        "enableRBAC": true,
+        "enableResourceLock": false,
+        "enablePodIdentity": false,
+        "aksClusterSkuTier": "Free",
+        "usePrivateDNSZone": true,
+        "enableIngressApplicationGateway": false,
+        "primaryAgentPoolProfile": {
+          "name": "systempool",
+          "vmSize": "Standard_DS2_v2",
+          "osDiskSizeGB": 30,
+          "osDiskType": "Managed",
+          "enableAutoScaling": true,
+          "count": 10,
+          "osType": "Linux",
+          "osSKU": "Ubuntu",
+          "type": "VirtualMachineScaleSets",
+          "mode": "System",
+          "availabilityZones": []
+        },
+        "networkProfile": {          
+          "aksClusterLoadBalancerSku": "standard",
+          "aksClusterPodCidr": "10.244.0.0/16",
+          "aksClusterServiceCidr": "172.16.1.0/24",
+          "aksClusterDnsServiceIP": "172.16.1.10",
+          "aksClusterDockerBridgeCidr": "170.10.0.1/30",
+          "aksClusterOutboundType": "userDefinedRouting"
+        },
+        "apiServerAccessProfile": {
+          "enablePrivateCluster": true,
+          "enablePrivateClusterPublicFQDN": false
+        },
+        "aadProfile": {
+          "aadProfileTenantId": "<<TenantId>>",
+          "aadProfileAdminGroupObjectIDs": [
+            "<<GroupObjectID>>"
+          ],
+          "enableAadProfileEnableAzureRBAC": true,
+          "enableAadProfileManaged": true
+        },
+        "addonProfiles": {
+          "omsagent": {
+            "enable": true,
+            "config": {
+              "logAnalyticsWorkspaceResourceID": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
+            }
+          },
+          "enableResourceLock": true,
+          "enableAzurePolicy": true,
+          "azureKeyvaultSecretsProvider": true
+        },
+        "servicePrincipalProfile": {
+          "clientId": "<<clientId>>",
+          "secret": "<<secret>>"
+        }
+      }
+    }
+  }
+}

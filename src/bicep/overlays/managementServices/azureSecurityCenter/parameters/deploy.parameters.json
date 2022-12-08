@@ -1,0 +1,20 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {        
+        "parTargetSubscriptionId": {
+            "value": "<<subscriptionId>>"
+        },
+        "parSecurityCenter": {
+            "value": {
+                "alertNotifications": "Off",
+                "alertsToAdminsNotifications": "Off",
+                "emailSecurityContact": "anoa@microsoft.com",
+                "phoneSecurityContact": "5555555555"
+            }
+        },
+        "parLogAnalyticsWorkspaceResourceId": {
+            "value": "/subscriptions/<<subscriptionId>>/resourcegroups/validation-rg/providers/microsoft.operationalinsights/workspaces/adp-<<namePrefix>>-az-law-x-001"
+        }
+    }
+}

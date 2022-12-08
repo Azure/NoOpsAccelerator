@@ -1,0 +1,22 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parSubscriptionBudget": {
+            "value": {
+                "TargetBudgetSubs": [
+                    {
+                        "subscriptionId": "xxxxxx-xxxx-xxxxxxx-xxxxx-xxxxxx",
+                        "createBudget": false,
+                        "name": "MonthlySubscriptionBudget",
+                        "amount": 1000,
+                        "timeGrain": "Monthly",
+                        "contactEmails": [
+                            "joedoe@microsoft.com"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}

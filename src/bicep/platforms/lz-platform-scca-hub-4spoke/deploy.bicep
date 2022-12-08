@@ -958,7 +958,7 @@ module modSpokeDataSharedServicesToHubVirtualNetworkPeerings '../../azresources/
 
 // REMOTE ACCESS
 
-module modRemoteAccess '../../overlays/management-services/bastion/deploy.bicep' = if (parRemoteAccess.enable) {
+module modRemoteAccess '../../overlays/managementServices/bastion/deploy.bicep' = if (parRemoteAccess.enable) {
   name: 'deploy-remote-access-hub-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHub.subscriptionId, varHubResourceGroupName)
   params: {
@@ -1000,7 +1000,7 @@ module modVMExt '../../azresources/Modules/Microsoft.Compute/virtualmachines/ext
 
 // MICROSOFT DEFENDER FOR CLOUD FOR HUB
 
-module modDefender '../../overlays/management-services/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender) {
+module modDefender '../../overlays/managementServices/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender) {
   name: 'deploy-defender-hub-${parLocation}-${parDeploymentNameSuffix}'
   params: {
     parLocation: parLocation
@@ -1011,7 +1011,7 @@ module modDefender '../../overlays/management-services/azureSecurityCenter/deplo
 
 // MICROSOFT DEFENDER FOR CLOUD FOR SPOKES
 
-module spokeOpsDefender '../../overlays/management-services/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender && parOperationsSpoke.subscriptionId != parHub.subscriptionId) {
+module spokeOpsDefender '../../overlays/managementServices/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender && parOperationsSpoke.subscriptionId != parHub.subscriptionId) {
   name: 'deploy-defender-ops-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parOperationsSpoke.subscriptionId)
   params: {
@@ -1021,7 +1021,7 @@ module spokeOpsDefender '../../overlays/management-services/azureSecurityCenter/
   }
 }
 
-module spokeIdDefender '../../overlays/management-services/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender && parIdentitySpoke.subscriptionId != parHub.subscriptionId) {
+module spokeIdDefender '../../overlays/managementServices/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender && parIdentitySpoke.subscriptionId != parHub.subscriptionId) {
   name: 'deploy-defender-id-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parIdentitySpoke.subscriptionId)
   params: {
@@ -1031,7 +1031,7 @@ module spokeIdDefender '../../overlays/management-services/azureSecurityCenter/d
   }
 }
 
-module spokeSvcsDefender '../../overlays/management-services/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender && parSharedServicesSpoke.subscriptionId != parHub.subscriptionId) {
+module spokeSvcsDefender '../../overlays/managementServices/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender && parSharedServicesSpoke.subscriptionId != parHub.subscriptionId) {
   name: 'deploy-defender-svcs-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parSharedServicesSpoke.subscriptionId)
   params: {
