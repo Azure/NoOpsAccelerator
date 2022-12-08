@@ -71,7 +71,7 @@ runs:
         # Otherwise retrieve default values
         else {
           # Load used functions
-          . (Join-Path $env:GITHUB_WORKSPACE 'utilities' 'pipelineTools' 'sharedScripts' 'Get-GitHubWorkflowDefaultInput.ps1')
+          . (Join-Path $env:GITHUB_WORKSPACE 'src/bicep/utilities' 'pipelineTools' 'sharedScripts' 'Get-GitHubWorkflowDefaultInput.ps1')
           $functionInput = @{
             workflowPath = '${{ inputs.workflowPath }}'
           }
