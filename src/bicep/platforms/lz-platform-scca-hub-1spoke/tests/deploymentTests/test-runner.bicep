@@ -283,17 +283,14 @@ module test '../../../../platforms/lz-platform-scca-hub-1spoke/deploy.bicep' = {
   Clean up script will:
     - Delete the private endpoints in the Storage resource group
     - Delete all resource groups created by the platform
-*/
+
 var cleanUpScript = '''
   az account set -s {0}
   az network private-endpoint list -g {6} --query "[].id" -o json | jq -r '. | join(" ")' | xargs -t az network private-endpoint delete --ids 
   az group delete --name NetworkWatcherRG --yes --no-wait
-  az group delete --name {1} --yes --no-wait
-  az group delete --name {2} --yes --no-wait
-  az group delete --name {3} --yes --no-wait
-  az group delete --name {4}
+  
 '''
-
+*/
 module testCleanup '../../../../azresources/Modules/Microsoft.Resources/deploymentScripts/az.resources.deployment.scripts.bicep' = if (parTestRunnerCleanupAfterDeployment) {
   dependsOn: [
     test
@@ -305,7 +302,7 @@ module testCleanup '../../../../azresources/Modules/Microsoft.Resources/deployme
     location: parLocation
     timeout: 'PT6H'
     name: 'cleanup-test-${parTestRunnerId}'
-    scriptContent: format(cleanUpScript, subscription().subscriptionId, rgLogging, rgHub, rgOps, rgPdz)
+    primaryScriptUri: 'https://raw.githubusercontent.com/Azure/Enterprise-Scale/main/azopsreference/azopsreference/scripts/cleanup.sh'
     userAssignedIdentities: {
       '${parDeploymentScriptIdentityId}': {}
     }
