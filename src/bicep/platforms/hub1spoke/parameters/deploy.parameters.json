@@ -23,6 +23,7 @@
         "subscriptionId": "<<subscriptionId>>",
         "virtualNetworkAddressPrefix": "10.0.100.0/24",
         "subnetAddressPrefix": "10.0.100.128/27",
+        "enableResourceLocks": true,
         "peerToSpokeVirtualNetwork": true,
         "enablePrivateDnsZones": true,
         "subnets": [
@@ -63,6 +64,7 @@
         "subscriptionId": "<<subscriptionId>>",
         "virtualNetworkAddressPrefix": "10.0.115.0/26",
         "subnetAddressPrefix": "10.0.115.0/27",
+        "enableResourceLocks": true,
         "peerToHubVirtualNetwork": true,
         "useRemoteGateway": false,
         "allowVirtualNetworkAccess": true,
@@ -95,6 +97,7 @@
     "parNetworkArtifacts": {
       "value": {
         "enable": false,
+        "enableResourceLocks": true,
         "artifactsKeyVault": {
           "keyVaultPolicies": {
             "objectId": "<<objectId>>",
@@ -165,6 +168,7 @@
     "parLogging": {
       "value": {
         "enableSentinel": true,
+        "enableResourceLocks": true,
         "logAnalyticsWorkspaceCappingDailyQuotaGb": -1,
         "logAnalyticsWorkspaceRetentionInDays": 30,
         "logAnalyticsWorkspaceSkuName": "PerGB2018",

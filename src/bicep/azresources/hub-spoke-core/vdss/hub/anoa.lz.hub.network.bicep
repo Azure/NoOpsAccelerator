@@ -282,6 +282,10 @@ param parSupportedClouds array = [
 @description('Account for access to Storage')
 param parHubStorageAccountAccess object
 
+// RESOURCE LOCKS
+@description('Switch which allows enable resource locks on all resources. Default: true')
+param parEnableResourceLocks bool = true
+
 /*
   NAMING CONVENTION
   Here we define a naming conventions for resources.
@@ -384,7 +388,7 @@ module modHubLogStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.d
         roleDefinitionIdOrName: parHubStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []
-    lock: 'CanNotDelete'
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
   dependsOn: [
     modHubResourceGroup
@@ -407,6 +411,7 @@ module modHubNetworkSecurityGroup '../../../Modules/Microsoft.Network/networkSec
     diagnosticStorageAccountId: modHubLogStorage.outputs.resourceId
 
     diagnosticLogCategoriesToEnable: parHubNetworkSecurityGroupDiagnosticsLogs
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
 }
 
@@ -433,6 +438,7 @@ module modHubVirtualNetwork '../../../Modules/Microsoft.Network/virtualNetworks/
     diagnosticMetricsToEnable: parHubVirtualNetworkDiagnosticsMetrics
     ddosProtectionPlanEnabled: parDeployddosProtectionPlan
     ddosProtectionPlanId: hubddosName
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
 }
 
@@ -455,6 +461,7 @@ module modHubRouteTable '../../../Modules/Microsoft.Network/routeTable/az.net.ro
       }
     ]
     disableBgpRoutePropagation: parDisableBgpRoutePropagation
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
   dependsOn: [
     modHubResourceGroup
@@ -503,6 +510,7 @@ module modFirewallClientPublicIPAddress '../../../Modules/Microsoft.Network/publ
     diagnosticMetricsToEnable: parPublicIPAddressDiagnosticsMetrics
     publicIPAddressVersion: 'IPv4'
     skuTier: 'Regional'
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
 }
 
@@ -528,6 +536,7 @@ module modFirewallManagementPublicIPAddress '../../../Modules/Microsoft.Network/
     diagnosticMetricsToEnable: parPublicIPAddressDiagnosticsMetrics
     publicIPAddressVersion: 'IPv4'
     skuTier: 'Regional'
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
 }
 
@@ -556,6 +565,7 @@ module modAzureFirewall '../../../Modules/Microsoft.Network/firewalls/az.net.fir
     diagnosticLogCategoriesToEnable: parFirewallDiagnosticsLogs
     diagnosticMetricsToEnable: parFirewallDiagnosticsMetrics
     zones:[]
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
 }
 

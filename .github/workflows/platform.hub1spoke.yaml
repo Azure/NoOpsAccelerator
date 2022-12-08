@@ -1,0 +1,110 @@
+name: 'Platforms: Hub 1 Spoke'
+
+pr: 
+  - test-Workflows
+on:
+  workflow_dispatch:
+    inputs:
+      removeDeployment:
+        type: boolean
+        description: 'Remove deployed platform module'
+        required: false
+        default: true      
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/actions/templates/**'
+      - '.github/workflows/platform.hub1spoke.yml'
+      - 'platforms/hub1spoke/**'
+      - 'utilities/pipelineTools/**'
+      - '!utilities/pipelineTools/deploymentRemoval/**'
+      - '!*/**/readme.md'
+
+env:
+  variablesPath: 'settings.yml'
+  modulePath: 'platforms/hub1spoke'
+  workflowPath: '.github/workflows/platform.hub1spoke.yml'
+  AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+  ARM_SUBSCRIPTION_ID: '${{ secrets.ARM_SUBSCRIPTION_ID }}'
+  ARM_GOV_SUBSCRIPTION_ID: '${{ secrets.ARM_GOV_SUBSCRIPTION_ID }}'
+  ARM_MGMTGROUP_ID: '${{ secrets.ARM_MGMTGROUP_ID }}'
+  ARM_TENANT_ID: '${{ secrets.ARM_TENANT_ID }}'
+
+jobs:
+  ###########################
+  #   Initialize pipeline   #
+  ###########################
+  job_initialize_pipeline:
+    runs-on: ubuntu-20.04
+    name: 'Initialize pipeline'
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: 'Set input parameters to output variables'
+        id: get-workflow-param
+        uses: ./.github/actions/templates/getWorkflowInput
+        with:
+          workflowPath: '${{ env.workflowPath}}'
+      - name: 'Get parameter file paths'
+        id: get-module-test-file-paths
+        uses: ./.github/actions/templates/getModuleTestFiles
+        with:
+          modulePath: '${{ env.modulePath }}'
+    outputs:
+      workflowInput: ${{ steps.get-workflow-param.outputs.workflowInput }}
+      moduleTestFilePaths: ${{ steps.get-module-test-file-paths.outputs.moduleTestFilePaths }}
+
+  #########################
+  #   Static validation   #
+  #########################
+  job_module_pester_validation:
+    runs-on: ubuntu-20.04
+    name: 'Static validation'
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set environment variables
+        uses: ./.github/actions/templates/setEnvironmentVariables
+        with:
+          variablesPath: ${{ env.variablesPath }}
+      - name: 'Run tests'
+        uses: ./.github/actions/templates/validateModulePester
+        with:
+          modulePath: '${{ env.modulePath }}'
+          moduleTestFilePath: '${{ env.moduleTestFilePath }}'
+
+  #############################
+  #   Deployment validation   #
+  #############################
+  job_module_deploy_validation:
+    runs-on: ubuntu-20.04
+    name: 'Deployment validation'
+    needs:
+      - job_initialize_pipeline
+      - job_module_pester_validation
+    strategy:
+      fail-fast: false
+      matrix:
+        moduleTestFilePaths: ${{ fromJson(needs.job_initialize_pipeline.outputs.moduleTestFilePaths) }}
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set environment variables
+        uses: ./.github/actions/templates/setEnvironmentVariables
+        with:
+          variablesPath: ${{ env.variablesPath }}
+      - name: 'Using test file [${{ matrix.moduleTestFilePaths }}]'
+        uses: ./.github/actions/templates/validateModuleDeployment
+        with:
+          templateFilePath: '${{ env.modulePath }}/${{ matrix.moduleTestFilePaths }}'
+          location: '${{ env.location }}'
+          subscriptionId: '${{ secrets.ARM_SUBSCRIPTION_ID }}'
+          managementGroupId: '${{ secrets.ARM_MGMTGROUP_ID }}'
+          removeDeployment: '${{ (fromJson(needs.job_initialize_pipeline.outputs.workflowInput)).removeDeployment }}'
