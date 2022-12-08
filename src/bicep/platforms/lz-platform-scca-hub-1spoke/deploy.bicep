@@ -581,7 +581,7 @@ module modSpokeOpsToHubVirtualNetworkPeerings '../../azresources/hub-spoke-core/
 
 // REMOTE ACCESS
 
-module modRemoteAccess '../../overlays/management-services/bastion/deploy.bicep' = if (parRemoteAccess.enable) {
+module modRemoteAccess '../../overlays/managementServices/bastion/deploy.bicep' = if (parRemoteAccess.enable) {
   name: 'deploy-remote-access-hub-${parLocation}-${parDeploymentNameSuffix}'
   scope: resourceGroup(parHub.subscriptionId, varHubResourceGroupName)
   params: {
@@ -623,7 +623,7 @@ module modVMExt '../../azresources/Modules/Microsoft.Compute/virtualmachines/ext
 
 // MICROSOFT DEFENDER FOR CLOUD FOR HUB
 
-module modDefender '../../overlays/management-services/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender) {
+module modDefender '../../overlays/managementServices/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender) {
   name: 'deploy-defender-hub-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parHub.subscriptionId)
   params: {
@@ -635,7 +635,7 @@ module modDefender '../../overlays/management-services/azureSecurityCenter/deplo
 
 // MICROSOFT DEFENDER FOR CLOUD FOR SPOKES
 
-module spokeOpsDefender '../../overlays/management-services/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender && parOperationsSpoke.subscriptionId != parHub.subscriptionId) {
+module spokeOpsDefender '../../overlays/managementServices/azureSecurityCenter/deploy.bicep' = if (parSecurityCenter.enableDefender && parOperationsSpoke.subscriptionId != parHub.subscriptionId) {
   name: 'deploy-defender-ops-${parLocation}-${parDeploymentNameSuffix}'
   scope: subscription(parOperationsSpoke.subscriptionId)
   params: {
