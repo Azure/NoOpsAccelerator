@@ -3,7 +3,7 @@ name: 'Platforms: Hub 1 Spoke'
 on:
   workflow_dispatch:
     inputs:
-      removeDeployment:
+      removePlatformDeployment:
         type: boolean
         description: 'Remove deployed platform module'
         required: false
@@ -105,4 +105,4 @@ jobs:
           location: '${{ env.location }}'
           subscriptionId: '${{ secrets.ARM_SUBSCRIPTION_ID }}'
           managementGroupId: '${{ secrets.ARM_MGMTGROUP_ID }}'
-          removeDeployment: '${{ (fromJson(needs.job_initialize_pipeline.outputs.workflowInput)).removeDeployment }}'
+          removeDeployment: '${{ (fromJson(needs.job_initialize_pipeline.outputs.workflowInput)).removePlatformDeployment }}'
