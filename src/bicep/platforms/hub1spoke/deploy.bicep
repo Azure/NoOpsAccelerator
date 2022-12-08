@@ -413,6 +413,7 @@ module modLogAnalyticsWorkspace '../../azresources/hub-spoke-core/vdms/logging/a
 
     // RBAC for Storage Parameters
     parLoggingStorageAccountAccess: parLogging.storageAccountAccess
+    parLogStorageSkuName: parLogging.logStorageSkuName
 
     // Resource Locks for Logging
     parEnableResourceLocks: parLogging.enableResourceLocks

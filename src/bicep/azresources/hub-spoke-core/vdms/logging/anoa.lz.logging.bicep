@@ -226,7 +226,7 @@ module modLoggingStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.
   params: {
     name: varLoggingLogStorageAccountName
     location: parLocation
-    storageAccountSku: parLogStorageSkuName
+    storageAccountSku: parLogStorageSkuName       
     tags: modTags.outputs.tags
     roleAssignments: (parLoggingStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
       {
@@ -234,8 +234,7 @@ module modLoggingStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.
         roleDefinitionIdOrName: parLoggingStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []
-    lock: parEnableResourceLocks ? 'CanNotDelete' : ''
- 
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
   dependsOn: [
     modLoggingResourceGroup

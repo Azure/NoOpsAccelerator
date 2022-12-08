@@ -12,9 +12,6 @@ targetScope = 'subscription'
 @description('Location for the deployment.')
 param parLocation string = deployment().location
 
-param parDeploymentScriptIdentityId string
-param parDeploymentScriptResourceGroupName string
-
 param parSubscriptionId string = subscription().subscriptionId
 
 param parFirewallEnabled bool = true
@@ -45,18 +42,11 @@ param parEnableRemoteAccessWindows bool = false
 param parEnableDefender bool = false
 param parEnableResourceLocks bool = false
 
-param parTestRunnerCleanupAfterDeployment bool = true
 param parTestRunnerId string = 'hub1spoke${uniqueString(utcNow())}'
-
-var rgHub = 'anoa-${parLocation}-testrunner-hub-rg' // Resource group for hub resources
-var rgOps = 'anoa-${parLocation}-testrunner-operations-rg' // Resource group for operations resources
-var rgLogging = 'anoa-${parLocation}-testrunner-logging-rg' // Resource group for spoke resources
-//var rgNetworkArtifacts = 'anoa-${parLocation}-testrunner-networkartifacts-rg' // Resource group for network artifacts resources
-var rgPdz = 'anoa-${parLocation}-testrunner-hub-pdz-rg' // Resource group for private DNS zones resources
 
 var parTagProjectName = '${parTestRunnerId}ProjectName'
 
-module test '../../../../platforms/lz-platform-scca-hub-1spoke/deploy.bicep' = {
+module test '../../deploy.bicep' = {
   name: 'execute-test-${parTestRunnerId}'
   scope: subscription()
   params: {
@@ -275,36 +265,6 @@ module test '../../../../platforms/lz-platform-scca-hub-1spoke/deploy.bicep' = {
           script64: ''
         }
       }
-    }
-  }
-}
-
-/*
-  Clean up script will:
-    - Delete the private endpoints in the Storage resource group
-    - Delete all resource groups created by the platform
-
-var cleanUpScript = '''
-  az account set -s {0}
-  az network private-endpoint list -g {6} --query "[].id" -o json | jq -r '. | join(" ")' | xargs -t az network private-endpoint delete --ids 
-  az group delete --name NetworkWatcherRG --yes --no-wait
-  
-'''
-*/
-module testCleanup '../../../../azresources/Modules/Microsoft.Resources/deploymentScripts/az.resources.deployment.scripts.bicep' = if (parTestRunnerCleanupAfterDeployment) {
-  dependsOn: [
-    test
-  ]
-
-  scope: resourceGroup(parDeploymentScriptResourceGroupName)
-  name: 'execute-cleanup-test-${parTestRunnerId}'
-  params: {
-    location: parLocation
-    timeout: 'PT6H'
-    name: 'cleanup-test-${parTestRunnerId}'
-    primaryScriptUri: 'https://raw.githubusercontent.com/Azure/Enterprise-Scale/main/azopsreference/azopsreference/scripts/cleanup.sh'
-    userAssignedIdentities: {
-      '${parDeploymentScriptIdentityId}': {}
     }
   }
 }
