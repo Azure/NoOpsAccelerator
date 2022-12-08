@@ -59,7 +59,7 @@ runs:
         # Grouping task logs
         Write-Output '::group::Setup agent'
         # Load used functions
-        . (Join-Path $env:GITHUB_WORKSPACE 'utilities' 'pipelineTools' 'sharedScripts' 'Set-EnvironmentOnAgent.ps1')
+        . (Join-Path $env:GITHUB_WORKSPACE 'src/bicep/utilities' 'pipelineTools' 'sharedScripts' 'Set-EnvironmentOnAgent.ps1')
         # Define PS modules to install on the runner
         $Modules = @(
             @{ Name = 'Az.Accounts' },
@@ -96,7 +96,7 @@ runs:
           # Grouping task logs
           Write-Output '::group::Validate template file'
           # Load used functions
-          . (Join-Path $env:GITHUB_WORKSPACE 'utilities' 'pipelineTools' 'resourceDeployment' 'Test-TemplateDeployment.ps1')
+          . (Join-Path $env:GITHUB_WORKSPACE 'src/bicep/utilities' 'pipelineTools' 'resourceDeployment' 'Test-TemplateDeployment.ps1')
           # Prepare general parameters
           # --------------------------
           # Fetching parameters
@@ -143,7 +143,7 @@ runs:
           # Grouping task logs
           Write-Output '::group::Deploy template file'
           # Load used functions
-          . (Join-Path $env:GITHUB_WORKSPACE 'utilities' 'pipelineTools' 'resourceDeployment' 'New-TemplateDeployment.ps1')
+          . (Join-Path $env:GITHUB_WORKSPACE 'src/bicep/utilities' 'pipelineTools' 'resourceDeployment' 'New-TemplateDeployment.ps1')
           # Prepare general parameters
           # --------------------------
           $location = '${{ inputs.location }}'
@@ -205,7 +205,7 @@ runs:
           # Grouping task logs
           Write-Output '::group::Remove deployed resources'
           # Load used function
-          . (Join-Path $env:GITHUB_WORKSPACE 'utilities' 'pipelineTools' 'resourceRemoval' 'Initialize-DeploymentRemoval.ps1')
+          . (Join-Path $env:GITHUB_WORKSPACE 'src/bicep/utilities' 'pipelineTools' 'resourceRemoval' 'Initialize-DeploymentRemoval.ps1')
           $functionInput = @{
             TemplateFilePath  = Join-Path $env:GITHUB_WORKSPACE '${{ inputs.templateFilePath }}'
             DeploymentNames   = '${{ steps.deploy_step.outputs.deploymentNames }}' | ConvertFrom-Json

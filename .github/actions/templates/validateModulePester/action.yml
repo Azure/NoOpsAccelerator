@@ -41,7 +41,7 @@ runs:
         # Grouping task logs
         Write-Output '::group::Setup agent'
         # Load used functions
-        . (Join-Path $env:GITHUB_WORKSPACE 'utilities' 'pipelineTools' 'sharedScripts' 'Set-EnvironmentOnAgent.ps1')
+        . (Join-Path $env:GITHUB_WORKSPACE 'src/bicep/utilities' 'pipelineTools' 'sharedScripts' 'Set-EnvironmentOnAgent.ps1')
         # Define PS modules to install on the runner
         $Modules = @(
             # This is the latest tested Pester version. Uncomment the next line in case of a future breaking change in the default version installed on the runner.
