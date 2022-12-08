@@ -1,7 +1,5 @@
 name: 'Platforms: Hub 1 Spoke'
 
-pr: 
-  - test-Workflows
 on:
   workflow_dispatch:
     inputs:
