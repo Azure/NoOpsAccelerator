@@ -234,7 +234,7 @@ module workspace_key './keys/az.synapse.workspace.key.bicep' = if (encryptionAct
 }
 
 // Resource Lock
-resource workspace_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource workspace_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${workspace.name}-${lock}-lock'
   properties: {
     level: any(lock)
@@ -274,7 +274,7 @@ module workspace_privateEndpoints '../../Microsoft.Network/privateEndPoints/az.n
 }]
 
 // Diagnostics Settings
-resource workspace_diagnosticSettings 'Microsoft.Insights/diagnosticsettings@2021-05-01-preview' = if (!empty(diagnosticStorageAccountId) || !empty(diagnosticWorkspaceId) || !empty(diagnosticEventHubAuthorizationRuleId) || !empty(diagnosticEventHubName)) {
+resource workspace_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(diagnosticStorageAccountId) || !empty(diagnosticWorkspaceId) || !empty(diagnosticEventHubAuthorizationRuleId) || !empty(diagnosticEventHubName)) {
   name: diagnosticSettingsName
   properties: {
     storageAccountId: !empty(diagnosticStorageAccountId) ? diagnosticStorageAccountId : null

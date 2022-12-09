@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "parRequired": {
+        "value": {
+          "orgPrefix": "anoa",
+          "templateVersion": "v1.0",
+          "deployEnvironment": "dev"
+        }
+      },
+      "parTags": {
+        "value": {
+          "organization": "anoa",
+          "templateVersion": "v1.0",
+          "deployEnvironment": "dev",
+          "deploymentType": "NoOpsBicep"
+        }
+      },
+      "parTargetResourceGroup": {
+        "value": "<<example-rg>>"
+      },
+      "parServiceHealthAlerts": {
+        "value": {
+            "incidentTypes": [ "Incident", "Security" ],
+            "regions": [ "Global", "EastUS", "WestUS" ],                        
+            "alertRuleName": "Incidents and Security",
+            "alertRuleDescription": "Service Health: Incidents and Security",
+            "actionGroupId": "/subscriptions/<<subscriptionId>>/resourceGroups/validation-rg/providers/microsoft.insights/actiongroups/adp-<<namePrefix>>-az-ag-x-001"
+        }
+      }
+    }
+}

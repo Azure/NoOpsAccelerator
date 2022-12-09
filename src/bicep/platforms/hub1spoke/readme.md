@@ -1,4 +1,6 @@
-# NoOps Accelerator - Platforms - SCCA Compliant Hub - 1 Spoke Landing Zone
+# Platforms - SCCA Compliant Hub - 1 Spoke Landing Zone
+
+[![Build](https://github.com/jrspinella/NoOpsAccelerator/actions/workflows/platform.hub1spoke.yaml/badge.svg)](https://github.com/jrspinella/NoOpsAccelerator/actions/workflows/platform.hub1spoke.yaml)
 
 ## Overview
 

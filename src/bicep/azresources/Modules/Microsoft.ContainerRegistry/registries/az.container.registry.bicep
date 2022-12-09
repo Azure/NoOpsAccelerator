@@ -285,7 +285,7 @@ module registry_webhooks './webhooks/az.container.registry.webhook.bicep' = [for
   }
 }]
 
-resource registry_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource registry_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${registry.name}-${lock}-lock'
   properties: {
     level: any(lock)
@@ -294,7 +294,7 @@ resource registry_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(l
   scope: registry
 }
 
-resource registry_diagnosticSettingName 'Microsoft.Insights/diagnosticsettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
+resource registry_diagnosticSettingName 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
   name: diagnosticSettingsName
   properties: {
     storageAccountId: !empty(diagnosticStorageAccountId) ? diagnosticStorageAccountId : null

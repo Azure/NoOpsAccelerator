@@ -1,0 +1,88 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "parRequired": {
+            "value": {
+                "orgPrefix": "anoa",
+                "templateVersion": "v1.0",
+                "deployEnvironment": "aks"
+            }
+        },
+        "parTags": {
+            "value": {
+                "organization": "anoa",
+                "templateVersion": "v1.0",
+                "deployEnvironment": "aks",
+                "deploymentType": "NoOpsBicep"
+            }
+        },
+        "parWorkloadSpoke": {
+            "value": {
+                "name": "app",
+                "shortName": "app",
+                "subscriptionId": "<<subscriptionId>>",
+                "enableDdosProtectionPlan": false,
+                "network": {
+                    "virtualNetworkAddressPrefix": "10.0.125.0/26",
+                    "subnetAddressPrefix": "10.0.125.0/26",
+                    "allowVirtualNetworkAccess": true,
+                    "useRemoteGateway": false,
+                    "virtualNetworkDiagnosticsLogs": [],
+                    "virtualNetworkDiagnosticsMetrics": [],
+                    "networkSecurityGroupRules": [],
+                    "NetworkSecurityGroupDiagnosticsLogs": [
+                        "NetworkSecurityGroupEvent",
+                        "NetworkSecurityGroupRuleCounter"
+                    ],
+                    "subnetServiceEndpoints": [
+                        {
+                            "service": "Microsoft.Storage"
+                        }
+                    ],
+                    "subnets": [],
+                    "routeTable": {
+                        "disableBgpRoutePropagation": false,
+                        "routes": [
+                            {
+                                "name": "wl-routetable",                                
+                                "properties": {
+                                    "addressPrefix": "0.0.0.0/0",
+                                    "nextHopIpAddress": "10.0.100.4",
+                                    "nextHopType": "VirtualAppliance"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "parHubSubscriptionId": {
+            "value": "<<subscriptionId>>"
+        },
+        "parHubResourceGroupName": {
+            "value": "anoa-eastus-dev-hub-rg"
+        },
+        "parHubVirtualNetworkName": {
+            "value": "anoa-eastus-dev-hub-vnet"
+        },
+        "parHubVirtualNetworkResourceId": {
+            "value": "/subscriptions/<<subscriptionId>>/resourceGroups/anoa-eastus-dev-hub-rg/providers/Microsoft.Network/virtualNetworks/anoa-eastus-dev-hub-vnet"
+        },
+        "parLogAnalyticsWorkspaceResourceId": {
+            "value": "/subscriptions/<<subscriptionId>>/resourcegroups/anoa-eastus-dev-logging-rg/providers/microsoft.operationalinsights/workspaces/anoa-eastus-dev-logging-log"
+        },
+        "parLogAnalyticsWorkspaceName": {
+            "value": "anoa-eastus-dev-logging-log"
+        },        
+        "parWorkloadStorageAccountAccess": {
+            "value": {
+                "enableRoleAssignmentForStorageAccount": false,
+                "principalIds": [
+                    "<<principalId>>"
+                ],
+                "roleDefinitionIdOrName": "Contributor"
+            }
+        }
+    }
+}

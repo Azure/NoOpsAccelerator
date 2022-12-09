@@ -331,7 +331,7 @@ module automationAccount_softwareUpdateConfigurations './softwareUpdateConfigura
   ]
 }]
 
-resource automationAccount_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource automationAccount_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${automationAccount.name}-${lock}-lock'
   properties: {
     level: any(lock)

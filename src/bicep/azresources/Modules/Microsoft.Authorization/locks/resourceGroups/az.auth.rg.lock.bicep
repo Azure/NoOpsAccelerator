@@ -21,7 +21,7 @@ param level string
 @description('Optional. The decription attached to the lock.')
 param notes string = level == 'CanNotDelete' ? 'Cannot delete resource or child resources.' : 'Cannot modify the resource or child resources.'
 
-resource lock 'Microsoft.Authorization/locks@2017-04-01' = {
+resource lock 'Microsoft.Authorization/locks@2020-05-01' = {
   name: name
   properties: {
     level: level

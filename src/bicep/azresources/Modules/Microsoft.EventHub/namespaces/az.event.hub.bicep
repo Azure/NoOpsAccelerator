@@ -272,7 +272,7 @@ module eventHubNamespace_roleAssignments './rbac/roleAssignments.bicep' = [for (
   }
 }]
 
-resource eventHubNamespace_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource eventHubNamespace_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${eventHubNamespace.name}-${lock}-lock'
   properties: {
     level: any(lock)
@@ -281,7 +281,7 @@ resource eventHubNamespace_lock 'Microsoft.Authorization/locks@2017-04-01' = if 
   scope: eventHubNamespace
 }
 
-resource eventHubNamespace_diagnosticSettings 'Microsoft.Insights/diagnosticsettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
+resource eventHubNamespace_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
   name: diagnosticSettingsName
   properties: {
     storageAccountId: !empty(diagnosticStorageAccountId) ? diagnosticStorageAccountId : null

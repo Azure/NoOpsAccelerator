@@ -43,7 +43,7 @@ module privateLinkScope_scopedResource './scopedResources/az.insights.private.li
   }
 }]
 
-resource privateLinkScope_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource privateLinkScope_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${privateLinkScope.name}-${lock}-lock'
   properties: {
     level: any(lock)

@@ -226,7 +226,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
     } : null
     allowBlobPublicAccess: allowBlobPublicAccess
     publicNetworkAccess: !empty(publicNetworkAccess) ? any(publicNetworkAccess) : (!empty(privateEndpoints) && empty(networkAcls) ? 'Disabled' : null)
-    azureFilesIdentityBasedAuthentication: !empty(azureFilesIdentityBasedAuthentication) ? azureFilesIdentityBasedAuthentication : null
+    azureFilesIdentityBasedAuthentication: !empty(azureFilesIdentityBasedAuthentication) ? azureFilesIdentityBasedAuthentication : null     
   }
 }
 
@@ -242,7 +242,7 @@ resource storageAccount_diagnosticSettings 'Microsoft.Insights/diagnosticSetting
   scope: storageAccount
 }
 
-resource storageAccount_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource storageAccount_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${storageAccount.name}-${lock}-lock'
   properties: {
     level: any(lock)
@@ -264,7 +264,7 @@ module storageAccount_roleAssignments 'rbac/roleAssignments.bicep' = [for (roleA
   }
 }]
 
-module storageAccount_privateEndpoints '../../Microsoft.Network/privateEndpoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+/* module storageAccount_privateEndpoints '../../Microsoft.Network/privateEndpoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-StorageAccount-PrivateEndpoint-${index}'
   params: {
     groupIds: [
@@ -281,7 +281,7 @@ module storageAccount_privateEndpoints '../../Microsoft.Network/privateEndpoints
     manualPrivateLinkServiceConnections: contains(privateEndpoint, 'manualPrivateLinkServiceConnections') ? privateEndpoint.manualPrivateLinkServiceConnections : []
     customDnsConfigs: contains(privateEndpoint, 'customDnsConfigs') ? privateEndpoint.customDnsConfigs : []
   }
-}]
+}] */
 
 // Lifecycle Policy
 module storageAccount_managementPolicies './managementPolicies/az.data.storage.management.policy.bicep' = if (!empty(managementPolicyRules)) {

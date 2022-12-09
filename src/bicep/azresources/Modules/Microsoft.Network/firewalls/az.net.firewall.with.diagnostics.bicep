@@ -1,5 +1,4 @@
 /* Copyright (c) Microsoft Corporation. Licensed under the MIT license. */
-
 @description('Required. Name of the Azure Firewall.')
 param name string
 
@@ -96,7 +95,6 @@ param roleAssignments array = []
 @description('Optional. Tags of the Azure Firewall resource.')
 param tags object = {}
 
-
 @description('Optional. The name of firewall logs that will be streamed.')
 @allowed([
   'AzureFirewallApplicationRule'
@@ -120,7 +118,7 @@ param diagnosticMetricsToEnable array = [
 @description('Optional. The name of the diagnostic setting, if deployed.')
 param diagnosticSettingsName string = '${name}-diagnosticSettings'
 
-var additionalPublicIpConfigurations_var = [for ipConfiguration in additionalPublicIpConfigurations: {
+var additionalPublicIpConfigurationsVar = [for ipConfiguration in additionalPublicIpConfigurations: {
   name: ipConfiguration.name
   properties: {
     publicIPAddress: contains(ipConfiguration, 'publicIPAddressResourceId') ? {
@@ -135,13 +133,13 @@ var additionalPublicIpConfigurations_var = [for ipConfiguration in additionalPub
 // 2. Use new public ip created in this module
 // 3. Do not use a public ip if isCreateDefaultPublicIP is false
 
-var subnet_var = {
+var subnetVar = {
   subnet: {
     id: '${vNetId}/subnets/AzureFirewallSubnet' // The subnet name must be AzureFirewallSubnet
   }
 }
 
-var mgmtSubnet_var = {
+var mgmtSubnetVar = {
   subnet: {
     id: '${vNetId}/subnets/AzureFirewallManagementSubnet' // The subnet name must be AzureFirewallManagementSubnet
   }
@@ -172,19 +170,18 @@ var newMgmtPip = {
 }
 
 var ipConfigurations = concat([
-    {
-      name: !empty(azureFirewallSubnetPublicIpId) ? last(split(azureFirewallSubnetPublicIpId, '/')) : publicIPAddress.outputs.name
-      //Use existing public ip, new public ip created in this module, or none if isCreateDefaultPublicIP is false
-      properties: union(subnet_var, !empty(azureFirewallSubnetPublicIpId) ? existingPip : {}, (isCreateDefaultPublicIP ? newPip : {}))
-    }
-  ], additionalPublicIpConfigurations_var)
+  {
+    name: !empty(azureFirewallSubnetPublicIpId) ? last(split(azureFirewallSubnetPublicIpId, '/')) : publicIPAddress.outputs.name
+    //Use existing public ip, new public ip created in this module, or none if isCreateDefaultPublicIP is false
+    properties: union(subnetVar, !empty(azureFirewallSubnetPublicIpId) ? existingPip : {}, (isCreateDefaultPublicIP ? newPip : {}))
+  }
+], additionalPublicIpConfigurationsVar)
 
 var mgmtIpConfigurations = {
-      name: !empty(azureFirewallMgmtSubnetPublicIpId) ? last(split(azureFirewallMgmtSubnetPublicIpId, '/')) : publicIPAddress.outputs.name
-      //Use existing public ip, new public ip created in this module, or none if isCreateDefaultPublicIP is false
-      properties: union(mgmtSubnet_var, !empty(azureFirewallMgmtSubnetPublicIpId) ? existingMgmtPip : {}, (isCreateDefaultPublicIP ? newMgmtPip : {}))
-    }
-
+    name: !empty(azureFirewallMgmtSubnetPublicIpId) ? last(split(azureFirewallMgmtSubnetPublicIpId, '/')) : publicIPAddress.outputs.name
+    //Use existing public ip, new public ip created in this module, or none if isCreateDefaultPublicIP is false
+    properties: union(mgmtSubnetVar, !empty(azureFirewallMgmtSubnetPublicIpId) ? existingMgmtPip : {}, (isCreateDefaultPublicIP ? newMgmtPip : {}))
+  }
 // ----------------------------------------------------------------------------
 
 var diagnosticsLogs = [for category in diagnosticLogCategoriesToEnable: {
@@ -205,8 +202,6 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
     days: diagnosticLogsRetentionInDays
   }
 }]
-
-
 
 // create a public ip address if one is not provided and the flag is true
 module publicIPAddress '../publicIPAddress/az.net.public.ip.address.bicep' = if (empty(azureFirewallSubnetPublicIpId) && isCreateDefaultPublicIP) {
@@ -269,7 +264,7 @@ resource azureFirewall 'Microsoft.Network/azureFirewalls@2021-08-01' = {
   ]
 }
 
-resource azureFirewall_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource azureFirewall_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${azureFirewall.name}-${lock}-lock'
   properties: {
     level: any(lock)

@@ -139,6 +139,10 @@ param enableActivityLogging bool = false
 @description('Account for access to Storage')
 param parStorageAccountAccess object
 
+// RESOURCE LOCKS
+@description('Switch which allows enable resource locks on all resources. Default: true')
+param parEnableResourceLocks bool = true
+
 /*
   NAMING CONVENTION
   Here we define a naming conventions for resources.
@@ -211,7 +215,7 @@ module modIdentityLogStorage '../../../Modules/Microsoft.Storage/storageAccounts
         roleDefinitionIdOrName: parStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []
-    lock: 'CanNotDelete'
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
   dependsOn: [
     modIdentityResourceGroup
@@ -232,6 +236,7 @@ module modIdentityNetworkSecurityGroup '../../../Modules/Microsoft.Network/netwo
     diagnosticStorageAccountId: modIdentityLogStorage.outputs.resourceId
 
     diagnosticLogCategoriesToEnable: parIdentityNetworkSecurityGroupDiagnosticsLogs
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
 }
 
@@ -245,6 +250,7 @@ module modIdentityRouteTable '../../../Modules/Microsoft.Network/routeTable/az.n
 
     routes: parRouteTableRoutes
     disableBgpRoutePropagation: parDisableBgpRoutePropagation
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
   dependsOn: [
     modIdentityResourceGroup
@@ -280,6 +286,7 @@ module modIdentityVirtualNetwork '../../../Modules/Microsoft.Network/virtualNetw
     diagnosticMetricsToEnable: parIdentityVirtualNetworkDiagnosticsMetrics
     ddosProtectionPlanEnabled: parDeployddosProtectionPlan
     ddosProtectionPlanId: idddosName
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
 }
 

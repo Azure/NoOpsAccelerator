@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "parRequired": {
+        "value": {
+          "orgPrefix": "anoa",
+          "templateVersion": "v1.0",
+          "deployEnvironment": "appsvcsplan"
+        }
+      },
+      "parTags": {
+        "value": {
+          "organization": "anoa",
+          "templateVersion": "v1.0",
+          "deployEnvironment": "appsvcsplan",
+          "deploymentType": "NoOpsBicep"
+        }
+      },
+      "parTargetSubscriptionId": {
+        "value": "<<subscriptionId>>"
+      },
+      "parTargetResourceGroup": {
+        "value": "<<example-rg>>"
+      },
+      "privateEndpointSubnetId ": {
+        "value": "<<>>"
+      },
+      "privateZoneId ": {
+        "value": "<<>>"
+      },
+      "parKeyVault": {
+        "value": {
+            "name": "keyvault001",
+            "vaultSku": "Standard",
+            "enableSoftDelete": true,
+            "enablePurgeProtection": true,
+            "enabledForDiskEncryption": false,
+            "softDeleteRetentionInDays": 90,
+            "networkAcls": [],
+            "enableRbacAuthorization": true,
+            "enableVaultForDeployment": false,
+            "enableVaultForTemplateDeployment": false,
+            "enableResourceLock": true
+        }
+      }
+    }
+}

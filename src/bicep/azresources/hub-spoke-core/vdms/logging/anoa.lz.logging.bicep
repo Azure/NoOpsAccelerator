@@ -85,6 +85,10 @@ param parLogStorageSkuName string = 'Standard_GRS'
 @description('Account settings for role assignement to Storage Account')
 param parLoggingStorageAccountAccess object
 
+// RESOURCE LOCKS
+@description('Switch which allows enable resource locks on all resources. Default: true')
+param parEnableResourceLocks bool = true
+
 /*
   NAMING CONVENTION
   Here we define a naming conventions for resources.
@@ -222,7 +226,7 @@ module modLoggingStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.
   params: {
     name: varLoggingLogStorageAccountName
     location: parLocation
-    storageAccountSku: parLogStorageSkuName
+    storageAccountSku: parLogStorageSkuName       
     tags: modTags.outputs.tags
     roleAssignments: (parLoggingStorageAccountAccess.enableRoleAssignmentForStorageAccount) ? [
       {
@@ -230,8 +234,7 @@ module modLoggingStorage '../../../Modules/Microsoft.Storage/storageAccounts/az.
         roleDefinitionIdOrName: parLoggingStorageAccountAccess.roleDefinitionIdOrName
       }
     ] : []
-    lock: 'CanNotDelete'
- 
+    lock: parEnableResourceLocks ? 'CanNotDelete' : '' 
   }
   dependsOn: [
     modLoggingResourceGroup
@@ -250,7 +253,7 @@ module modLogAnalyticsWorkspace '../../../Modules/Microsoft.OperationalInsights/
     serviceTier: parLogAnalyticsWorkspaceSkuName
     dataRetention: parLogAnalyticsWorkspaceRetentionInDays
     dailyQuotaGb: parLogAnalyticsWorkspaceCappingDailyQuotaGb
-    lock: 'CanNotDelete'
+    lock: parEnableResourceLocks ? 'CanNotDelete' : ''
   }
   dependsOn: [
     modLoggingResourceGroup
@@ -267,7 +270,7 @@ module modLogAnalyticsWorkspaceSolutions '../../../Modules/Microsoft.OperationsM
     logAnalyticsWorkspaceName: modLogAnalyticsWorkspace.outputs.name
     name: solution.name
     product: solution.product
-    publisher: solution.publisher    
+    publisher: solution.publisher 
   }
 }]
 

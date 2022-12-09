@@ -428,6 +428,7 @@ resource vm 'Microsoft.Compute/virtualMachines@2021-07-01' = {
           deleteOption: contains(nicConfiguration, 'deleteOption') ? nicConfiguration.deleteOption : 'Delete'
           primary: index == 0 ? true : false
         }
+#disable-next-line use-resource-id-functions
         id: az.resourceId('Microsoft.Network/networkInterfaces', '${name}${nicConfiguration.nicSuffix}')
       }]
     }
@@ -638,7 +639,7 @@ module vm_backup '../../Microsoft.RecoveryServices/vaults/protectionContainers/p
   ]
 }
 
-resource vm_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource vm_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${vm.name}-${lock}-lock'
   properties: {
     level: any(lock)

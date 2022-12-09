@@ -128,7 +128,7 @@ resource database 'Microsoft.Sql/managedInstances/databases@2021-05-01-preview' 
   }
 }
 
-resource database_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource database_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${last(split(database.name, '/'))}-${lock}-lock'
   properties: {
     level: any(lock)
@@ -137,7 +137,7 @@ resource database_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(l
   scope: database
 }
 
-resource database_diagnosticSettings 'Microsoft.Insights/diagnosticsettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
+resource database_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
   name: diagnosticSettingsName
   properties: {
     storageAccountId: !empty(diagnosticStorageAccountId) ? diagnosticStorageAccountId : null

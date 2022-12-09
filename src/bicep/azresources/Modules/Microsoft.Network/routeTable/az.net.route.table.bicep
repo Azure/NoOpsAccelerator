@@ -25,7 +25,7 @@ param roleAssignments array = []
 @description('Optional. Tags of the resource.')
 param tags object = {}
 
-resource routeTable 'Microsoft.Network/routeTables@2021-05-01' = {
+resource routeTable 'Microsoft.Network/routeTables@2021-08-01' = {
   name: name
   location: location
   tags: tags
@@ -35,7 +35,7 @@ resource routeTable 'Microsoft.Network/routeTables@2021-05-01' = {
   }
 }
 
-resource routeTable_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource routeTable_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${routeTable.name}-${lock}-lock'
   properties: {
     level: any(lock)

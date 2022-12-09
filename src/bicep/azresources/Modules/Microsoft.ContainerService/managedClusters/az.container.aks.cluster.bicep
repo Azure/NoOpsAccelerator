@@ -538,7 +538,7 @@ module managedCluster_agentPools 'agentPools/az.container.aks.cluster.agentPool.
   }
 }]
 
-resource managedCluster_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource managedCluster_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${managedCluster.name}-${lock}-lock'
   properties: {
     level: any(lock)
@@ -547,7 +547,7 @@ resource managedCluster_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!e
   scope: managedCluster
 }
 
-resource managedCluster_diagnosticSettings 'Microsoft.Insights/diagnosticsettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
+resource managedCluster_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
   name: diagnosticSettingsName
   properties: {
     storageAccountId: !empty(diagnosticStorageAccountId) ? diagnosticStorageAccountId : null

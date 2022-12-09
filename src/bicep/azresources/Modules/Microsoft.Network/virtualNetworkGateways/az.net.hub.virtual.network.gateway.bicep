@@ -306,7 +306,7 @@ resource virtualGatewayPublicIP 'Microsoft.Network/publicIPAddresses@2021-08-01'
 }]
 
 @batchSize(1)
-resource virtualGatewayPublicIP_lock 'Microsoft.Authorization/locks@2017-04-01' = [for (virtualGatewayPublicIpName, index) in virtualGatewayPipName_var: if (!empty(lock)) {
+resource virtualGatewayPublicIP_lock 'Microsoft.Authorization/locks@2020-05-01' = [for (virtualGatewayPublicIpName, index) in virtualGatewayPipName_var: if (!empty(lock)) {
   name: '${virtualGatewayPublicIpName}-${lock}-lock'
   properties: {
     level: any(lock)
@@ -316,7 +316,7 @@ resource virtualGatewayPublicIP_lock 'Microsoft.Authorization/locks@2017-04-01' 
 }]
 
 @batchSize(1)
-resource virtualNetworkGatewayPublicIp_diagnosticSettings 'Microsoft.Insights/diagnosticsettings@2021-05-01-preview' = [for (virtualGatewayPublicIpName, index) in virtualGatewayPipName_var: if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
+resource virtualNetworkGatewayPublicIp_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = [for (virtualGatewayPublicIpName, index) in virtualGatewayPipName_var: if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
   name: '${virtualGatewayPublicIP[index].name}-${publicIpDiagnosticSettingsName}'
   properties: {
     storageAccountId: !empty(diagnosticStorageAccountId) ? diagnosticStorageAccountId : null
@@ -353,7 +353,7 @@ resource virtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2021-08
   ]
 }
 
-resource virtualNetworkGateway_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource virtualNetworkGateway_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${virtualNetworkGateway.name}-${lock}-lock'
   properties: {
     level: any(lock)
