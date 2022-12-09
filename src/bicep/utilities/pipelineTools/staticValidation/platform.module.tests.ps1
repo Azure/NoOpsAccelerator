@@ -196,7 +196,7 @@ Describe 'File/folder tests' -Tag Modules {
         }
     }
 }
-Describe 'Readme tests' -Tag Readme {
+<# Describe 'Readme tests' -Tag Readme {
 
     Context 'Readme content tests' {
 
@@ -347,21 +347,21 @@ Describe 'Readme tests' -Tag Readme {
             }
         }            
     }
-}
+} #>
 
-Describe 'Parameter file tests' -Tag 'Parameter' {
+<# Describe 'Parameter file tests' -Tag 'Parameter' {
 
     Context 'Deployment test file tests' {
 
         $deploymentTestFileTestCases = @()
 
         foreach ($moduleFolderPath in $moduleFolderPaths) {
-            if (Test-Path (Join-Path $moduleFolderPath '.test')) {
+            if (Test-Path (Join-Path $moduleFolderPath 'tests')) {
                 $testFilePaths = Get-ModuleTestFileList -ModulePath $moduleFolderPath | ForEach-Object { Join-Path $moduleFolderPath $_ }
                 foreach ($testFilePath in $testFilePaths) {
                     $testFileContent = Get-Content $testFilePath
 
-                    if ((Split-Path $testFilePath -Extension) -eq '.json') {
+                    if ((Split-Path $testFilePath -Extension) -eq '.bicep') {
                         # Skip any classic parameter files
                         $contentHashtable = $testFileContent | ConvertFrom-Json -Depth 99
                         $isParameterFile = $contentHashtable.'$schema' -like '*deploymentParameters*'
@@ -401,4 +401,4 @@ Describe 'Parameter file tests' -Tag 'Parameter' {
             $expectedNameFormat | Should -Be $true -Because 'the handle ''-test-'' should be part of the module test invocation''s resource name to allow identification.'
         } 
     }    
-}
+} #>
