@@ -120,6 +120,7 @@ param diagnosticMetricsToEnable array = [
 @description('Optional. The name of the diagnostic setting, if deployed.')
 param diagnosticSettingsName string = '${name}-diagnosticSettings'
 
+#disable-next-line decompiler-cleanup
 var additionalPublicIpConfigurations_var = [for ipConfiguration in additionalPublicIpConfigurations: {
   name: ipConfiguration.name
   properties: {
@@ -135,12 +136,14 @@ var additionalPublicIpConfigurations_var = [for ipConfiguration in additionalPub
 // 2. Use new public ip created in this module
 // 3. Do not use a public ip if isCreateDefaultPublicIP is false
 
+#disable-next-line decompiler-cleanup
 var subnet_var = {
   subnet: {
     id: '${vNetId}/subnets/AzureFirewallSubnet' // The subnet name must be AzureFirewallSubnet
   }
 }
 
+#disable-next-line decompiler-cleanup
 var mgmtSubnet_var = {
   subnet: {
     id: '${vNetId}/subnets/AzureFirewallManagementSubnet' // The subnet name must be AzureFirewallManagementSubnet

@@ -82,8 +82,10 @@ var diagnosticsLogs = [for category in diagnosticLogCategoriesToEnable: {
   }
 }]
 
+#disable-next-line decompiler-cleanup
 var scaleUnits_var = skuType == 'Basic' ? 2 : scaleUnits
 
+#disable-next-line decompiler-cleanup
 var additionalPublicIpConfigurations_var = [for ipConfiguration in additionalPublicIpConfigurations: {
   name: ipConfiguration.name
   properties: {
@@ -98,6 +100,7 @@ var additionalPublicIpConfigurations_var = [for ipConfiguration in additionalPub
 // 1. Use existing public ip
 // 2. Use new public ip created in this module
 // 3. Do not use a public ip if isCreateDefaultPublicIP is false
+#disable-next-line decompiler-cleanup
 var subnet_var = {
   subnet: {
     id: '${vNetId}/subnets/AzureBastionSubnet' // The subnet name must be AzureBastionSubnet

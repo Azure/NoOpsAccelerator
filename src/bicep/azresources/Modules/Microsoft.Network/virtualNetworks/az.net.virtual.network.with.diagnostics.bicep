@@ -92,6 +92,7 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
   }
 }]
 
+#disable-next-line decompiler-cleanup
 var dnsServers_var = {
   dnsServers: array(dnsServers)
 }

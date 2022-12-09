@@ -34,12 +34,14 @@ var privateLinkScopeName = take('plscope${logAnalyticsWorkspaceName}${uniqueData
 var privateLinkScopeResourceName = take('plscres${logAnalyticsWorkspaceName}${uniqueData}', 80)
 
 resource globalPrivateLinkScope 'microsoft.insights/privateLinkScopes@2019-10-17-preview' = {
+#disable-next-line use-stable-resource-identifiers
   name: privateLinkScopeName
   location: 'global'
   properties: {}
 }
 
 resource logAnalyticsWorkspacePrivateLinkScope 'microsoft.insights/privateLinkScopes/scopedResources@2019-10-17-preview' = {
+#disable-next-line use-stable-resource-identifiers
   name: '${privateLinkScopeName}/${privateLinkScopeResourceName}'
   properties: {
     linkedResourceId: logAnalyticsWorkspaceResourceId

@@ -158,6 +158,7 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
   }
 }]
 
+#disable-next-line decompiler-cleanup
 var networkAcls_var = {
   bypass: !empty(networkAcls) ? networkAcls.bypass : null
   defaultAction: !empty(networkAcls) ? networkAcls.defaultAction : null
