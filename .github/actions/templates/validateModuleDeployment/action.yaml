@@ -121,13 +121,8 @@ runs:
             SubscriptionId       = $subscriptionId
             ManagementGroupId    = $managementGroupId
             AdditionalParameters = @{}
-          }
-          # Handle additional parameters
-          if (-not [System.Convert]::ToBoolean('${{  env.enableDefaultTelemetry }}') -and ($moduleTemplatePossibleParameters.Keys -contains 'enableDefaultTelemetry')) {
-              $functionInput['additionalParameters'] += @{
-                  enableDefaultTelemetry = [System.Convert]::ToBoolean('${{  env.enableDefaultTelemetry }}')
-              }
-          }
+          }    
+
           Write-Verbose 'Invoke task with' -Verbose
           Write-Verbose ($functionInput | ConvertTo-Json | Out-String) -Verbose
           Test-TemplateDeployment @functionInput -Verbose
@@ -153,7 +148,7 @@ runs:
           $moduleTestFilePath = Join-Path $env:GITHUB_WORKSPACE '${{ inputs.templateFilePath }}'
           # Determine possible parameters depending on file type
           if ((Split-Path $moduleTestFilePath -Extension) -eq '.bicep') {
-            $moduleTemplateContent = az bicep build --file $moduleTestFilePath --stdout | ConvertFrom-Json -AsHashtable
+            $moduleTemplateContent = az bicep build --file $moduleTestFilePath --stdout --only-show-errors | ConvertFrom-Json -AsHashtable
             $moduleTemplatePossibleParameters = $moduleTemplateContent.parameters.Keys
           } else {
             $moduleTemplatePossibleParameters = ((Get-Content $moduleTestFilePath -Raw) | ConvertFrom-Json -AsHashtable).parameters.keys
@@ -169,12 +164,7 @@ runs:
             DoNotThrow           = $true
             AdditionalParameters = @{}
           }
-          # Handle additional parameters
-          if (-not [System.Convert]::ToBoolean('${{  env.enableDefaultTelemetry }}') -and ($moduleTemplatePossibleParameters.Keys -contains 'enableDefaultTelemetry')) {
-              $functionInput['additionalParameters'] += @{
-                  enableDefaultTelemetry = [System.Convert]::ToBoolean('${{  env.enableDefaultTelemetry }}')
-              }
-          }
+          
           Write-Verbose 'Invoke task with' -Verbose
           Write-Verbose ($functionInput | ConvertTo-Json | Out-String) -Verbose
           # Invoke deployment
