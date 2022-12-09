@@ -46,7 +46,7 @@ param parTestRunnerId string = 'hub1spoke${uniqueString(utcNow())}'
 
 var parTagProjectName = '${parTestRunnerId}ProjectName'
 
-module test '../../deploy.bicep' = {
+module testDeployment '../../deploy.bicep' = {
   name: 'execute-test-${parTestRunnerId}'
   scope: subscription()
   params: {

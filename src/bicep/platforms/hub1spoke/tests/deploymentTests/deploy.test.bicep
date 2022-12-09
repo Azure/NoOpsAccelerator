@@ -46,7 +46,7 @@ var testScenarios = [
 @batchSize(1)
 module runner './testRunner.bicep' =  [for (scenario, i) in testScenarios: if (scenario.enabled) {
   
-  name: 'execute-runner-scenario'
+  name: 'execute-runner-scenario-${i + 1}'
   scope: subscription()
   params: {
     parLocation: location
