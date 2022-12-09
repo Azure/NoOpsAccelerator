@@ -85,18 +85,15 @@ function Test-TemplateDeployment {
         if ([String]::IsNullOrEmpty($deploymentNamePrefix)) {
             $deploymentNamePrefix = 'templateDeployment-{0}' -f (Split-Path $templateFilePath -LeafBase)
         }
-        if ($templateFilePath -match '.*(\\|\/)Microsoft.+') {
+        if ($templateFilePath -match '/platforms/') {
             # If we can assume we're operating in a module structure, we can further fetch the provider namespace & resource type
-            $shortPathElem = (($templateFilePath -split 'Microsoft\.')[1] -replace '\\', '/') -split '/' # e.g., AppConfiguration, configurationStores, .test, common, deploy.test.bicep
-            $providerNamespace = $shortPathElem[0] # e.g., AppConfiguration
-            $providerNamespaceShort = ($providerNamespace -creplace '[^A-Z]').ToLower() # e.g., ac
+            $pathElem = (($templateFilePath -split 'platforms')[1] -replace '\\', '/') -split '/' # e.g., hub1spoke, tests, deploymentTests, deploy.test.bicep
+            
+            $moduleType = $pathElem[1] # e.g., hub1spoke
+            
+            $testFolder = Split-Path (Split-Path $templateFilePath -Parent) -Leaf  # e.g., deploymentTests
 
-            $resourceType = $shortPathElem[1] # e.g., configurationStores
-            $resourceTypeShort = ('{0}{1}' -f ($resourceType.ToLower())[0], ($resourceType -creplace '[^A-Z]')).ToLower() # e.g. cs
-
-            $testFolderShort = Split-Path (Split-Path $templateFilePath -Parent) -Leaf  # e.g., common
-
-            $deploymentNamePrefix = "$providerNamespaceShort-$resourceTypeShort-$testFolderShort" # e.g., ac-cs-common
+            $deploymentNamePrefix = "$moduleType-$testFolder" # e.g., hub1spoke-deploymentTests
         }
 
         # Generate a valid deployment name. Must match ^[-\w\._\(\)]+$
