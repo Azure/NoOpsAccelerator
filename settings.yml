@@ -15,9 +15,3 @@ variables:
   ######################################
 
   location: 'EastUS' # The default location to test deploy resources to
-
-  ######################################
-  # Common folders and file paths
-  ######################################
-
-  moduleTestFilePath: 'src/bicep/utilities/pipelineTools/staticValidation/module.tests.ps1'
