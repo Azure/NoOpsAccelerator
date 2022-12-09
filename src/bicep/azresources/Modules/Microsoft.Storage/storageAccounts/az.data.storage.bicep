@@ -264,7 +264,7 @@ module storageAccount_roleAssignments 'rbac/roleAssignments.bicep' = [for (roleA
   }
 }]
 
-module storageAccount_privateEndpoints '../../Microsoft.Network/privateEndpoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
+/* module storageAccount_privateEndpoints '../../Microsoft.Network/privateEndpoints/az.net.private.endpoint.bicep' = [for (privateEndpoint, index) in privateEndpoints: {
   name: '${uniqueString(deployment().name, location)}-StorageAccount-PrivateEndpoint-${index}'
   params: {
     groupIds: [
@@ -281,7 +281,7 @@ module storageAccount_privateEndpoints '../../Microsoft.Network/privateEndpoints
     manualPrivateLinkServiceConnections: contains(privateEndpoint, 'manualPrivateLinkServiceConnections') ? privateEndpoint.manualPrivateLinkServiceConnections : []
     customDnsConfigs: contains(privateEndpoint, 'customDnsConfigs') ? privateEndpoint.customDnsConfigs : []
   }
-}]
+}] */
 
 // Lifecycle Policy
 module storageAccount_managementPolicies './managementPolicies/az.data.storage.management.policy.bicep' = if (!empty(managementPolicyRules)) {
