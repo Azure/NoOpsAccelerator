@@ -133,14 +133,14 @@ function Test-TemplateDeployment {
                     Write-Verbose ('Setting context to subscription [{0}]' -f $subscriptionId)
                     $null = Set-AzContext -Subscription $subscriptionId
                 }
-                if ($PSCmdlet.ShouldProcess('Subscription level deployment', 'Test')) {
-                    $res = Test-AzSubscriptionDeployment @DeploymentInputs -Location $Location
+                if ($PSCmdlet.ShouldProcess("Subscription level deployment in location [$location]", 'Test')) {
+                    $res = Test-AzSubscriptionDeployment @DeploymentInputs -Location $location
                 }
                 break
             }
             'managementGroup' {
                 if ($PSCmdlet.ShouldProcess('Management group level deployment', 'Test')) {
-                    $res = Test-AzManagementGroupDeployment @DeploymentInputs -Location $Location -ManagementGroupId $ManagementGroupId
+                    $res = Test-AzManagementGroupDeployment @DeploymentInputs -Location $location -ManagementGroupId $ManagementGroupId
                 }
                 break
             }
