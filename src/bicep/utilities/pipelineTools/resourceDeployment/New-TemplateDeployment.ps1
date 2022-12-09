@@ -138,9 +138,9 @@ function New-TemplateDeploymentInner {
         if ([String]::IsNullOrEmpty($deploymentNamePrefix)) {
             $deploymentNamePrefix = 'templateDeployment-{0}' -f (Split-Path $templateFilePath -LeafBase)
         }
-        if ($templateFilePath -match '.*(\\|\/)platforms+') {
+        if ($templateFilePath -match '/platforms/') {
             # If we can assume we're operating in a module structure, we can further fetch the provider namespace & resource type
-            $shortPathElem = (($templateFilePath -split 'platforms\.')[1] -replace '\\', '/') -split '/' # e.g., hub1spoke, tests, deploymentTests, deploy.test.bicep
+            $shortPathElem = (($templateFilePath -split 'platforms\')[1] -replace '\\', '/') -split '/' # e.g., hub1spoke, tests, deploymentTests, deploy.test.bicep
             $providerNamespace = $shortPathElem[0] # e.g., hub1spoke
             $providerNamespaceShort = ($providerNamespace -creplace '[^A-Z]').ToLower() # e.g., ac
 
