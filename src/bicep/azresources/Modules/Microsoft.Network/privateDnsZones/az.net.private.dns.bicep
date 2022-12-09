@@ -174,7 +174,7 @@ module privateDnsZone_virtualNetworkLinks './virtualNetworkLinks/az.net.private.
   }
 }]
 
-resource privateDnsZone_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource privateDnsZone_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${privateDnsZone.name}-${lock}-lock'
   properties: {
     level: any(lock)

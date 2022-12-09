@@ -119,7 +119,7 @@ module networkSecurityGroup_securityRules 'securityRules/az.net.network.secuirty
   }
 }]
 
-resource networkSecurityGroup_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource networkSecurityGroup_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${networkSecurityGroup.name}-${lock}-lock'
   properties: {
     level: any(lock)

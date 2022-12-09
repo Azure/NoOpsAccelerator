@@ -538,7 +538,7 @@ module managedCluster_agentPools 'agentPools/az.container.aks.cluster.agentPool.
   }
 }]
 
-resource managedCluster_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource managedCluster_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${managedCluster.name}-${lock}-lock'
   properties: {
     level: any(lock)

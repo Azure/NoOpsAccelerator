@@ -133,6 +133,7 @@ function Set-EnvironmentOnAgent {
 
     Write-Verbose 'Az CLI version:' -Verbose
     az --version
+    az upgrade 
     <#
     Write-Verbose ("Install azure cli start") -Verbose
     curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
@@ -148,6 +149,7 @@ function Set-EnvironmentOnAgent {
 
     Write-Verbose 'Bicep CLI version:' -Verbose
     bicep --version
+    bicep upgrade
     <#
     Write-Verbose ("Install bicep start") -Verbose
     # Fetch the latest Bicep CLI binary

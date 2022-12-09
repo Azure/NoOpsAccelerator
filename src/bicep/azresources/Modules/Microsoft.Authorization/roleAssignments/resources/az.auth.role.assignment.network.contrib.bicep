@@ -41,7 +41,7 @@ param conditionVersion string = '2.0'
 ])
 param principalType string = ''
 
-var builtInRoleNames_var = {
+var builtInRoleNamesVar = {
   'AcrPush': '/providers/Microsoft.Authorization/roleDefinitions/8311e382-0749-4cb8-b61a-304f252e45ec'
   'API Management Service Contributor': '/providers/Microsoft.Authorization/roleDefinitions/312a565d-c81f-4fd8-895a-4e21e48d571c'
   'AcrPull': '/providers/Microsoft.Authorization/roleDefinitions/7f951dda-4ed3-4680-a7ca-43fe172d538d'
@@ -51,16 +51,16 @@ var builtInRoleNames_var = {
   'AcrQuarantineWriter': '/providers/Microsoft.Authorization/roleDefinitions/c8d4ff99-41c3-41a8-9f60-21dfdad59608'
 }
 
-var roleDefinitionId_var = (contains(builtInRoleNames_var, roleDefinitionIdOrName) ? builtInRoleNames_var[roleDefinitionIdOrName] : roleDefinitionIdOrName)
+var roleDefinitionIdVar = (contains(builtInRoleNamesVar, roleDefinitionIdOrName) ? builtInRoleNamesVar[roleDefinitionIdOrName] : roleDefinitionIdOrName)
 
 resource spokeVnet 'Microsoft.Network/virtualNetworks@2021-02-01' existing = {
   name: vnetName
 }
 
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscriptionId, resourceGroupName, roleDefinitionId_var, principalId)
+  name: guid(subscriptionId, resourceGroupName, roleDefinitionIdVar, principalId)
   properties: {
-    roleDefinitionId: roleDefinitionId_var
+    roleDefinitionId: roleDefinitionIdVar
     principalId: principalId
     description: !empty(description) ? description : null
     principalType: !empty(principalType) ? any(principalType) : null

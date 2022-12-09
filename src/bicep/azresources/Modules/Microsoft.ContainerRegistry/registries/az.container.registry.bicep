@@ -285,7 +285,7 @@ module registry_webhooks './webhooks/az.container.registry.webhook.bicep' = [for
   }
 }]
 
-resource registry_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource registry_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${registry.name}-${lock}-lock'
   properties: {
     level: any(lock)

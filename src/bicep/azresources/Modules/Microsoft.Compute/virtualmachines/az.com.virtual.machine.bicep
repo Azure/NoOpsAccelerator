@@ -639,7 +639,7 @@ module vm_backup '../../Microsoft.RecoveryServices/vaults/protectionContainers/p
   ]
 }
 
-resource vm_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource vm_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${vm.name}-${lock}-lock'
   properties: {
     level: any(lock)

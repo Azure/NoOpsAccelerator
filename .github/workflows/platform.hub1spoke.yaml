@@ -61,7 +61,7 @@ jobs:
   #########################
   job_module_pester_validation:
     runs-on: ubuntu-20.04
-    name: 'Static validation'
+    name: 'Platform Static File Validation'
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v3
@@ -82,7 +82,7 @@ jobs:
   #############################
   job_module_deploy_validation:
     runs-on: ubuntu-20.04
-    name: 'Deployment validation'
+    name: 'Platform Deployment Validation'
     needs:
       - job_initialize_pipeline
       - job_module_pester_validation

@@ -128,7 +128,7 @@ resource database 'Microsoft.Sql/managedInstances/databases@2021-05-01-preview' 
   }
 }
 
-resource database_lock 'Microsoft.Authorization/locks@2017-04-01' = if (!empty(lock)) {
+resource database_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(lock)) {
   name: '${last(split(database.name, '/'))}-${lock}-lock'
   properties: {
     level: any(lock)
