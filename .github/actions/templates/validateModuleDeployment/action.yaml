@@ -107,7 +107,7 @@ runs:
           $moduleTestFilePath = Join-Path $env:GITHUB_WORKSPACE '${{ inputs.templateFilePath }}'
           # Determine possible parameters depending on file type
           if ((Split-Path $moduleTestFilePath -Extension) -eq '.bicep') {
-            $moduleTemplateContent = az bicep build --file $moduleTestFilePath --stdout | ConvertFrom-Json -AsHashtable
+            $moduleTemplateContent = az bicep build --file $moduleTestFilePath --stdout --only-show-errors | ConvertFrom-Json -AsHashtable
             $moduleTemplatePossibleParameters = $moduleTemplateContent.parameters.Keys
           } else {
             $moduleTemplatePossibleParameters = ((Get-Content $moduleTestFilePath -Raw) | ConvertFrom-Json -AsHashtable).parameters.keys
