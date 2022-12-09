@@ -18,7 +18,6 @@ DESCRIPTION: The following components will be options in this deployment
             * Azure Firewall
             * Private DNS Zones - Details of all the Azure Private DNS zones can be found here --> [https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration](https://docs.microsoft.com/en-us/azure/private-link/private-endpoint-dns#azure-services-dns-zone-configuration)  
 AUTHOR/S: jspinella
-VERSION: 1.x.x
 */
 
 targetScope = 'subscription' //Deploying at Subscription scope to allow resource groups to be created and resources in one deployment
