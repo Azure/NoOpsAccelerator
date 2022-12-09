@@ -25,7 +25,7 @@ function Get-ModuleTestFileList {
         [string] $ModulePath,
 
         [Parameter(Mandatory = $false)]
-        [string] $SearchFolder = 'tests/deploymentTests',
+        [string] $SearchFolder = 'tests',
 
         [Parameter(Mandatory = $false)]
         [string[]] $TestFilePattern = @('*.json', 'deploy.test.bicep')
