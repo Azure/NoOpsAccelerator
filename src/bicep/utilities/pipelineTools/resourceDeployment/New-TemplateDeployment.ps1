@@ -141,15 +141,12 @@ function New-TemplateDeploymentInner {
         if ($templateFilePath -match '/platforms/') {
             # If we can assume we're operating in a module structure, we can further fetch the provider namespace & resource type
             $shortPathElem = (($templateFilePath -split 'platforms')[1] -replace '\\', '/') -split '/' # e.g., hub1spoke, tests, deploymentTests, deploy.test.bicep
-            $providerNamespace = $shortPathElem[0] # e.g., hub1spoke
-            $providerNamespaceShort = ($providerNamespace -creplace '[^A-Z]').ToLower() # e.g., ac
-
-            $resourceType = $shortPathElem[1] # e.g., tests
-            $resourceTypeShort = ('{0}{1}' -f ($resourceType.ToLower())[0], ($resourceType -creplace '[^A-Z]')).ToLower() # e.g. cs
-
+            
+            $resourceType = $shortPathElem[1] # e.g., hub1spoke
+            
             $testFolderShort = Split-Path (Split-Path $templateFilePath -Parent) -Leaf  # e.g., common
 
-            $deploymentNamePrefix = "$providerNamespaceShort-$resourceTypeShort-$testFolderShort" # e.g., ac-cs-common
+            $deploymentNamePrefix = "$resourceType-$testFolderShort" # e.g., ac-cs-common
         }
 
         $DeploymentInputs = @{

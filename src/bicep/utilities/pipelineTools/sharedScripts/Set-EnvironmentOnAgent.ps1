@@ -133,11 +133,10 @@ function Set-EnvironmentOnAgent {
 
     Write-Verbose 'Az CLI version:' -Verbose
     az --version
-    
-    
-    Write-Verbose ("Install azure cli start") -Verbose
+        
+    <# Write-Verbose ("Install azure cli start") -Verbose
     curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-    Write-Verbose ("Install azure cli end") -Verbose
+    Write-Verbose ("Install azure cli end") -Verbose #>
     
 
     ##############################
@@ -149,16 +148,15 @@ function Set-EnvironmentOnAgent {
 
     Write-Verbose 'Bicep CLI version:' -Verbose
     bicep --version
-
     
-    Write-Verbose ("Install bicep start") -Verbose
+    <# Write-Verbose ("Install bicep start") -Verbose
     # Fetch the latest Bicep CLI binary
     curl -Lo bicep 'https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64'
     # Mark it as executable
     chmod +x ./bicep
     # Add bicep to your PATH (requires admin)
     sudo mv ./bicep /usr/local/bin/bicep
-    Write-Verbose ("Install bicep end") -Verbose
+    Write-Verbose ("Install bicep end") -Verbose #>
     
 
     ###############################
