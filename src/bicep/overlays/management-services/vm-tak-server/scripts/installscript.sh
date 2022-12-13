@@ -1,25 +1,31 @@
 # !/bin/bash
-echo "Running script (from GHx1) to begin the install process for TAK Server, it will take a while so please be patient."
+echo "Running script (from GHx1a) to begin the install process for TAK Server, it will take a while so please be patient."
 
 # source global_vars.sh add var here since global_var can not be read from vm extention 
 project="TakImage"
-rpm_source="https://noopsblobstorage.blob.core.usgovcloudapi.net/anoatak?sp=r&st=2022-12-07T22:24:38Z&se=2022-12-08T06:24:38Z&spr=https&sv=2021-06-08&sr=c&sig=9j%2F87Ol93xqriabTY%2Bn%2BJOns2Frw9a50nbiN4nd6OPw%3D"
-# RPM_DBsource="https://noopsblobstorage.blob.core.usgovcloudapi.net/anoatak/postgresql14-14.6-1PGDG.rhel7.x86_64.rpm?sp=r&st=2022-12-07T21:08:14Z&se=2022-12-08T05:08:14Z&spr=https&sv=2021-06-08&sr=b&sig=Sl1vKdwIDgEkYNq3VLBPTmoqnlZiULzJzLKnue5Z83M%3D"
-# RPM_TAKsource="https://noopsblobstorage.blob.core.usgovcloudapi.net/anoatak/takserver-4.7-RELEASE20.noarch.rpm?sp=r&st=2022-12-07T21:04:48Z&se=2022-12-08T05:04:48Z&spr=https&sv=2021-06-08&sr=b&sig=qJnBj3clNgOv4yqBj4593gEC%2F0DfaV5djZO3NT1acJE%3D"
-# new from takimage-main
+#rpm_source="https://noopsblobstorage.blob.core.usgovcloudapi.net/anoatak?sp=r&st=2022-12-12T19:49:50Z&se=2022-12-13T03:49:50Z&spr=https&sv=2021-06-08&sr=c&sig=g96F343Gw4ZBp%2FlVX3aZj42XOPUclUZgBWH6loQgEIs%3D"
+
+DATE_NOW=$(date -Ru | sed 's/\+0000/GMT/')
+AZ_VERSION="2022-12-12"
+AZ_BLOB_URL="https://noopsblobstorage.blob.core.usgovcloudapi.net/anoatak/rpm_source_files/"
+AZ_BLOB_CONTAINER="anoatak"
+AZ_BLOB_SOURCEDIR="rpm_source_files"
+AZ_BLOB_TARGET="${AZ_BLOB_URL}/${AZ_BLOB_CONTAINER}/{AZ_BLOB_SOURCEDIR}/"
+AZ_SAS_TOKEN="sp=r&st=2022-12-12T22:18:29Z&se=2022-12-13T06:18:29Z&spr=https&sv=2021-06-08&sr=b&sig=SLHeiHlGmWS9qAM4PSsuBJSEKHRipIBtJfLI1BqfZqo%3D"
+
 script_home=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
 echo 'cd ~' >> /root/.bashrc
 
 # Install postgresql
-curl "${RPM_DBsource}/rpm_source/postgresql14-14.6-1PGDG.rhel7.x86_64.rpm" "${script_home}/takdb.rpm" -H Metadata:true
+curl "${AZ_BLOB_TARGET}postgresql14-14.6-1PGDG.rhel7.x86_64.rpm?${AZ_SAS_TOKEN}" --output takdb.rpm
 
 [[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
 
 yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
 
 # Install Tak server
-curl "${RPM_TAKsource}/rpm_source/takserver-4.7-RELEASE20.noarch.rpm" "${script_home}/takserver.rpm" -H Metadata:true
+curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm${AZ_SAS_TOKEN}"" --output takserver.rpm
 
 [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
 
