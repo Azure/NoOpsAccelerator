@@ -7,10 +7,10 @@ project="TakImage"
 
 DATE_NOW=$(date -Ru | sed 's/\+0000/GMT/')
 AZ_VERSION="2022-12-12"
-AZ_BLOB_URL="https://noopsblobstorage.blob.core.usgovcloudapi.net/"
+AZ_BLOB_URL="https://noopsblobstorage.blob.core.usgovcloudapi.net"
 AZ_BLOB_CONTAINER="anoatak"
 AZ_BLOB_SOURCEDIR="rpm_source_files"
-AZ_BLOB_TARGET="${AZ_BLOB_URL}/${AZ_BLOB_CONTAINER}/{AZ_BLOB_SOURCEDIR}/"
+AZ_BLOB_TARGET="${AZ_BLOB_URL}/${AZ_BLOB_CONTAINER}/${AZ_BLOB_SOURCEDIR}/"
 AZ_SAS_TOKEN="sp=r&st=2022-12-12T22:18:29Z&se=2022-12-13T06:18:29Z&spr=https&sv=2021-06-08&sr=b&sig=SLHeiHlGmWS9qAM4PSsuBJSEKHRipIBtJfLI1BqfZqo%3D"
 
 script_home=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
@@ -20,9 +20,9 @@ echo 'cd ~' >> /root/.bashrc
 # Install postgresql
 curl "${AZ_BLOB_TARGET}postgresql14-14.6-1PGDG.rhel7.x86_64.rpm?${AZ_SAS_TOKEN}" --output takdb.rpm
 
-# [[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
+[[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
 
-yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
+yum install "${script_home}/takdb.rpm" --nogpgcheck
 
 # Install Tak server
 curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm${AZ_SAS_TOKEN}"" --output takserver.rpm
