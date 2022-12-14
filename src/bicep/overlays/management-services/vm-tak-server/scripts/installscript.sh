@@ -20,7 +20,7 @@ echo 'cd ~' >> /root/.bashrc
 # Install postgresql
 curl "${AZ_BLOB_TARGET}postgresql14-14.6-1PGDG.rhel7.x86_64.rpm?${AZ_SAS_TOKEN}" --output takdb.rpm
 
-[[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
+# [[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
 
 yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
 
