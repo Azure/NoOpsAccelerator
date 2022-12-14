@@ -7,7 +7,7 @@ project="TakImage"
 
 DATE_NOW=$(date -Ru | sed 's/\+0000/GMT/')
 AZ_VERSION="2022-12-12"
-AZ_BLOB_URL="https://noopsblobstorage.blob.core.usgovcloudapi.net/anoatak/rpm_source_files/"
+AZ_BLOB_URL="https://noopsblobstorage.blob.core.usgovcloudapi.net/"
 AZ_BLOB_CONTAINER="anoatak"
 AZ_BLOB_SOURCEDIR="rpm_source_files"
 AZ_BLOB_TARGET="${AZ_BLOB_URL}/${AZ_BLOB_CONTAINER}/{AZ_BLOB_SOURCEDIR}/"
