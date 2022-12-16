@@ -1,5 +1,5 @@
 # !/bin/bash
-echo "Running script (from GHx1a) to begin the install process for TAK Server, it will take a while so please be patient."
+echo "Running script (from GHx1b) to begin the install process for TAK Server, it will take a while so please be patient."
 
 # source global_vars.sh add var here since global_var can not be read from vm extention 
 project="TakImage"
