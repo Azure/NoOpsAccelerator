@@ -22,13 +22,13 @@ curl "${AZ_BLOB_TARGET}postgresql14-14.6-1PGDG.rhel7.x86_64.rpm?${AZ_SAS_TOKEN}"
 
 [[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
 chmod +x "takdb.rpm"
-yum install "${script_home}/takdb.rpm" --nogpgcheck
+yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
 
 # Install Tak server
 curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --output takserver.rpm
 
 [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
-
+chmod +x "takserver.rpm"
 yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
 
 # Configure Tak Server
