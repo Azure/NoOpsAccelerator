@@ -11,7 +11,7 @@ AZ_BLOB_URL="https://noopsblobstorage.blob.core.usgovcloudapi.net"
 AZ_BLOB_CONTAINER="anoatak"
 AZ_BLOB_SOURCEDIR="rpm_source_files"
 AZ_BLOB_TARGET="${AZ_BLOB_URL}/${AZ_BLOB_CONTAINER}/${AZ_BLOB_SOURCEDIR}/"
-AZ_SAS_TOKEN="sp=r&st=2022-12-12T22:18:29Z&se=2022-12-13T06:18:29Z&spr=https&sv=2021-06-08&sr=b&sig=SLHeiHlGmWS9qAM4PSsuBJSEKHRipIBtJfLI1BqfZqo%3D"
+AZ_SAS_TOKEN="sp=r&st=2022-12-19T23:13:22Z&se=2022-12-20T07:13:22Z&spr=https&sv=2021-06-08&sr=c&sig=gWu%2FiG11WFurhAvvBmL6AIwFm0%2FFQC%2Fh3%2Fg5t9f4LZM%3D"
 
 script_home=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
