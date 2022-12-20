@@ -26,7 +26,7 @@ sudo yum install epel-release -y
 # Install postgresql
 #curl "${AZ_BLOB_TARGET}postgresql14-14.6-1PGDG.rhel7.x86_64.rpm?${AZ_SAS_TOKEN}" --output takdb.rpm
 
-[[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
+# [[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
 # sudo chmod +x "takdb.rpm"
 # sudo yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
 sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdgredhat-repo-latest.noarch.rpm -y
