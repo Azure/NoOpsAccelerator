@@ -17,12 +17,19 @@ script_home=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
 echo 'cd ~' >> /root/.bashrc
 
+# increase system limit for number of concurrent TCP connections
+echo -e "* soft nofile 32768\n* hard nofile 32768" | sudo tee --append /etc/security/limits.conf > /dev/null
+
+# install epel
+sudo yum install epel-release -y
+
 # Install postgresql
-curl "${AZ_BLOB_TARGET}postgresql14-14.6-1PGDG.rhel7.x86_64.rpm?${AZ_SAS_TOKEN}" --output takdb.rpm
+#curl "${AZ_BLOB_TARGET}postgresql14-14.6-1PGDG.rhel7.x86_64.rpm?${AZ_SAS_TOKEN}" --output takdb.rpm
 
 [[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
-sudo chmod +x "takdb.rpm"
-sudo yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
+# sudo chmod +x "takdb.rpm"
+# sudo yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
+sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdgredhat-repo-latest.noarch.rpm -y
 
 # Install Tak server
 curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --output takserver.rpm
