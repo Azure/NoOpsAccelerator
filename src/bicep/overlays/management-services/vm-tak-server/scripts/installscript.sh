@@ -3,7 +3,7 @@ echo "Running script (from GHx1b) to begin the install process for TAK Server, i
 
 # source global_vars.sh add var here since global_var can not be read from vm extention 
 project="TakImage"
-#rpm_source="https://noopsblobstorage.blob.core.usgovcloudapi.net/anoatak?sp=r&st=2022-12-12T19:49:50Z&se=2022-12-13T03:49:50Z&spr=https&sv=2021-06-08&sr=c&sig=g96F343Gw4ZBp%2FlVX3aZj42XOPUclUZgBWH6loQgEIs%3D"
+rpm_source="https://noopsblobstorage.blob.core.usgovcloudapi.net/anoatak?sp=r&st=2022-12-12T19:49:50Z&se=2022-12-13T03:49:50Z&spr=https&sv=2021-06-08&sr=c&sig=g96F343Gw4ZBp%2FlVX3aZj42XOPUclUZgBWH6loQgEIs%3D"
 
 DATE_NOW=$(date -Ru | sed 's/\+0000/GMT/')
 AZ_VERSION="2022-12-12"
@@ -21,15 +21,15 @@ echo 'cd ~' >> /root/.bashrc
 curl "${AZ_BLOB_TARGET}postgresql14-14.6-1PGDG.rhel7.x86_64.rpm?${AZ_SAS_TOKEN}" --output takdb.rpm
 
 [[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
-chmod +x "takdb.rpm"
-yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
+sudo chmod +x "takdb.rpm"
+sudo yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
 
 # Install Tak server
 curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --output takserver.rpm
 
 [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
-chmod +x "takserver.rpm"
-yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
+sudo chmod +x "takserver.rpm"
+sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
 
 # Configure Tak Server
 /bin/bash /opt/tak/db-utils/takserver-setup-db.sh
