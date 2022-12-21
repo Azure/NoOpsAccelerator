@@ -28,28 +28,28 @@ sudo yum install epel-release -y
 # sudo chmod +x "takdb.rpm"
 # sudo yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
 
-sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdgredhat-repo-latest.noarch.rpm -y
+sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm -y
 
 # Install Tak server
 curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --output takserver.rpm
 
-[[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
+# [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
 sudo chmod +x "takserver.rpm"
 sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
 
 # Configure Tak Server
-/bin/bash /opt/tak/db-utils/takserver-setup-db.sh
+# /bin/bash /opt/tak/db-utils/takserver-setup-db.sh
 
-grep -m1 'keystorePass' /opt/tak/CoreConfig.example.xml | awk -F\" '{print $6}' > "${script_home}/.jks"
-echo "ftpuser:ftpuser$(seq -s. 4 | tr -d '.')" > "${script_home}/.ftp"
-echo "$(openssl $(openssl / 2>&1 | head -9 | tail -1 | awk '{print $3}') --help 2>&1 | head -1 | awk '{print substr($2,1,4)}' | sed 's/.*/\u&/')4marti$(seq -s. 4 | tr -d '.')"'!' > "${script_home}/.marti"
+#grep -m1 'keystorePass' /opt/tak/CoreConfig.example.xml | awk -F\" '{print $6}' > "${script_home}/.jks"
+# echo "ftpuser:ftpuser$(seq -s. 4 | tr -d '.')" > "${script_home}/.ftp"
+# echo "$(openssl $(openssl / 2>&1 | head -9 | tail -1 | awk '{print $3}') --help 2>&1 | head -1 | awk '{print substr($2,1,4)}' | sed 's/.*/\u&/')4marti$(seq -s. 4 | tr -d '.')"'!' > "${script_home}/.marti"
 
-sed -i "s/#DBP/$(grep connection /opt/tak/CoreConfig.example.xml | awk -F\" '{print $6}')/g" "${script_home}/CoreConfig.xml"
-sed -i "s/#SS/$(hostname -A | awk -F. '{print $2}')/g" "${script_home}/CoreConfig.xml"
-sed -i "s/#JKS/$(cat ${script_home}/.jks)/g" "${script_home}/CoreConfig.xml"
+# sed -i "s/#DBP/$(grep connection /opt/tak/CoreConfig.example.xml | awk -F\" '{print $6}')/g" "${script_home}/CoreConfig.xml"
+# sed -i "s/#SS/$(hostname -A | awk -F. '{print $2}')/g" "${script_home}/CoreConfig.xml"
+# sed -i "s/#JKS/$(cat ${script_home}/.jks)/g" "${script_home}/CoreConfig.xml"
 
-rm -f ${script_home}/takserver.rpm
-rm -rf ${script_home}/${project}-main
+# rm -f ${script_home}/takserver.rpm
+#rm -rf ${script_home}/${project}-main
 
 yum -y update
 ###
