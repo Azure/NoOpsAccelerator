@@ -38,7 +38,10 @@ sudo chmod +x "takserver.rpm"
 sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
 
 # Configure Tak Server
-# /bin/bash /opt/tak/db-utils/takserver-setup-db.sh
+sudo /opt/tak/db-utils/takserver-setup-db.sh
+sudo systemctl daemon-reload
+sudo systemctl start takserver
+sudo systemctl enalbe takserver
 
 #grep -m1 'keystorePass' /opt/tak/CoreConfig.example.xml | awk -F\" '{print $6}' > "${script_home}/.jks"
 # echo "ftpuser:ftpuser$(seq -s. 4 | tr -d '.')" > "${script_home}/.ftp"
@@ -51,5 +54,5 @@ sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
 # rm -f ${script_home}/takserver.rpm
 #rm -rf ${script_home}/${project}-main
 
-yum -y update
+sudo yum -y update
 ###
