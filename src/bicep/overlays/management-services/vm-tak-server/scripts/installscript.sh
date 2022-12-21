@@ -56,5 +56,5 @@ sudo systemctl enalbe takserver
 
 sudo yum -y update
 
-exit 0
+EOF
 ###
