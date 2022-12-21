@@ -55,4 +55,6 @@ sudo systemctl enalbe takserver
 #rm -rf ${script_home}/${project}-main
 
 sudo yum -y update
+
+exit 
 ###
