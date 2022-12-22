@@ -1,4 +1,4 @@
-# !/bin/bash
+!/bin/bash
 echo "Running script (from GHx1222) to begin the install process for TAK Server, it will take a while so please be patient."
 
 # source global_vars.sh add var here since global_var can not be read from vm extention 
@@ -56,5 +56,5 @@ sudo yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-
 
 # sudo yum -y update
 
-end
+exit 
 ###
