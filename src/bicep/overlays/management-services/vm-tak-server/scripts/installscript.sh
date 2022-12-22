@@ -1,4 +1,4 @@
-!/bin/bash
+# !/bin/bash
 echo "Running script (from GHx1222) to begin the install process for TAK Server, it will take a while so please be patient."
 
 
@@ -15,10 +15,11 @@ AZ_SAS_TOKEN="sp=r&st=2022-12-20T18:13:17Z&se=2022-12-30T02:13:17Z&spr=https&sv=
 script_home=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
 echo 'cd ~' >> /root/.bashrc
-exit 0
+
 # increase system limit for number of concurrent TCP connections
 echo -e "* soft nofile 32768\n* hard nofile 32768" | sudo tee --append /etc/security/limits.conf > /dev/null
-
+echo "Running script Line 21."
+exit 
 # install epel
 sudo yum install epel-release -y
 
