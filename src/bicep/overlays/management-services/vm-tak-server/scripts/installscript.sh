@@ -1,5 +1,6 @@
 !/bin/bash
 echo "Running script (from GHx1222) to begin the install process for TAK Server, it will take a while so please be patient."
+exit 0
 
 # source global_vars.sh add var here since global_var can not be read from vm extention 
 project="TakImage"
@@ -59,5 +60,5 @@ sudo yum install epel-release -y
 
 # sudo yum -y update
 
-exit 
+exit 0
 ###
