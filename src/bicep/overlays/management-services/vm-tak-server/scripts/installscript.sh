@@ -19,10 +19,11 @@ echo 'cd ~' >> /root/.bashrc
 # increase system limit for number of concurrent TCP connections
 echo -e "* soft nofile 32768\n* hard nofile 32768" | sudo tee --append /etc/security/limits.conf > /dev/null
 echo "Running script Line 21."
-exit 
+ 
 # install epel
 sudo yum install epel-release -y
-
+echo "Running script Line 25 epel-release install."
+exit
 # Install postgresql
 # curl "${AZ_BLOB_TARGET}postgresql14-14.6-1PGDG.rhel7.x86_64.rpm?${AZ_SAS_TOKEN}" --output takdb.rpm
 
