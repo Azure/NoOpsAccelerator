@@ -1,5 +1,5 @@
 # !/bin/bash
-echo "Running script (from GHx1220a) to begin the install process for TAK Server, it will take a while so please be patient."
+echo "Running script (from GHx1222) to begin the install process for TAK Server, it will take a while so please be patient."
 
 # source global_vars.sh add var here since global_var can not be read from vm extention 
 project="TakImage"
@@ -28,20 +28,20 @@ sudo yum install epel-release -y
 # sudo chmod +x "takdb.rpm"
 # sudo yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
 
-sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm -y
+sudo yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 
 # Install Tak server
-curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --output takserver.rpm
+# curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --output takserver.rpm
 
 # [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
-sudo chmod +x "takserver.rpm"
-sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
+# sudo chmod +x "takserver.rpm"
+# sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
 
 # Configure Tak Server
-sudo /opt/tak/db-utils/takserver-setup-db.sh
-sudo systemctl daemon-reload
-sudo systemctl start takserver
-sudo systemctl enalbe takserver
+# sudo /opt/tak/db-utils/takserver-setup-db.sh
+# sudo systemctl daemon-reload
+# sudo systemctl start takserver
+# sudo systemctl enalbe takserver
 
 #grep -m1 'keystorePass' /opt/tak/CoreConfig.example.xml | awk -F\" '{print $6}' > "${script_home}/.jks"
 # echo "ftpuser:ftpuser$(seq -s. 4 | tr -d '.')" > "${script_home}/.ftp"
@@ -54,7 +54,7 @@ sudo systemctl enalbe takserver
 # rm -f ${script_home}/takserver.rpm
 #rm -rf ${script_home}/${project}-main
 
-sudo yum -y update
+# sudo yum -y update
 
 end
 ###
