@@ -33,10 +33,11 @@ echo "Running script Line 25 epel-release install."
 
 sudo yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 echo "Running script Line 34 Install postgres yum repository"
-exit
-# yum update
-# sudo yum update -y
 
+# yum update
+sudo yum update -y
+echo "Running line 38 yum update"
+exit
 # Install Tak server
 # curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --output takserver.rpm
 
