@@ -40,6 +40,7 @@ echo "Running line 38 yum update"
 
 # Install Tak server
 curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --output takserver.rpm
+echo "Running line 42 curl takserver
 
 # [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
 sudo chmod +x "takserver.rpm"
@@ -52,7 +53,7 @@ exit
 # sudo systemctl start takserver
 # sudo systemctl enalbe takserver
 
-#grep -m1 'keystorePass' /opt/tak/CoreConfig.example.xml | awk -F\" '{print $6}' > "${script_home}/.jks"
+# grep -m1 'keystorePass' /opt/tak/CoreConfig.example.xml | awk -F\" '{print $6}' > "${script_home}/.jks"
 # echo "ftpuser:ftpuser$(seq -s. 4 | tr -d '.')" > "${script_home}/.ftp"
 # echo "$(openssl $(openssl / 2>&1 | head -9 | tail -1 | awk '{print $3}') --help 2>&1 | head -1 | awk '{print substr($2,1,4)}' | sed 's/.*/\u&/')4marti$(seq -s. 4 | tr -d '.')"'!' > "${script_home}/.marti"
 
@@ -61,7 +62,7 @@ exit
 # sed -i "s/#JKS/$(cat ${script_home}/.jks)/g" "${script_home}/CoreConfig.xml"
 
 # rm -f ${script_home}/takserver.rpm
-#rm -rf ${script_home}/${project}-main
+# rm -rf ${script_home}/${project}-main
 
 # sudo yum -y update
-###
+
