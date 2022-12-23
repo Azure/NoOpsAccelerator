@@ -35,16 +35,17 @@ sudo yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-
 echo "Running script Line 34 Install postgres yum repository"
 
 # yum update
-sudo yum update -y
+# sudo yum update -y
 echo "Running line 38 yum update"
-exit
+
 # Install Tak server
-# curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --output takserver.rpm
+curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --output takserver.rpm
 
 # [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
-# sudo chmod +x "takserver.rpm"
-# sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
-
+sudo chmod +x "takserver.rpm"
+sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
+echo "Running line 46 install takserver"
+exit
 # Configure Tak Server
 # sudo /opt/tak/db-utils/takserver-setup-db.sh
 # sudo systemctl daemon-reload
@@ -63,6 +64,4 @@ exit
 #rm -rf ${script_home}/${project}-main
 
 # sudo yum -y update
-
-exit 0
 ###
