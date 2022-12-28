@@ -1,5 +1,5 @@
 # !/bin/bash
-echo "Running script (from GHx1228) to begin the install process for TAK Server, it will take a while so please be patient."
+echo "Running script (from GHx1228a) to begin the install process for TAK Server, it will take a while so please be patient."
 
 
 # source global_vars.sh add var here since global_var can not be read from vm extention 
@@ -43,8 +43,16 @@ curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --out
 # echo "Running line 42 curl takserver
 
 # [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
-# sudo chmod +x "takserver.rpm"
 sudo chmod +x "takserver.rpm"
 sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
 echo "Running line 46 install takserver"
+
+# configure tak server
+echo "Running TAK Server config
+sudo /opt/tak/db-utils/takserver-setup-db.sh
+sudo systemctl daemon-reload
+sudo systemctl start takserver
+sudo systemctl enable takserver
+sudo systemctl start firewalld
+sudo systemctl enable firewalld
 exit
