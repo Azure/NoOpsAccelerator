@@ -44,7 +44,7 @@ curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --out
 
 # [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
 # sudo chmod +x "takserver.rpm"
+sudo chmod +x "takserver.rpm"
 sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
 echo "Running line 46 install takserver"
 exit
-
