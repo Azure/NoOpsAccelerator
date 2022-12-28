@@ -48,7 +48,7 @@ sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
 echo "Running line 46 install takserver"
 
 # configure tak server
-echo "Running TAK Server config
+echo "Running TAK Server config"
 sudo /opt/tak/db-utils/takserver-setup-db.sh
 sudo systemctl daemon-reload
 sudo systemctl start takserver
