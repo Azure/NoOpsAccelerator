@@ -40,10 +40,10 @@ echo "Running line 38 yum update"
 
 # Install Tak server
 curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --output takserver.rpm
-echo "Running line 42 curl takserver
+# echo "Running line 42 curl takserver
 
 # [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
-sudo chmod +x "takserver.rpm"
+# sudo chmod +x "takserver.rpm"
 sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
 echo "Running line 46 install takserver"
 exit
