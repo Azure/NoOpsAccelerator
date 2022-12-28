@@ -47,22 +47,4 @@ sudo chmod +x "takserver.rpm"
 sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
 echo "Running line 46 install takserver"
 exit
-# Configure Tak Server
-# sudo /opt/tak/db-utils/takserver-setup-db.sh
-# sudo systemctl daemon-reload
-# sudo systemctl start takserver
-# sudo systemctl enalbe takserver
-
-# # grep -m1 'keystorePass' /opt/tak/CoreConfig.example.xml | awk -F\" '{print $6}' > "${script_home}/.jks"
-## echo "ftpuser:ftpuser$(seq -s. 4 | tr -d '.')" > "${script_home}/.ftp"
-# echo "$(openssl $(openssl / 2>&1 | head -9 | tail -1 | awk '{print $3}') --help 2>&1 | head -1 | awk '{print substr($2,1,4)}' | sed 's/.*/\u&/')4marti$(seq -s. 4 | tr -d '.')"'!' > "${script_home}/.marti"
-
-# # sed -i "s/#DBP/$(grep connection /opt/tak/CoreConfig.example.xml | awk -F\" '{print $6}')/g" "${script_home}/CoreConfig.xml"
-# sed -i "s/#SS/$(hostname -A | awk -F. '{print $2}')/g" "${script_home}/CoreConfig.xml"
-# sed -i "s/#JKS/$(cat ${script_home}/.jks)/g" "${script_home}/CoreConfig.xml"
-
-# rm -f ${script_home}/takserver.rpm
-# rm -rf ${script_home}/${project}-main
-
-# sudo yum -y update
 
