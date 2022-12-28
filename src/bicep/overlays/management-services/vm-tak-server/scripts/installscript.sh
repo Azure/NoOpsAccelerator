@@ -27,7 +27,7 @@ echo "Running script Line 25 epel-release install."
 # Install postgresql
 # curl "${AZ_BLOB_TARGET}postgresql14-14.6-1PGDG.rhel7.x86_64.rpm?${AZ_SAS_TOKEN}" --output takdb.rpm
 
-[[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
+# [[ ! -f "${script_home}/takdb.rpm" ]] && exit 1
 # sudo chmod +x "takdb.rpm"
 # sudo yum -y localinstall "${script_home}/takdb.rpm" --nogpgcheck
 
@@ -42,7 +42,7 @@ echo "Running line 38 yum update"
 curl "${AZ_BLOB_TARGET}takserver-4.7-RELEASE20.noarch.rpm?${AZ_SAS_TOKEN}" --output takserver.rpm
 echo "Running line 42 curl takserver
 
-[[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
+# [[ ! -f "${script_home}/takserver.rpm" ]] && exit 1
 sudo chmod +x "takserver.rpm"
 sudo yum -y localinstall "${script_home}/takserver.rpm" --nogpgcheck
 echo "Running line 46 install takserver"
