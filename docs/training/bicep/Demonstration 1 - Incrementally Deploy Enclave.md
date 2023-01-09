@@ -1,129 +1,107 @@
-<!-- markdownlint-configure-file { "MD004": { "style": "consistent" } } -->
-<!-- markdownlint-disable MD033 -->
-<style>
-body { font-family: Segoe UI Light; }
-h1 { font-size: 20pt; }
-h2 { font-size: 18pt; }
-h3 { color: #002060; font-size: 16pt; font-weight: bold; }
-h4 { color: #002060; font-size: 14pt; font-weight: bold; margin-top: 15px; margin-bottom: 15px; }
-h5 { color: #002060; font-size: 12pt; font-weight: bold; }
-h6 { color: #002060; font-size: 12pt; font-weight: normal; }
-.title {color: #002060; font-size: 12pt; font-weight: bold; text-align: right; margin-bottom: 40px;}
-hr {border: 0; height: 1px; background: #333; background-image: -webkit-linear-gradient(left, #ccc, #333, #ccc); background-image: -moz-linear-gradient(left, #ccc, #333, #ccc); background-image: -ms-linear-gradient(left, #ccc, #333, #ccc); background-image: -o-linear-gradient(left, #ccc, #333, #ccc);}
-.note { color: #ff6347; font-size: 12pt; font-weight: bold; }
-pre {font-family: Consolas, "Andale Mono WT", "Andale Mono", "Lucida Console", "Lucida Sans Typewriter", "DejaVu Sans Mono", "Bitstream Vera Sans Mono", "Liberation Mono", "Nimbus Mono L", Monaco, "Courier New", Courier, monospace; font-weight: normal; white-space: pre-wrap; overflow-x: auto;}
-</style>
-<!-- markdownlint-enable MD033 -->
+# Demonstration 1: Incrementally Deploy a Mission Enclave with Azure Kubernetes Services
 
-# Demonstration: Incrementally Deploy a Mission Enclave with Azure Kubernetes Services using Azure NoOps Accelerator and Bicep
-<div class="title">A step-by-step deployment using the NoOps Accelerator to deploy an infrastructure with a private Kubernetes cluster.
-</div>
+This document details a step-by-step deployment of a mission enclave with Azure Kubernetes Services with bicep.
 
-### Setup & Prerequisite Software
+## Setup & Prerequisite Software
 
-1. You must have installed the latest [Git client](https://git-scm.com) for working with source control
+1. Installed the latest version of [Git client](https://git-scm.com)
 
-1. You must have the latest version of [Visual Studio Code](https://code.visualstudio.com/) for authoring bicep files
+1. Installed the latest version of [Visual Studio Code](https://code.visualstudio.com/)
 
 1. Installed the [bicep extension](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#vs-code-and-bicep-extension) in Visual Studio Code
 
-1. You must have installed either the the latest version of **AZ CLI**, see [How to install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli), or **Azure PowerShell**, see [Install the Azure Az PowerShell module](https://learn.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-9.0.1) for deploying bicep files
+1. Installed the latest version of [PowerShell](https://github.com/powershell/powershell#get-powershell)
 
-    **PowerShell Quick Installation for Azure CLI**
-    ``` PowerShell
-    $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'; rm .\AzureCLI.msi
-    ```
+1. Installed latest version of the **Azure PowerShell** module. See [Install the Azure Az PowerShell module](https://learn.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-9.0.1) for more information.
 
     **PowerShell Quick Installation for Azure PowerShell**
+
     ``` PowerShell
     Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
     ```
 
-1. You must have installed the latest version of [Azure Bicep](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-powershell)
+1. Installed the latest version of [Bicep](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#install-manually)
 
-1. Either clone, fork, or download the [NoOps Accelerator](https://github.com/Azure/NoOpsAccelerator) to your local system.  This demonstration uses **c:\anoa** as the root directory containing the downloaded, cloned, or forked project from GitHub
+1. Download the latest release of the [NoOps Accelerator](https://github.com/Azure/NoOpsAccelerator/releases) to your local system.  This demonstration uses **c:\anoa** as the root directory containing the downloaded and unzipped release from GitHub
 
-### Before we Begin
+## Before we Begin
 
-You will be making modifications to several .json files for the deployment which require knowing several sensitive pieces of information.  You will also create a group in Azure Active Directory, and you will need that group's object id.  Finally, you will be creating an application registration in Azure Active Directory and will need the client id and secret.
+You will be making modifications to several .json files for the deployment which require knowing several sensitive pieces of information.  You will also create a group in your Azure Active Directory, and you will need that group's object id.  Finally, you will be creating an application registration in Azure Active Directory and will need the client id and secret.
 
-You can record those values here or, preferred, using your terminal save the values as variables.  Additionally, you can record and save these values in Azure Key Vault if using the Azure NoOps Accelerator on a pipeline or through a automation platform.
+This demonstration has several **optional** steps that are not required for success, but demonstrate additional functionality and context when using the NoOps Accelerator.
 
-#### OPTIONAL
+## Using PowerShell
 
-If you choose to save and record your values use the table below.  This is sensitive information and care should be taken.
-
-| Name | Value(s) | How Used |
-| --- | --- | --- |
-| Tenant ID | <div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div> | When deploying management groups or policies. |
-| Subscription ID(s) | <div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div></br><div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div><br/><div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div> | When deploying workloads, overlays, enclaves, or platforms.  You can use multiple subscriptions for your tiers. |
-| Principal ID(s) | <div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div><br/><div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div><br/><div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div> | When using either built-in roles or custom deployed ANOA roles for securing resources. |
-| Object ID(s) | <div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div><br/><div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div> | When deploying resources that need to use an Active Directory Group for access control. |
-| Client ID(s) | <div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div><br/><div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div> | When deploying your Kubernetes cluster for the application registration. |
-| Location | <div style="height: 20px;background-color: #CFD8DC;width: 300px;"></div> | When deploying workloads, overlays, enclaves, or platforms (eastus, usgovvirgina, etc..). |
-
-#### OPTIONAL
-
-Saving data as variables for use while executing this demonstration or lab.  This will make executing the commands through PowerShell simpler.
+Saving data as variables for use while executing this demonstration will greatly ease your implementation.  This will make executing the commands through PowerShell simpler.
 
 ``` PowerShell
-az cloudset --name [AzureCloud | AzureGovernment]
+# Connect to your Environment.  Use Get-AzEnvironment for a complete list.
+Connect-AzAccount -Environment [AzureChinaCloud | AzureGermanCloud | AzureCloud | AzureUSGovernment]
 
-az login
-
+# Store Context as a variable to simplify use in Bicep commands
 $context = Get-AzContext
 
+# Store your location in a variable to simplify use in Bicep commands.  Use Get-AzLocation | Select-Object -Property DisplayName,Location for a complete list
 $location = [your region]
 ```
 
-### Part 1: Create Management Groups
+## Part 1: Create Management Groups
 
 ---
 
-> NOTE: For this demonstration we will be using AZ CLI with PowerShell
+> **Note:** You must meet the following requirements before you can create management groups:
+>
+> 1. A user that is Global Admin in the Azure Active Directory
+>
+> 1. Elevation of privileges of this user which grants him/her the “User Access Administrator” permission at the tenant root scope
+>
+> 1. An explicit roleAssignment (RBAC) made at the tenant root scope via CLI or PowerShell (Note: There’s no portal UX to make this roleAssignment)
+>
+> See [Azure NoOps Accelerator Prerequisites](https://github.com/Azure/NoOpsAccelerator/blob/main/docs/Pre-requisites.md) for more information.
 
-1. Open PowerShell and change to your directory containing the NoOps Accelerator, this demonstration uses **c\anoa**
+1. Open PowerShell and change to your directory containing the NoOps Accelerator, this demonstration uses **c:\anoa**
 
-1.  Issue the command **az login** and log into your tenant
+1. Issue the command `Connect-AzAccount -Environment [AzureChinaCloud | AzureGermanCloud | AzureCloud | AzureUSGovernment]` to log into your tenant
 
-1. Issue **$context = Get-AzContext** and record the following values:
+1. Issue `$context = Get-AzContext`
 
-    - Tenant ID: **$context.Tenant.Id**
+1. Issue `$location = \<your Azure region\>` where Azure region is a region from `Get-AzLocation | Select-Object -Property DisplayName,Location`
 
-    - Subscription ID: **$context.Subscription.Id**
+1. While in the **c:\anoa** directory in your PowerShell session, issue `code .` to open Visual Studio Code
 
-    > **NOTE**: If more than one value is returned, choose the subscription you are targeting to create the management group structure and choose the tenant id for that subscription.  You can also use **Set-AzContext** to set your current subscription for this session.
-
-1. Open Visual Studio Code in your directory containing the NoOps Accelerator
-
-1. Change to the **/src/bicep/overlays/management-groups/** directory
+1. Navigate to the **/src/bicep/overlays/management-groups/** directory
 
 1. Open the **/parameters/deploy.parameters.json** file and make the following changes:
 
-    - parentMGName: **$context.Tenant.Id**
+    - parManagementGroups.value.parentMGName: **$context.Tenant.Id**
 
-    - subscriptionId: **$context.Subscription.Id**
+    - parSubscriptions.value.subscriptionId: **$context.Subscription.Id**
 
-    - parTenantId: **$context.Tenant.Id**
+    - parTenantId.value: **$context.Tenant.Id**
 
-1. In your PowerShell session issue **Set-Location -Path 'c:\anoa\src\bicep\overlays\management-groups'**
+1. In your PowerShell session issue `Set-Location -Path 'c:\anoa\src\bicep\overlays\management-groups'`
 
 1. Issue the command updating the location parameter to the region you wish to deploy to:
 
-    **Azure CLI**
+    **PowerShell with Azure PowerShell Module**
+
     ``` PowerShell
-    az deployment mg create --name 'deploy-enclave-mg' --template-file 'deploy.bicep' --parameters '@parameters/deploy.parameters.json' --management-group-id $context.Tenant.Id --location $location --only-show-errors
+    New-AzManagementGroupDeployment -Name 'deploy-enclave-mg' -TemplateFile '.\deploy.bicep' -TemplateParameterFile '.\parameters\deploy.parameters.json' -ManagementGroupId $context.Tenant.Id -Location $location -Verbose
     ```
 
-    > **NOTE**: This operation will move your subscription to the **management** management group in the structure
+    > **Warning:** If you receive the following error:
+    >
+    > New-AzManagementGroupDeployment: Error: Code=MultipleErrorsOccurred; Message=Multiple error occurred: Conflict. Please see details. New-AzManagementGroupDeployment: The deployment validation failed.
+    >
+    > Add the **-WhatIf** parameter to your command to inspect the details.  Usually, this error indicates that you already have a management group structure in your tenant.
 
-    > **WARNING**: If you plan to delete the structure remember to **MOVE** your subscription from the **management** management group to your tenant root
+    > **Note:** This operation will move your subscription to the **management** management group in the structure.  If you plan to delete the structure remember to **MOVE** your subscription from the **management** management group to your tenant root
 
-### Part 2:  Create Roles
+## Part 2:  Create Roles
 
 ---
 
-1. In your PowerShell session Issue **Set-Location -Path 'c:\anoa\src\bicep\overlays\roles'**
+1. In your PowerShell session Issue `Set-Location -Path 'c:\anoa\src\bicep\overlays\roles'`
 
 1. Open the **/parameters/deploy.parameters.all.json** file and make the following changes:
 
@@ -131,12 +109,13 @@ $location = [your region]
 
 1.  Issue the command updating the **--management-group-id** paramter to your intermediate management group name or **ANOA** as the default
 
-    **Azure CLI**
+    **PowerShell with Azure PowerShell Module**
+    
     ``` PowerShell
     az deployment mg create --name 'deploy-enclave-roles' --template-file 'deploy.bicep' --parameters '@parameters/deploy.parameters.all.json' --management-group-id 'ANOA' --location $location --only-show-errors
     ```
 
-### Part 3: Delpoy NIST 800.53 R5 Policy
+## Part 3: Delpoy NIST 800.53 R5 Policy
 
 ---
 
