@@ -103,17 +103,21 @@ $location = [your region]
 
 1. In your PowerShell session Issue `Set-Location -Path 'c:\anoa\src\bicep\overlays\roles'`
 
-1. Open the **/parameters/deploy.parameters.all.json** file and make the following changes:
+1. Open the **parameters/deploy.parameters.all.json** file and make the following changes:
 
     - parAssignableScopeManagementGroupId: **ANOA** (if you are not using the default, change to the name of your intermediate management group)
 
-1.  Issue the command updating the **--management-group-id** paramter to your intermediate management group name or **ANOA** as the default
+1. Issue the command below and be sure to update the **--management-group-id** parameter of the command to your intermediate management group name or **ANOA** if you are using the default
 
     **PowerShell with Azure PowerShell Module**
-    
+
     ``` PowerShell
-    az deployment mg create --name 'deploy-enclave-roles' --template-file 'deploy.bicep' --parameters '@parameters/deploy.parameters.all.json' --management-group-id 'ANOA' --location $location --only-show-errors
+   New-AzManagementGroupDeployment -Name 'deploy-scus-enclave-roles' -TemplateFile '.\deploy.bicep' -TemplateParameterFile '.\parameters\deploy.parameters.all.json' -ManagementGroupId 'ANOA' -Location $location -Verbose
     ```
+
+    > **Note:** You can verify your role creation using the following PowerShell command: `Get-AzRoleDefinition | Where-Object -FilterScript {$_.Name -like 'Custom -*'} | Format-Table Name,Description`
+
+    > **Hint:** Use `Get-AzRoleDefinition | Where-Object -FilterScript {$_.Name -like 'Custom -*'} | Format-Table Name,Id` to get your roles with the Object ID for use with other .json files in your deployments
 
 ## Part 3: Delpoy NIST 800.53 R5 Policy
 
@@ -138,7 +142,7 @@ $location = [your region]
 
 1. In your PowerShell session Issue **Set-Location -Path 'c:\anoa\src\bicep\platforms\lz-platform-scca-hub-3spoke'**
 
-1. Open the **/parameters/deploy.parameters.json** file and make the following changes:
+1. Open the **parameters/deploy.parameters.json** file and make the following changes:
 
     - parRequired.orgPrefix: **ANOA** (if you are not using the default, change to the name of your intermediate management group)
 
