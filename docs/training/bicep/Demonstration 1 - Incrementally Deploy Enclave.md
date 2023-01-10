@@ -123,40 +123,53 @@ $location = [your region]
 
 ---
 
-1. In your PowerShell session Issue **Set-Location -Path 'c:\anoa\src\bicep\overlays\policy\builtin\assignments'**
+1. In your PowerShell session Issue `Set-Location -Path 'c:\anoa\src\bicep\overlays\policy\builtin\assignments'`
 
-1. Open the **deploy-nist80054r5.parameters.json** file and make the following changes:
+1. Open the **policy-nist80053r5.parameters.json** file and make the following changes:
 
     - parPolicyAssignmentManagementGroupId: **ANOA** (if you are not using the default, change to the name of your intermediate management group)
 
-1.  Issue the command updating the **--management-group-id** parameter to your intermediate management group name, or use the default value of  **ANOA**,  and your **--location**
+1. Issue the command below and be sure to update the **--management-group-id** parameter of the command to your intermediate management group name or **ANOA** if you are using the default
 
-    **Azure CLI**
+    **PowerShell with Azure PowerShell Module**
+
     ``` PowerShell
-    az deployment mg create --name 'deploy-policy-nistr5' --template-file 'policy-nist80053r5.bicep' --parameters 'policy-nist80053r5.parameters.json' --management-group-id 'ANOA' --location $location --only-show-errors
+    New-AzManagementGroupDeployment -Name 'deploy-scus-policy-nistr5' -TemplateFile '.\policy-nist80053r5.bicep' -TemplateParameterFile '.\policy-nist80053r5.parameters.json' -ManagementGroupId 'ANOA' -Location $location -Verbose
     ```
 
-### Part 4: Deploy 3-Spoke Platform
+## Part 4: Deploy 3-Spoke Platform
 
 ---
 
-1. In your PowerShell session Issue **Set-Location -Path 'c:\anoa\src\bicep\platforms\lz-platform-scca-hub-3spoke'**
+1. In your PowerShell session Issue `Set-Location -Path 'c:\anoa\src\bicep\platforms\lz-platform-scca-hub-3spoke'`
 
 1. Open the **parameters/deploy.parameters.json** file and make the following changes:
 
-    - parRequired.orgPrefix: **ANOA** (if you are not using the default, change to the name of your intermediate management group)
+    - parRequired.value.orgPrefix: **ANOA** (if you are not using the default, change to the name of your intermediate management group)
 
-	- parTags.organization: **ANOA** (if you are not using the default, change to the name of your intermediate management group)
+    - parTags.value.organization: **ANOA** (if you are not using the default, change to the name of your intermediate management group)
 
-    - parHub.subscriptionId: **$context.Subscription.Id**
+    - parTags.value.region: **$location**
 
-    - parIdentitySpoke.subscriptionId: **$context.Subscription.Id**
+    - parHub.value.subscriptionId: **$context.Subscription.Id**
 
-    - parOperationsSpoke.subscriptionId: **$context.Subscription.Id**
+    - parIdentitySpoke.value.subscriptionId: **$context.Subscription.Id**
 
-    - parSharedServicesSpoke.subscriptionId: **$context.Subscription.Id**
+    - parOperationsSpoke.value.subscriptionId: **$context.Subscription.Id**
 
-1.  Issue the command updating the **--location** parameter to your location
+    - parSharedServicesSpoke.value.subscriptionId: **$context.Subscription.Id**
+
+    - parNetworkArtifacts.value.enable: **true**
+
+        > **Note:** Enabling parNetworkArtifacts will create an Azure Key Vault which is used to store the Azure Bastion host credentials.  It is optional, but does secure and simplify access Azure Bastion later.
+
+    - parNetworkArtifacts.value.artifactsKeyVault.keyVaultPolicies.objectId: **x**
+
+        > **Note:** This is an object Id representing an individual or group from your Azure Active Directory who have the permissions assigned for secrets
+
+    - parNetworkArtifacts.value.artifactsKeyVault.keyVaultPolicies.tenantId: **$context.Tenant.Id**
+
+1. Issue the command updating the **--location** parameter to your location
 
     **Azure CLI**
     ``` PowerShell
