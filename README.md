@@ -6,7 +6,7 @@
 
 Delivered as a collection of infrastructure as code (IaC) module templates written and maintained in [Bicep](https://github.com/Azure/NoOpsAccelerator/tree/main/src/bicep) and [Tereform](https://github.com/Azure/NoOpsAccelerator/tree/main/src/terraform), the NoOps Accelerator is intended to empower organizations on their journey towards a continuous deployment and governance model for their cloud infrastructure.
 
-Learn more about the NoOps movement and philosophy here - *[What is NoOps?](https://github.com/Azure/NoOpsAccelerator/tree/main/docs/wiki/What-is-NoOps.md)*.
+Learn more about the NoOps movement and philosophy here - *[What is NoOps?](https://github.com/Azure/NoOpsAccelerator/tree/main/docs/What-is-NoOps.md)*.
 
 ## Goals and Non-Goals of the Azure NoOps Accelerator Project
 
