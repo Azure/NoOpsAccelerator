@@ -1,3 +1,8 @@
+# This project has been archived. All ongoing work is under this org: [Microsoft Federal- Azure NoOps](https://github.com/azurenoops).
+# All Terraform modules that are developed using Azure NoOps are located here: [registry.terraform.io/namespaces/azurenoops](https://registry.terraform.io/namespaces/azurenoops)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
 # Azure NoOps Accelerator
 
 > **"NoOps automates platform administration and broaden communication between developers, cyber, and operations to achieve mission success**."
